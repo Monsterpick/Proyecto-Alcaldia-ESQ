@@ -27,15 +27,40 @@
             'permission' => 'view-tenant-payment',
         ],
         [
-            'header' => 'Administrar Usuarios',
-            'permission' => 'view-user',
+            'header' => 'Administración',
+            'permission' => 'view-patient',
         ],
         [
-            'name' => 'Users',
+            'name' => 'Usuarios',
             'icon' => 'fa-solid fa-users',
             'url' => route('admin.users.index'),
             'active' => request()->routeIs('admin.users.*'),
             'permission' => 'view-user',
+        ],
+        [
+            'name' => 'Pacientes',
+            'icon' => 'fa-solid fa-user-injured',
+            'url' => route('admin.patients.index'),
+            'active' => request()->routeIs('admin.patients.*'),
+            'permission' => 'view-patient',
+        ],
+        [
+            'name' => 'Doctores',
+            'icon' => 'fa-solid fa-user-doctor',
+            'url' => route('admin.doctors.index'),
+            'active' => request()->routeIs('admin.doctors.*'),
+            'permission' => 'view-doctor',
+        ],
+        [
+            'name' => 'Citas',
+            'icon' => 'fa-solid fa-calendar-check',
+            'url' => route('admin.appointments.index'),
+            'active' => request()->routeIs('admin.appointments.*'),
+            'permission' => 'view-appointment',
+        ],
+        [
+            'header' => 'Configuración de Sistema',
+            'permission' => 'view-setting',
         ],
         [
             'name' => 'Roles',
@@ -52,17 +77,6 @@
             'permission' => 'view-permission',
         ],
         [
-            'header' => 'Configuración de Sistema',
-            'permission' => 'view-setting',
-        ],
-        [
-            'name' => 'Actividades',
-            'icon' => 'fa-solid fa-list-check',
-            'url' => route('admin.actividads.index'),
-            'active' => request()->routeIs('admin.actividads.*'),
-            'permission' => 'view-actividad',
-        ],
-        [
             'name' => 'Estatus',
             'icon' => 'fa-solid fa-toggle-on',
             'url' => route('admin.estatuses.index'),
@@ -70,13 +84,12 @@
             'permission' => 'view-estatus',
         ],
         [
-            'name' => 'Planes',
-            'icon' => 'fa-solid fa-ranking-star',
-            'url' => route('admin.plans.index'),
-            'active' => request()->routeIs('admin.plans.*'),
-            'permission' => 'view-plan',
+            'name' => 'Estatus de Cita',
+            'icon' => 'fa-solid fa-calendar-days',
+            'url' => route('admin.appointment-statuses.index'),
+            'active' => request()->routeIs('admin.appointment-statuses.*'),
+            'permission' => 'view-appointment-status',
         ],
-        
         [
             'name' => 'Tipos de pago',
             'icon' => 'fa-solid fa-coins',
@@ -98,7 +111,7 @@
             'active' => request()->routeIs('admin.settings.*'),
             'permission' => 'view-setting',
         ],
-        /* [
+        [
             'name' => 'Direcciones',
             'icon' => 'fa-solid fa-location-dot',
             'href' => '#',
@@ -107,47 +120,26 @@
                 [
                     'name' => 'Estados',
                     'icon' => 'fa-solid fa-map-location-dot',
-                    'url' => route('estados.index'),
+                    'url' => route('admin.estados.index'),
                     'active' => request()->routeIs('estados.*'),
                     'permission' => 'view-estado',
                 ],
                 [
                     'name' => 'Municipios',
                     'icon' => 'fa-solid fa-location-dot',
-                    'url' => route('municipios.index'),
+                    'url' => route('admin.municipios.index'),
                     'active' => request()->routeIs('municipios.*'),
                     'permission' => 'view-municipio',
                 ],
                 [
                     'name' => 'Parroquias',
                     'icon' => 'fa-solid fa-map-pin',
-                    'url' => route('parroquias.index'),
+                    'url' => route('admin.parroquias.index'),
                     'active' => request()->routeIs('parroquias.*'),
                     'permission' => 'view-parroquia',
                 ],
             ],
-        ], */
-        [
-            'name' => 'Estados',
-            'icon' => 'fa-solid fa-map-location-dot',
-            'url' => route('admin.estados.index'),
-            'active' => request()->routeIs('admin.estados.*'),
-            'permission' => 'view-estado',
-        ],
-        [
-            'name' => 'Municipios',
-            'icon' => 'fa-solid fa-location-dot',
-            'url' => route('admin.municipios.index'),
-            'active' => request()->routeIs('admin.municipios.*'),
-            'permission' => 'view-municipio',
-        ],
-        [
-            'name' => 'Parroquias',
-            'icon' => 'fa-solid fa-map-pin',
-            'url' => route('admin.parroquias.index'),
-            'active' => request()->routeIs('admin.parroquias.*'),
-            'permission' => 'view-parroquia',
-        ],
+        ], 
     ];
 
 @endphp

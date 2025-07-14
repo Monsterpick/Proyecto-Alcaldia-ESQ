@@ -4,32 +4,42 @@ use Livewire\Volt\Component;
 use App\Models\Doctor;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
+use App\Models\BloodType;
+use App\Models\Speciality;
 
 new class extends Component {
-
     public function rendering(View $view)
     {
-        $view->title('Doctor');
+        $view->title('Horarios');
     }
 
     public $user;
-    public $speciality;
+    public $doctor;
+    public $speciality_id;
+    public $specialities;
     public $medical_license_number;
     public $medical_college_number;
     public $title;
     public $biography;
+    public $image;
+    public $is_active;
 
     public function mount(Doctor $doctor)
     {
+        $this->specialities = Speciality::all();
+
         $this->doctor = $doctor;
         $this->user = $doctor->user;
-        $this->speciality = $doctor->speciality;
+        $this->speciality_id = $doctor->speciality_id;
         $this->medical_license_number = $doctor->medical_license_number;
         $this->medical_college_number = $doctor->medical_college_number;
         $this->title = $doctor->title;
         $this->biography = $doctor->biography;
+        $this->image = $doctor->user->image_url;
+        $this->is_active = $doctor->is_active ? '1' : '0';
     }
 
+   
 
     public function cancel()
     {
@@ -55,26 +65,8 @@ new class extends Component {
         ]" />
     </x-slot>
 
-    <x-container class="py-6 sm:py-2 lg:py-6 md:py-4">
-        <div class="card">
-            <div class="card-body">
-                <h1 class="text-2xl font-bold">
-                    Información del Doctor
-                </h1>
-                <p class="text-sm text-gray-600 dark:text-gray-400 py-4">
-                    Muestra la información del doctor.
-                </p>
-
-                <div class="border-t border-gray-200 dark:border-gray-600"></div>
-
-                @include('livewire.pages.admin.doctors.partials.form', ['showForm' => true, 'editForm' => false])
-
-                <div class="border-t border-gray-200 dark:border-gray-600"></div>
-                <div class="flex justify-end space-x-2">
-                    
-                    <x-button slate label="Atras" icon="x-mark" interaction="secondary" wire:click="cancel" />
-                </div>
-            </div>
-        </div>
+    <x-container class="lg:py-0 lg:px-6">
+        <livewire:pages.admin.doctors.schedulemanager :doctor="$doctor" />
     </x-container>
+
 </div>

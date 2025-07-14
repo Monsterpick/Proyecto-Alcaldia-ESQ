@@ -361,6 +361,53 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('/doctors/{doctor}', 'pages.admin.doctors.destroy')
         ->middleware('permission:delete-doctor')
         ->name('doctors.destroy');
+
+    Volt::route('/doctors/{doctor}/schedules', 'pages.admin.doctors.schedules')
+        ->middleware('permission:view-doctor')
+        ->name('doctors.schedules');
+
+    Volt::route('/appointments', 'pages.admin.appointments.index')
+        ->middleware('permission:view-appointment')
+        ->name('appointments.index');
+
+    Volt::route('/appointments/create', 'pages.admin.appointments.create')
+        ->middleware('permission:create-appointment')
+        ->name('appointments.create');
+
+    Volt::route('/appointments/{appointment}/edit', 'pages.admin.appointments.edit')
+        ->middleware('permission:edit-appointment')
+        ->name('appointments.edit');
+
+    Volt::route('/appointments/{appointment}/show', 'pages.admin.appointments.show')
+        ->middleware('permission:view-appointment')
+        ->name('appointments.show');
+
+    Volt::route('/appointments/{appointment}', 'pages.admin.appointments.destroy')
+        ->middleware('permission:delete-appointment')
+        ->name('appointments.destroy');
+
+    // Rutas para la gestión de estatuses de cita
+    Volt::route('/appointment-statuses', 'pages.admin.appointment-statuses.index')
+        ->middleware('permission:view-appointment-status')
+        ->name('appointment-statuses.index');
+
+    Volt::route('/appointment-statuses/create', 'pages.admin.appointment-statuses.create')
+        ->middleware('permission:create-appointment-status')
+        ->name('appointment-statuses.create');
+
+    Volt::route('/appointment-statuses/{appointmentStatus}/edit', 'pages.admin.appointment-statuses.edit')
+        ->middleware('permission:edit-appointment-status')
+        ->name('appointment-statuses.edit');
+
+    Volt::route('/appointment-statuses/{appointmentStatus}/show', 'pages.admin.appointment-statuses.show')
+        ->middleware('permission:view-appointment-status')
+        ->name('appointment-statuses.show');
+
+    Volt::route('/appointment-statuses/{appointmentStatus}', 'pages.admin.appointment-statuses.destroy')
+        ->middleware('permission:delete-appointment-status')
+        ->name('appointment-statuses.destroy');
+
+
 });
 
 Route::middleware('guest')->group(function () {

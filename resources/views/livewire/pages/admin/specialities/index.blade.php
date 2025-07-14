@@ -5,8 +5,7 @@ use App\Models\Speciality;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.tenancy')]
-class extends Component {
+new class extends Component {
     
     public function rendering(View $view)
     {

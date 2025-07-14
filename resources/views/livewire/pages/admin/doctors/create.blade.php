@@ -5,8 +5,7 @@ use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\WithFileUploads;
 
-new #[Layout('layouts.tenancy')]
-class extends Component {
+new class extends Component {
 
     use WithFileUploads;
     

@@ -29,7 +29,7 @@
 </p>
 <div class="border-t border-gray-200 dark:border-gray-600"></div>
 
-<figure class="mb-4 relative text-black">
+<figure class="mb-4  mt-4 relative text-black">
     <div class="absolute top-8 right-8">
         <label class="text-black flex items-center px-4 py-2 rounded-lg bg-white cursor-pointer shadow-lg">
             <i class="fas fa-camera mr-2"></i> Actualizar Imagen
@@ -40,10 +40,13 @@
         ? $image->temporaryUrl() 
         : ($user && $user->image_url 
             ? Storage::url($user->image_url) 
-            : asset('images/no_user_image.png')) }}" 
+            : asset('images/user_no_image.png')) }}" 
         alt="Imagen de usuario"
         class="h-64 w-64 object-cover object-center rounded-lg">
 </figure>
+<x-validation-errors />
+
+
 @if ($showPassword ?? true)
     @if ($showForm ?? true)
         <h1 class="text-2xl font-bold mt-4">

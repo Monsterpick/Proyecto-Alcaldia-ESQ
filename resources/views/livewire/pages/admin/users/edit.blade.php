@@ -51,7 +51,7 @@ new class extends Component {
             'email' => ['required', 'email', Rule::unique('users')->ignore($this->user->id)],
             'password' => $this->password ? 'min:8|confirmed' : '',
             'selectedRoles' => 'required|array|min:1',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:20480',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:20480',
         ]);
         
 
@@ -60,7 +60,9 @@ new class extends Component {
             $this->user['image_url'] = $this->image->store('images/users', 'public');
         }
 
-        $this->image_url = $this->image->store('images/users', 'public');
+        if($this->image){
+            $this->image_url = $this->image->store('images/users', 'public');
+        }
 
         $this->user->update([
             'name' => $this->name,

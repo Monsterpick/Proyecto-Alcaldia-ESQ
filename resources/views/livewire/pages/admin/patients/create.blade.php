@@ -5,11 +5,9 @@ use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\WithFileUploads;
 
-new #[Layout('layouts.tenancy')]
-class extends Component {
-
+new class extends Component {
     use WithFileUploads;
-    
+
     public function rendering(View $view)
     {
         $view->title('Crear Paciente');
@@ -26,12 +24,10 @@ class extends Component {
     public $emergency_contact_phone;
     public $emergency_contact_relationship;
 
-    public function mount()
-    {
-        
-    }
+    public function mount() {}
 
-    public function save() {
+    public function save()
+    {
         $validated = $this->validate([
             'bloodType' => 'required',
             'user' => 'required',
@@ -89,7 +85,7 @@ class extends Component {
             ],
         ]" />
     </x-slot>
-    
+
 
     <x-container class="lg:py-0 lg:px-6">
         <x-card>
@@ -102,9 +98,12 @@ class extends Component {
                 </p>
                 <div class="border-t border-gray-200 dark:border-gray-600"></div>
 
-                    @include('livewire.pages.admin.patients.partials.form', ['showForm' => true, 'editForm' => false])
+                @include('livewire.pages.admin.patients.partials.form', [
+                    'showForm' => true,
+                    'editForm' => false,
+                ])
 
-                                <x-slot name="footer">
+                <x-slot name="footer">
                     <div class="flex justify-end space-x-2">
                         <x-button info wire:click="save" spinner="save" label="Guardar" icon="check"
                             interaction="positive" />

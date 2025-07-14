@@ -5,9 +5,7 @@ use App\Models\Patient;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.tenancy')]
-class extends Component {
-
+new class extends Component {
     public function rendering(View $view)
     {
         $view->title('Paciente');
@@ -37,7 +35,6 @@ class extends Component {
         $this->emergency_contact_phone = $patient->emergency_contact_phone;
         $this->emergency_contact_relationship = $patient->emergency_contact_relationship;
     }
-
 
     public function cancel()
     {
@@ -74,13 +71,16 @@ class extends Component {
                 </p>
                 <div class="border-t border-gray-200 dark:border-gray-600"></div>
 
-                @include('livewire.pages.admin.patients.partials.form', ['showForm' => true, 'editForm' => false])
+                @include('livewire.pages.admin.patients.partials.form', [
+                    'showForm' => true,
+                    'editForm' => false,
+                ])
 
-                <div class="border-t border-gray-200 dark:border-gray-600"></div>
-                <div class="flex justify-end space-x-2">
-                    
-                    <x-button slate label="Atras" icon="x-mark" interaction="secondary" wire:click="cancel" />
-                </div>
+                <x-slot name="footer">
+                    <div class="flex justify-end space-x-2">
+                        <x-button slate label="Atras" icon="x-mark" interaction="secondary" wire:click="cancel" />
+                    </div>
+                </x-slot>
             </div>
         </div>
     </x-container>

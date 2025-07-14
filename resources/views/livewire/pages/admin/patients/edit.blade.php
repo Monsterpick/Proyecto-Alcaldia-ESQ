@@ -6,7 +6,7 @@ use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use App\Models\BloodType;
 
-new #[Layout('layouts.tenancy')] class extends Component {
+new class extends Component {
     public function rendering(View $view)
     {
         $view->title('Editar Paciente');
@@ -110,7 +110,7 @@ new #[Layout('layouts.tenancy')] class extends Component {
             <x-card class="mb-8">
                 <div class="lg:flex lg:justify-between lg:items-center">
                     <div class="flex items-center space-x-5">
-                        <img src="{{ $this->user->image_url ? route('file', $this->user->image_url) : asset('images/no_user_image.png') }}"
+                        <img src="{{ $this->user->image_url ? Storage::url($this->user->image_url) : asset('images/no_user_image.png') }}"
                             alt="{{ $this->user->name }}" class="h-20 w-20 object-cover object-center rounded-full">
 
                         <div class="">
@@ -124,7 +124,7 @@ new #[Layout('layouts.tenancy')] class extends Component {
                         </div>
                     </div>
                     <div class="flex items-center space-x-3 mt-6 lg:mt-0">
-                        <x-button wire:click="update" spinner="save" label="Guardar cambios" icon="check"
+                        <x-button wire:click="update" info spinner="save" label="Guardar cambios" icon="check"
                             interaction="positive" />
                         <x-button slate outline label="Volver" icon="x-mark" interaction="secondary"
                             wire:click="cancel" />

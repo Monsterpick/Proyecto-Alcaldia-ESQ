@@ -44,10 +44,12 @@ new class extends Component {
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8|confirmed',
             'selectedRoles' => 'required|array|min:1',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:20480',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:20480',
         ]);
 
-        $this->image_url = $this->image->store('images/users', 'public');
+        if ($this->image) {
+            $this->image_url = $this->image->store('images/users', 'public');
+        }
 
         $user = User::create([
             'name' => $this->name,
@@ -58,12 +60,8 @@ new class extends Component {
             'image_url' => $this->image_url ?? 'images/no_user_image.png',
             'password' => Hash::make($this->password),
         ]);
-        
-        
-        $user->assignRole($this->selectedRoles);
-        
-        
 
+        $user->assignRole($this->selectedRoles);
 
         session()->flash('swal', [
             'icon' => 'success',
@@ -71,12 +69,23 @@ new class extends Component {
             'text' => 'El usuario se ha creado correctamente',
         ]);
 
-        $this->redirect(route('admin.users.index'), navigate: true);
+        if ($user->hasRole('Paciente')) {
+            $patient = $user->patient()->create([]);
+
+            return $this->redirect(route('admin.patients.edit', ['patient' => $patient]), navigate: true);
+        }
+
+        if ($user->hasRole('Doctor')) {
+            $doctor = $user->doctor()->create([]);
+            return $this->redirect(route('admin.doctors.edit', ['doctor' => $doctor]), navigate: true);
+        }
+
+        return $this->redirect(route('admin.users.index'), navigate: true);
     }
 
     public function cancel()
     {
-        $this->redirect(route('admin.users.index'), navigate: true);
+        return $this->redirect(route('admin.users.index'), navigate: true);
     }
 }; ?>
 

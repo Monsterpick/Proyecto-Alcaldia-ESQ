@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             PaymentTypeSeeder::class,
             PaymentOriginSeeder::class,
             TenantSeeder::class,
+            AppointmentStatusSeeder::class,
         ]);
     }
 }

@@ -7,7 +7,7 @@ use Livewire\Attributes\Layout;
 use App\Models\BloodType;
 use App\Models\Speciality;
 
-new #[Layout('layouts.tenancy')] class extends Component {
+new class extends Component {
     public function rendering(View $view)
     {
         $view->title('Editar Doctor');
@@ -95,11 +95,11 @@ new #[Layout('layouts.tenancy')] class extends Component {
     </x-slot>
 
     <x-container class="lg:py-0 lg:px-6">
-        <x-card>
-            <form wire:submit="update">
+        <form wire:submit="update">
+                <x-card>
                 <div class="lg:flex lg:justify-between lg:items-center">
                     <div class="flex items-center space-x-5">
-                        <img src="{{ $this->user->image_url ? route('file', $this->user->image_url) : asset('images/no_user_image.png') }}"
+                        <img src="{{ $this->user->image_url ? Storage::url($this->user->image_url) : asset('images/no_user_image.png') }}"
                             alt="{{ $this->user->name }}" class="h-20 w-20 object-cover object-center rounded-full">
 
                         <div class="">
@@ -119,15 +119,14 @@ new #[Layout('layouts.tenancy')] class extends Component {
                         </div>
                     </div>
                     <div class="flex items-center space-x-3 mt-6 lg:mt-0">
-                        <x-button wire:click="update" spinner="save" label="Guardar cambios" icon="check"
+                        <x-button wire:click="update" info spinner="save" label="Guardar cambios" icon="check"
                             interaction="positive" />
                         <x-button slate outline label="Volver" icon="x-mark" interaction="secondary"
                             wire:click="cancel" />
+                        <x-button positive label="Gestionar horarios" icon="clock" interaction="secondary"
+                            :href="route('admin.doctors.schedules', ['doctor' => $this->doctor->id])" />
                     </div>
-                </x-slot>
-            </form>
         </x-card>
-    </x-container>
 
             <x-card class="mb-8">
                 <div class="space-y-4">

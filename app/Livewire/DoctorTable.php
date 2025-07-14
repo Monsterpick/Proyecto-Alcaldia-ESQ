@@ -149,10 +149,10 @@ final class DoctorTable extends PowerGridComponent
 
         if(Auth::check() && Auth::user()->can('view-doctor')){
             $actions[] = Button::add('show')
-                ->slot('<i class="fas fa-eye btn-group-icon"></i> ')
+                ->slot('<i class="fas fa-calendar-days btn-group-icon"></i>')
                 ->id()
                 ->class('btn-group-item btn-group-item-first')
-                ->route('admin.doctors.show', ['doctor' => $row->id])
+                ->route('admin.doctors.schedules', ['doctor' => $row->id])
                 ->attributes(['wire:navigate' => true]);
         }
 

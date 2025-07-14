@@ -1,52 +1,52 @@
 <?php
 
 use Livewire\Volt\Component;
-use App\Models\Speciality;
+use App\Models\AppointmentStatus;
 use Illuminate\View\View;
-use Livewire\Attributes\Layout;
 
 new class extends Component {
+    
     public function rendering(View $view)
     {
-        $view->title('Editar Especialidad');
+        $view->title('Crear Estatus de Cita');
     }
 
-    public $name;
-    public $speciality;
+    public $appointment_status_name;
+    public $appointment_status_description;
 
-    public function mount(Speciality $speciality)
+    public function mount()
     {
-        $this->speciality = $speciality;
-        $this->name = $speciality->name;
+        $this->appointment_status_name = '';
+        $this->appointment_status_description = '';
     }
 
-    public function save()
-    {
+    public function save() {
         $validated = $this->validate([
-            'name' => 'required',
+            'appointment_status_name' => 'required',
+            'appointment_status_description' => 'required',
         ]);
 
-        $this->speciality->update([
-            'name' => $this->name,
+        $appointment_status = AppointmentStatus::create([
+            'name' => $this->appointment_status_name,
+            'description' => $this->appointment_status_description,
         ]);
 
         session()->flash('swal', [
             'icon' => 'success',
-            'title' => 'Especialidad actualizada',
-            'text' => 'La especialidad se ha actualizado correctamente',
+            'title' => 'Estatus de Cita creado',
+            'text' => 'El estatus de cita se ha creado correctamente',
         ]);
 
-        $this->redirect(route('admin.specialities.index'), navigate: true);
+        $this->redirect(route('admin.appointment-statuses.index'), navigate: true);
     }
 
     public function cancel()
     {
-        $this->redirect(route('admin.specialities.index'), navigate: true);
+        $this->redirect(route('admin.appointment-statuses.index'), navigate: true);
     }
 }; ?>
 
 <div>
-
     <x-slot name="breadcrumbs">
         <livewire:components.breadcrumb :breadcrumbs="[
             [
@@ -54,32 +54,29 @@ new class extends Component {
                 'route' => route('admin.dashboard'),
             ],
             [
-                'name' => 'Especialidades',
-                'route' => route('admin.specialities.index'),
+                'name' => 'Estatus de Cita',
+                'route' => route('admin.appointment-statuses.index'),
             ],
             [
-                'name' => $this->speciality->name,
+                'name' => 'Crear Estatus de Cita',
             ],
         ]" />
     </x-slot>
 
     <x-container class="lg:py-0 lg:px-6">
         <x-card>
-            <form wire:submit="save">
+            <form wire:submit.prevent="save">
                 <h1 class="text-2xl font-bold">
-                    Información de la Especialidad
+                    Información del Estatus de Cita
                 </h1>
                 <p class="text-sm text-gray-600 dark:text-gray-400 py-4">
-                    Actualice la información de la especialidad.
+                    Registre la información del estatus de cita.
                 </p>
                 <div class="border-t border-gray-200 dark:border-gray-600"></div>
 
-                @include('livewire.pages.admin.specialities.partials.form', [
-                    'showForm' => true,
-                    'editForm' => true,
-                ])
+                @include('livewire.pages.admin.appointment-statuses.partials.form', ['showForm' => true, 'editForm' => false])
 
-                <x-slot name="footer">
+                                <x-slot name="footer">
                     <div class="flex justify-end space-x-2">
                         <x-button info wire:click="save" spinner="save" label="Guardar" icon="check"
                             interaction="positive" />

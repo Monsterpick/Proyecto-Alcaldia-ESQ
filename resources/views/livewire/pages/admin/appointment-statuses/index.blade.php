@@ -1,46 +1,45 @@
 <?php
 
 use Livewire\Volt\Component;
-use App\Models\Doctor;
+use App\Models\AppointmentStatus;
 use Illuminate\View\View;
-use Livewire\Attributes\Layout;
 
 new class extends Component {
     
     public function rendering(View $view)
     {
-        $view->title('Doctores');
+        $view->title('Estatus de Cita');
     }
 
-    public function deleteDoctor(Doctor $doctor)
+    public function deleteAppointmentStatus(AppointmentStatus $appointment_status)
     {
-        // Validar si es el rol principal (ID 1)
-        if ($doctor->id === 1) {
+        // Validar si es el estado principal (ID 1)
+        if ($appointment_status->id === 1) {
             $this->dispatch('showAlert', [
                 'icon' => 'error',
                 'title' => 'Acción no permitida',
-                'text' => 'No puedes eliminar el origen de pago principal del sistema',
+                'text' => 'No puedes eliminar el rol principal del sistema',
             ]);
             return;
         }
 
         // Si pasa todas las validaciones, proceder con la eliminación
         try {
-            $doctor->delete();
+            $appointment_status->delete();
 
             $this->dispatch('showAlert', [
                 'icon' => 'success',
-                'title' => 'Doctor eliminado',
-                'text' => 'El doctor se ha eliminado correctamente',
+                'title' => 'Estatus de Cita eliminado',
+                'text' => 'El estatus de cita se ha eliminado correctamente',
             ]);
 
             // Recargar la tabla
-            $this->dispatch('pg:eventRefresh-doctor-table');
+            $this->dispatch('pg:eventRefresh-appointment-status-table');
         } catch (\Exception $e) {
             $this->dispatch('showAlert', [
                 'icon' => 'error',
                 'title' => 'Error',
-                'text' => 'Ocurrió un error al intentar eliminar el doctor',
+                'text' => 'Ocurrió un error al intentar eliminar el estatus de cita',
             ]);
         }
     }
@@ -55,29 +54,28 @@ new class extends Component {
                 'route' => route('admin.dashboard'),
             ],
             [
-                'name' => 'Doctores',
+                'name' => 'Estatus de Cita',
             ],
         ]" />
     </x-slot>
 
-    @can('create-patient')
+    @can('create-appointment-status')
         <x-slot name="action">
-            <x-button info href="{{ route('admin.doctors.create') }}" wire:navigate>
+            <x-button info href="{{ route('admin.appointment-statuses.create') }}" wire:navigate>
                 <i class="fa-solid fa-plus"></i>
                 Nuevo
             </x-button>
         </x-slot>
     @endcan
-    
     <x-container class="w-full px-4">
 
-        <livewire:doctor-table />
+        <livewire:appointment-status-table />
 
     </x-container>
 
     @push('scripts')
         <script>
-            function confirmDelete(patient_id) {
+            function confirmDelete(appointment_status_id) {
                 Swal.fire({
                     title: '¿Estás seguro?',
                     text: 'No podrás revertir esto!',
@@ -89,7 +87,7 @@ new class extends Component {
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        @this.call('deleteDoctor', doctor_id);
+                        @this.call('deleteAppointmentStatus', appointment_status_id);
                     }
                 });
             }

@@ -57,7 +57,7 @@ new class extends Component {
             'document' => $this->document,
             'phone' => $this->phone,
             'email' => $this->email,
-            'image_url' => $this->image_url ?? 'images/no_user_image.png',
+            'image_url' => $this->image_url ?? 'images/user_no_image.png',
             'password' => Hash::make($this->password),
         ]);
 

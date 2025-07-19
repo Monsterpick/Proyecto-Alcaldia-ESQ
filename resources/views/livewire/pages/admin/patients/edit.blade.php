@@ -110,7 +110,7 @@ new class extends Component {
             <x-card class="mb-8">
                 <div class="lg:flex lg:justify-between lg:items-center">
                     <div class="flex items-center space-x-5">
-                        <img src="{{ $this->user->image_url ? Storage::url($this->user->image_url) : asset('images/no_user_image.png') }}"
+                        <img src="{{ $this->user->image_url ? Storage::url($this->user->image_url) : asset('images/user_no_image.png') }}"
                             alt="{{ $this->user->name }}" class="h-20 w-20 object-cover object-center rounded-full">
 
                         <div class="">

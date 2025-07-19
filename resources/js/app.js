@@ -7,6 +7,16 @@ import Swiper from 'swiper/bundle';
 import AOS from 'aos';
 import { AreaSeries, BarSeries, BaselineSeries, CandlestickSeries, createChart, LineSeries, HistogramSeries } from 'lightweight-charts';
 
+import { Calendar } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+
+window.Calendar = Calendar;
+window.dayGridPlugin = dayGridPlugin;
+window.timeGridPlugin = timeGridPlugin;
+window.listPlugin = listPlugin;
+
 window.createChart = createChart;
 window.AreaSeries = AreaSeries;
 window.BarSeries = BarSeries;

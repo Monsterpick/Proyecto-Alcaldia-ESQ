@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\Appointment;
 
 return new class extends Migration
 {
@@ -11,12 +12,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('appointment_statuses', function (Blueprint $table) {
+        Schema::create('consultations', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description')->nullable();
-            $table->string('color')->nullable();
-            $table->string('color_hex')->nullable();
+            $table->foreignIdFor(Appointment::class);
+            $table->text('diagnosis')->nullable();
+            $table->text('treatment')->nullable();
+            $table->text('notes')->nullable();
+            $table->json('prescriptions')->nullable();
+            $table->json('tests')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -27,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('appointment_statuses');
+        Schema::dropIfExists('consultations');
     }
 };

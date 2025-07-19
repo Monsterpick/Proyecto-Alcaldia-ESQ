@@ -79,7 +79,8 @@ new class extends Component {
             return;
         }
 
-        Appointment::create($this->appointment);
+        Appointment::create($this->appointment)
+            ->consultation()->create([]);
 
         session()->flash('swal', [
             'title' => 'Cita agendada correctamente',
@@ -179,7 +180,16 @@ new class extends Component {
             </x-select>
 
             <div class="lg:pt-6.5">
-                <x-button wire:click="searchAvailability" icon="magnifying-glass" class="w-full" info>Buscar</x-button>
+                <x-button
+                    wire:click="searchAvailability" 
+                    icon="magnifying-glass" 
+                    class="w-full" 
+                    info
+                    spinner="searchAvailability"
+                    :disabled="$appointmentEdit && !$appointmentEdit->isEditable()"
+                    >
+                    Buscar disponibilidad
+                </x-button>
 
             </div>
         </div>

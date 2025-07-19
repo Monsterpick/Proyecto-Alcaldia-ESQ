@@ -11,6 +11,7 @@ return [
         6 => 'Sabado',
     ],
     'appointment_duration' => 15, // Duracion de la cita en minutos
+    'appointment_duration_time' => '00:15:00', // Duracion de la cita en minutos
 
     'appointment_status_id' => 1, /* Estatus predeterminado de la cita */
 

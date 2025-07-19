@@ -59,6 +59,7 @@ final class AppointmentTable extends PowerGridComponent
             'appointments.created_at',
             'appointments.updated_at',
             'appointment_statuses.name as appointment_status_name',
+            'appointment_statuses.color as appointment_status_color',
             'users.name as name_patient',
             'users.last_name as last_name_patient',
             'users.phone as phone_patient',
@@ -84,7 +85,15 @@ final class AppointmentTable extends PowerGridComponent
         ->add('end_time')
         ->add('duration')
         ->add('reason')
-        ->add('appointment_status_name')
+        ->add('appointment_status_name', function ($row) {
+            return [
+                'template-appointment-status' => [
+                    'id' => $row->id,
+                    'name' => $row->appointment_status_name,
+                    'color' => $row->appointment_status_color,
+                ]
+                ];
+        })
         ->add('created_at')
         ->add('updated_at');
     }
@@ -165,12 +174,12 @@ final class AppointmentTable extends PowerGridComponent
     {
         $actions = [];
 
-        if(Auth::check() && Auth::user()->can('view-appointment')){
+        if(Auth::check() && Auth::user()->can('view-consultation')){
             $actions[] = Button::add('show')
-                ->slot('<i class="fas fa-calendar-days btn-group-icon"></i>')
+                ->slot('<i class="fas fa-file-medical btn-group-icon"></i>')
                 ->id()
                 ->class('btn-group-item btn-group-item-first')
-                ->route('admin.appointments.edit', ['appointment' => $row->id])
+                ->route('admin.appointments.consultation', ['appointment' => $row->id])
                 ->attributes(['wire:navigate' => true]);
         }
 
@@ -191,6 +200,15 @@ final class AppointmentTable extends PowerGridComponent
         }
 
         return $actions;
+    }
+
+    public function rowTemplates(): array
+    {
+        return [
+            'template-appointment-status' => '
+                <span class="bg-{{ color }}-100 text-{{ color }}-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-{{ color }}-900 dark:text-{{ color }}-300">{{ name }}</span>
+            ',
+        ];
     }
 
 }

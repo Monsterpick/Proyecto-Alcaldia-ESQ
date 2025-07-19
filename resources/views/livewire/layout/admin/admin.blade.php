@@ -24,6 +24,7 @@
             display: none !important;
         }
     </style>
+    @stack('styles')
 </head>
 
 <body x-data="{

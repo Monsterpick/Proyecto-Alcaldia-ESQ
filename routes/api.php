@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
-
+use App\Models\Appointment;
 
 Route::get('/patients', function (Request $request) {
 
@@ -35,3 +35,30 @@ Route::get('/patients', function (Request $request) {
             ];
         });
 })->name('api.patients.index');
+
+
+Route::get('/appointments', function (Request $request) {
+    $appointments = Appointment::with(['patient.user', 'doctor.user'])
+        ->whereBetween('date', [$request->start, $request->end])
+        ->get();
+
+    return $appointments->map(function ($appointment) {
+
+        
+        return [
+            'id' => $appointment->id,
+            'title' => $appointment->patient->user->name . ' ' . $appointment->patient->user->last_name,
+            'start' => $appointment->start,
+            'end' => $appointment->end,
+            'color' => $appointment->appointmentStatus->color_hex,
+            'extendedProps' => [
+                'dateTime' => $appointment->start,
+                'patient' => $appointment->patient->user->name . ' ' . $appointment->patient->user->last_name,
+                'doctor' => $appointment->doctor->user->name . ' ' . $appointment->doctor->user->last_name,
+                'status' => $appointment->appointmentStatus->name,
+                'color' => $appointment->appointmentStatus->color_hex,
+                'url' => route('admin.appointments.edit', $appointment->id),
+            ],
+        ];
+    });
+})->name('api.appointments.index');

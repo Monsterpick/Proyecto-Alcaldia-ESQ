@@ -55,7 +55,7 @@ new class extends Component {
         ]);
         
 
-        if($this->image && $this->image_url != 'images/no_user_image.png' && $this->image_url != null){
+        if($this->image && $this->image_url != 'images/user_no_image.png' && $this->image_url != null){
             Storage::delete($this->user['image_url']);
             $this->user['image_url'] = $this->image->store('images/users', 'public');
         }

@@ -51,6 +51,23 @@
     --color-pg-primary-800: oklch(0.269 0 0);
     --color-pg-primary-900: oklch(0.205 0 0);
     --color-pg-primary-950: oklch(0.145 0 0);
+
+    /* Personal */
+    --color-blue-pure: #3b82f6;
+    --color-green-pure: #10b981;
+    --color-red-pure: #ef4444;
+    --color-yellow-pure: #eab308;
+    --color-purple-pure: #8b5cf6;
+    --color-pink-pure: #ec4899;
+    --color-orange-pure: #f59e0b;
+    --color-lime-pure: #84cc16;
+    --color-teal-pure: #14b8a6;
+    --color-cyan-pure: #06b6d4;
+    --color-indigo-pure: #6366f1;
+    --color-violet-pure: #8b5cf6;
+    --color-fuchsia-pure: #d946ef;
+    --color-pink-pure: #ec4899;
+    --color-gray-pure: #64748b;
 }
 
 @layer theme {

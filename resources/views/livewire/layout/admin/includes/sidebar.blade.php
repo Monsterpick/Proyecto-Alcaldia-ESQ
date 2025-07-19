@@ -59,6 +59,13 @@
             'permission' => 'view-appointment',
         ],
         [
+            'name' => 'Calendario',
+            'icon' => 'fa-solid fa-calendar-days',
+            'url' => route('admin.calendar.index'),
+            'active' => request()->routeIs('admin.calendar.*'),
+            'permission' => 'view-calendar',
+        ],
+        [
             'header' => 'Configuración de Sistema',
             'permission' => 'view-setting',
         ],

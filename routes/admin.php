@@ -407,6 +407,30 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:delete-appointment-status')
         ->name('appointment-statuses.destroy');
 
+    Volt::route('/appointments/{appointment}/consultation', 'pages.admin.appointments.consultation')
+        ->middleware('permission:view-consultation')
+        ->name('appointments.consultation');
+
+    Volt::route('/calendar', 'pages.admin.calendar.index')
+        ->middleware('permission:view-calendar')
+        ->name('calendar.index');
+
+    Volt::route('/calendar/create', 'pages.admin.calendar.create')
+        ->middleware('permission:create-calendar')
+        ->name('calendar.create');
+
+    Volt::route('/calendar/{calendar}/edit', 'pages.admin.calendar.edit')
+        ->middleware('permission:edit-calendar')
+        ->name('calendar.edit');
+
+    Volt::route('/calendar/{calendar}/show', 'pages.admin.calendar.show')
+        ->middleware('permission:view-calendar')
+        ->name('calendar.show');
+
+    Volt::route('/calendar/{calendar}', 'pages.admin.calendar.destroy')
+        ->middleware('permission:delete-calendar')
+        ->name('calendar.destroy');
+
 
 });
 

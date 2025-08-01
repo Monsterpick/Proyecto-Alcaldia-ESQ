@@ -12,6 +12,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
 
+
     //Ruta de Dashboard
     Volt::route('/dashboard', 'pages.admin.dashboard.index')->name('dashboard');
 
@@ -431,22 +432,35 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:delete-calendar')
         ->name('calendar.destroy');
 
+    Volt::route('/settings/general', 'pages.admin.settings.general')
+        ->middleware('permission:view-setting')
+        ->name('settings.general');
+
+    Volt::route('/settings/logo', 'pages.admin.settings.logo')
+        ->middleware('permission:view-setting')
+        ->name('settings.logo');
+
+    Volt::route('/settings/profile', 'pages.admin.profile.index')
+        ->middleware('permission:profile-setting')
+        ->name('profile.index');
+
 
 });
 
-Route::middleware('guest')->group(function () {
+/* Route::middleware('guest')->group(function () {
     Volt::route('/login', 'pages.admin.auth.login')
         ->name('login');
-
-    /* Volt::route('register', 'auth.register')
+    
+    Volt::route('/register', 'pages.admin.auth.register')
         ->name('register');
-
-    Volt::route('forgot-password', 'auth.forgot-password')
+    
+    Volt::route('/forgot-password', 'pages.admin.auth.forgot-password')
         ->name('password.request');
-
-    Volt::route('reset-password/{token}', 'auth.reset-password')
-        ->name('password.reset'); */
-});
+    
+    Volt::route('/reset-password/{token}', 'pages.admin.auth.reset-password')
+        ->name('password.reset');
+}); */
+// Admin authentication routes moved to bootstrap/app.php
 
 /* Route::middleware('auth')->group(function () {
     Volt::route('verify-email', 'auth.verify-email')
@@ -459,6 +473,7 @@ Route::middleware('guest')->group(function () {
     Volt::route('confirm-password', 'auth.confirm-password')
         ->name('password.confirm');
 }); */
+
 
 Route::post('logout', App\Livewire\Actions\Logout::class)
     ->name('logout');

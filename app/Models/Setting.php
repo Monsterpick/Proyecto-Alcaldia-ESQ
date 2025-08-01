@@ -58,4 +58,6 @@ class Setting extends Model
         $setting->value = is_array($value) ? json_encode($value) : $value;
         return $setting->save();
     }
+
+    
 }

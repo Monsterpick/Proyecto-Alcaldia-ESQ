@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use App\Services\AppointmentService;
 use App\Models\Appointment;
+use App\Events\NotificationSend;
 
 new class extends Component {
     /* Si se recibe el parametro appointmentEdit, se usa para editar una cita, es del tipo appointment y se coloca null porque no siempre se va a enviar */
@@ -88,7 +89,11 @@ new class extends Component {
             'icon' => 'success',
         ]);
 
-        return redirect()->route('admin.appointments.index');
+        /* Se emite el evento para que se envie la notificación */
+        NotificationSend::dispatch();
+
+        return $this->redirect(route('admin.appointments.index'), navigate: true);
+        
     }
 
     public function updated($property, $value)

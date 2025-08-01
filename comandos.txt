@@ -42,3 +42,9 @@ php artisan up
 curl -I optirango.nevora.app
 
 Revisar el subdominio
+
+
+php artisan queue:work
+php artisan reverb:start
+
+php artisan make:event

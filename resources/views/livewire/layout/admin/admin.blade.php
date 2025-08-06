@@ -124,10 +124,10 @@
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            Echo.channel('notification')
+            /* Echo.channel('notification')
                 .listen('NotificationSend', (e) => {
                     console.log('se ha generado una notificación');
-                });
+                }); */
 
         });
     </script>

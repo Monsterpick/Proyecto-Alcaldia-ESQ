@@ -370,7 +370,7 @@
                                     <ul x-show="open" x-cloak {{-- id="{{ $link['id_submenu'] }}" --}} class="{{-- hidden --}} py-2 space-y-2">
                                         @foreach ($link['submenu'] as $submenu)
                                             <li>
-                                                <a href="{{ $submenu['url'] }}"
+                                                <a href="{{ $submenu['url'] }}" wire:navigate
                                                     class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 {{ $submenu['active'] ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
                                                     <i class="{{ $submenu['icon'] }}"></i>
                                                     <span class="ms-2">{{ $submenu['name'] }}</span>

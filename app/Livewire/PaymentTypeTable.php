@@ -19,6 +19,9 @@ final class PaymentTypeTable extends PowerGridComponent
 {
     public string $tableName = 'payment-type-table';
 
+    public string $sortField = 'id';
+    public string $sortDirection = 'desc';
+
     public function setUp(): array
     {
         return [
@@ -119,7 +122,7 @@ final class PaymentTypeTable extends PowerGridComponent
             $actions[] = Button::add('delete')
                 ->slot('<i class="fas fa-trash btn-group-icon"></i> ')
                 ->id()
-                ->class('btn-group-item btn-group-item-last')
+                ->class('btn-group-item btn-group-item-last cursor-pointer')
                 ->attributes(['wire:navigate' => true]);
         }
 

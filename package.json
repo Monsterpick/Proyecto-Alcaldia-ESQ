@@ -17,6 +17,7 @@
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
+        "dropzone": "^6.0.0-beta.2",
         "flowbite": "^3.1.2",
         "fullcalendar": "^6.1.18",
         "laravel-vite-plugin": "^1.0",

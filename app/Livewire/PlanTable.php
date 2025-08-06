@@ -21,6 +21,9 @@ final class PlanTable extends PowerGridComponent
     use WithExport;
     public string $tableName = 'plan-table';
 
+    public string $sortField = 'id';
+    public string $sortDirection = 'desc';
+
     public function setUp(): array
     {
         return [
@@ -123,7 +126,7 @@ final class PlanTable extends PowerGridComponent
             $actions[] = Button::add('delete')
                 ->slot('<i class="fas fa-trash btn-group-icon"></i> ')
                 ->id()
-                ->class('btn-group-item btn-group-item-last')
+                ->class('btn-group-item btn-group-item-last cursor-pointer')
                 ->attributes(['onclick' => 'confirmDelete('.$row->id.')']);
         }
 

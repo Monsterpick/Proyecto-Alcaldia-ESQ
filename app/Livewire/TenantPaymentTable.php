@@ -208,7 +208,7 @@ final class TenantPaymentTable extends PowerGridComponent
             $actions[] = Button::add('delete')
                 ->slot('<i class="fas fa-trash btn-group-icon"></i> ')
                 ->id()
-                ->class('btn-group-item btn-group-item-last')
+                ->class('btn-group-item btn-group-item-last cursor-pointer')
                 ->route('admin.tenant-payments.destroy', ['tenantPayment' => $row->id])
                 ->attributes(['wire:navigate' => true]);
         }

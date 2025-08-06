@@ -19,6 +19,9 @@ final class DoctorTable extends PowerGridComponent
 {
     use WithExport;
 
+    public string $sortField = 'id';
+    public string $sortDirection = 'desc';
+
     public string $tableName = 'doctor-table';
 
     public function setUp(): array
@@ -137,12 +140,6 @@ final class DoctorTable extends PowerGridComponent
         ];
     }
 
-    #[\Livewire\Attributes\On('edit')]
-    public function edit($rowId): void
-    {
-        $this->js('alert(' . $rowId . ')');
-    }
-
     public function actions(Doctor $row): array
     {
         $actions = [];
@@ -168,7 +165,7 @@ final class DoctorTable extends PowerGridComponent
             $actions[] = Button::add('delete')
                 ->slot('<i class="fas fa-trash btn-group-icon"></i> ')
                 ->id()
-                ->class('btn-group-item btn-group-item-last')
+                ->class('btn-group-item btn-group-item-last cursor-pointer')
                 ->attributes(['onclick' => 'confirmDelete('.$row->id.')']);
         }
 

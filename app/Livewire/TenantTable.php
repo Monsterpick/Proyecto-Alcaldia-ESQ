@@ -176,7 +176,7 @@ final class TenantTable extends PowerGridComponent
             $actions[] = Button::add('delete')
                 ->slot('<i class="fas fa-trash btn-group-icon"></i> ')
                 ->id()
-                ->class('btn-group-item btn-group-item-last')
+                ->class('btn-group-item btn-group-item-last cursor-pointer')
                 ->attributes(['onclick' => 'confirmDelete(\'' . $row->id . '\')']);
         }
 

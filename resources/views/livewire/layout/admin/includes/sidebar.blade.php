@@ -75,6 +75,11 @@
             'name' => 'Direcciones',
             'icon' => 'fa-solid fa-location-dot',
             'href' => '#',
+            'active' => request()->routeIs([
+                'admin.estados.*', 
+                'admin.municipios.*', 
+                'admin.parroquias.*'
+            ]),
             'id_submenu' => 'submenu-direcciones',
             'permission' => 'view-direccion',
             'submenu' => [
@@ -82,21 +87,21 @@
                     'name' => 'Estados',
                     'icon' => 'fa-solid fa-map-location-dot',
                     'url' => route('admin.estados.index'),
-                    'active' => request()->routeIs('estados.*'),
+                    'active' => request()->routeIs('admin.estados.*'),
                     'permission' => 'view-estado',
                 ],
                 [
                     'name' => 'Municipios',
                     'icon' => 'fa-solid fa-location-dot',
                     'url' => route('admin.municipios.index'),
-                    'active' => request()->routeIs('municipios.*'),
+                    'active' => request()->routeIs('admin.municipios.*'),
                     'permission' => 'view-municipio',
                 ],
                 [
                     'name' => 'Parroquias',
                     'icon' => 'fa-solid fa-map-pin',
                     'url' => route('admin.parroquias.index'),
-                    'active' => request()->routeIs('parroquias.*'),
+                    'active' => request()->routeIs('admin.parroquias.*'),
                     'permission' => 'view-parroquia',
                 ],
             ],
@@ -105,6 +110,18 @@
             'name' => 'General',
             'icon' => 'fa-solid fa-gears',
             'href' => '#',
+            'active' => request()->routeIs([
+                'admin.settings.*',
+                'admin.roles.*',
+                'admin.permissions.*',
+                'admin.estatuses.*',
+                'admin.appointment-statuses.*',
+                'admin.payment-types.*',
+                'admin.payment-origins.*',
+                'admin.categories.*',
+                'admin.products.*',
+                'admin.warehouses.*',
+            ]),
             'id_submenu' => 'submenu-general',
             'permission' => 'view-general',
             'submenu' => [
@@ -171,9 +188,153 @@
                     'active' => request()->routeIs('admin.payment-origins.*'),
                     'permission' => 'view-payment-origin',
                 ],
+                [
+                    'name' => 'Categorías',
+                    'icon' => 'fa-solid fa-tags',
+                    'url' => route('admin.categories.index'),
+                    'active' => request()->routeIs('admin.categories.*'),
+                    'permission' => 'view-category',
+                ],
+                [
+                    'name' => 'Productos',
+                    'icon' => 'fa-solid fa-box',
+                    'url' => route('admin.products.index'),
+                    'active' => request()->routeIs('admin.products.*'),
+                    'permission' => 'view-product',
+                ],
 
+
+                [
+                    'name' => 'Almacenes',
+                    'icon' => 'fa-solid fa-warehouse',
+                    'url' => route('admin.warehouses.index'),
+                    'active' => request()->routeIs('admin.warehouses.*'),
+                    'permission' => 'view-warehouse',
+                ],
+            ],
+
+        ],
+        [
+            'name' => 'Compras',
+            'icon' => 'fa-solid fa-cart-shopping',
+            'active' => request()->routeIs([
+                'admin.suppliers.*',
+                'admin.purchase-orders.*',
+                'admin.purchases.*',
+            ]),
+            'permission' => 'view-purchase',
+            'id_submenu' => 'submenu-compras',
+            'submenu' => [
+                [
+                    'name' => 'Proveedores',
+                    'icon' => 'fa-solid fa-truck',
+                    'url' => route('admin.suppliers.index'),
+                    'active' => request()->routeIs('admin.suppliers.*'),
+                    'permission' => 'view-supplier',
+                ],
+                [
+                    'name' => 'Ordenes de compra',
+                    'icon' => 'fa-solid fa-cart-shopping',
+                    'url' => route('admin.purchase-orders.index'),
+                    'active' => request()->routeIs('admin.purchase-orders.*'),
+                    'permission' => 'view-purchase-order',
+                ],
+                [
+                    'name' => 'Compras',
+                    'icon' => 'fa-solid fa-cart-plus',
+                    'url' => route('admin.purchases.index'),
+                    'active' => request()->routeIs('admin.purchases.*'),
+                    'permission' => 'view-purchase',
+                ],
             ],
         ],
+        [
+            'name' => 'Ventas',
+            'icon' => 'fa-solid fa-cash-register',
+            'active' => request()->routeIs([
+                'admin.customers.*',
+                'admin.quotes.*',
+                'admin.sales.*',
+            ]),
+            'permission' => 'view-sale',
+            'id_submenu' => 'submenu-ventas',
+            'submenu' => [
+                [
+                    'name' => 'Clientes',
+                    'icon' => 'fa-solid fa-user-group',
+                    'url' => route('admin.customers.index'),
+                    'active' => request()->routeIs('admin.customers.*'),
+                    'permission' => 'view-customer',
+                ],
+                [
+                    'name' => 'Cotizaciones',
+                    'icon' => 'fa-solid fa-file-invoice',
+                    'url' => route('admin.quotes.index'),
+                    'active' => request()->routeIs('admin.quotes.*'),
+                    'permission' => 'view-quote',
+                ],
+                [
+                    'name' => 'Ventas',
+                    'icon' => 'fa-solid fa-file-invoice-dollar',
+                    'url' => route('admin.sales.index'),
+                    'active' => request()->routeIs('admin.sales.*'),
+                    'permission' => 'view-sale',
+                ],
+            ],
+        ],
+
+        [
+            'name' => 'Movimientos',
+            'icon' => 'fa-solid fa-arrows-rotate',
+            'active' => request()->routeIs([
+                'admin.movements.*',
+            ]),
+            'permission' => 'view-movement',
+            'id_submenu' => 'submenu-movimientos',
+            'submenu' => [
+                [
+                    'name' => 'Entradas y Salidas',
+                    'icon' => 'fa-solid fa-right-left',
+                    'url' => route('admin.movements.index'),
+                    'active' => request()->routeIs('admin.movements.*'),
+                    'permission' => 'view-movement',
+                ],
+                [
+                    'name' => 'Transferencias',
+                    'icon' => 'fa-solid fa-retweet',
+                    'url' => route('admin.transfers.index'),
+                    'active' => request()->routeIs('admin.transfers.*'),
+                    'permission' => 'view-movement',
+                ],
+            ],
+        ],
+
+        [
+            'name' => 'Reportes',
+            'icon' => 'fa-solid fa-chart-line',
+            'active' => request()->routeIs([
+                'admin.reports.*',
+            ]),
+            'permission' => 'view-report',
+            'id_submenu' => 'submenu-reportes',
+            'submenu' => [
+                [
+                    'name' => 'Entradas y Salidas',
+                    'icon' => 'fa-solid fa-users',
+                    'url' => route('admin.customers.index'),
+                    'active' => request()->routeIs('admin.customers.*'),
+                    'permission' => 'view-customer',
+                ],
+                [
+                    'name' => 'Transferencias',
+                    'icon' => 'fa-solid fa-cart-shopping',
+                    'url' => route('admin.quotes.index'),
+                    'active' => request()->routeIs('admin.quotes.*'),
+                    'permission' => 'view-quote',
+                ],
+            ],
+        ],
+
     ];
 
 @endphp
@@ -195,25 +356,30 @@
                             </div>
                         @else
                             @isset($link['submenu'])
-                                <button type="button"
-                                    class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                                    aria-controls="{{ $link['id_submenu'] }}" data-collapse-toggle="{{ $link['id_submenu'] }}">
-                                    <i class="{{ $link['icon'] }}"></i>
-                                    <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">{{ $link['name'] }}</span>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </button>
-                                <ul id="{{ $link['id_submenu'] }}" class="hidden py-2 space-y-2">
-                                    @foreach ($link['submenu'] as $submenu)
-                                        <li>
-                                            <a href="{{ $submenu['url'] }}"
-                                                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
-                                                <i class="{{ $submenu['icon'] }}"></i>
-                                                <span class="ms-2">{{ $submenu['name'] }}</span>
-                                            </a>
-                                        </li>
-                                    @endforeach
+                                <div x-data="{
+                                    open: {{ $link['active'] ? 'true' : 'false' }}
+                                }">
+                                    <button type="button"
+                                        @click="open = !open"
+                                        class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                                        {{-- aria-controls="{{ $link['id_submenu'] }}" data-collapse-toggle="{{ $link['id_submenu'] }}" --}}>
+                                        <i class="{{ $link['icon'] }}"></i>
+                                        <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">{{ $link['name'] }}</span>
+                                        <i class="fa-solid fa-chevron-down" :class="{ 'rotate-180': open }"></i>
+                                    </button>
+                                    <ul x-show="open" x-cloak {{-- id="{{ $link['id_submenu'] }}" --}} class="{{-- hidden --}} py-2 space-y-2">
+                                        @foreach ($link['submenu'] as $submenu)
+                                            <li>
+                                                <a href="{{ $submenu['url'] }}"
+                                                    class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 {{ $submenu['active'] ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
+                                                    <i class="{{ $submenu['icon'] }}"></i>
+                                                    <span class="ms-2">{{ $submenu['name'] }}</span>
+                                                </a>
+                                            </li>
+                                        @endforeach
 
-                                </ul>
+                                    </ul>
+                                </div>
                             @else
                                 <a href="{{ $link['url'] }}"
                                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group {{ $link['active'] ? 'bg-gray-100 dark:bg-gray-700' : '' }}"

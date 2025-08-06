@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\PaymentReceiptController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ImageController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -444,7 +446,242 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:profile-setting')
         ->name('profile.index');
 
+    Volt::route('/categories', 'pages.admin.categories.index')
+        ->middleware('permission:view-category')
+        ->name('categories.index');
 
+    Volt::route('/categories/create', 'pages.admin.categories.create')
+        ->middleware('permission:create-category')
+        ->name('categories.create');
+    
+    Volt::route('/categories/{category}/edit', 'pages.admin.categories.edit')
+        ->middleware('permission:edit-category')
+        ->name('categories.edit');
+
+    Volt::route('/categories/{category}/show', 'pages.admin.categories.show')
+        ->middleware('permission:view-category')
+        ->name('categories.show');
+    
+    Volt::route('/categories/{category}', 'pages.admin.categories.destroy')
+        ->middleware('permission:delete-category')
+        ->name('categories.destroy');
+
+    Volt::route('/products', 'pages.admin.products.index')
+        ->middleware('permission:view-product')
+        ->name('products.index');
+
+    Volt::route('/products/create', 'pages.admin.products.create')
+        ->middleware('permission:create-product')
+        ->name('products.create');
+    
+    Volt::route('/products/{product}/edit', 'pages.admin.products.edit')
+        ->middleware('permission:edit-product')
+        ->name('products.edit');
+
+    Volt::route('/products/{product}/show', 'pages.admin.products.show')
+        ->middleware('permission:view-product')
+        ->name('products.show');
+    
+    Volt::route('/products/{product}', 'pages.admin.products.destroy')
+        ->middleware('permission:delete-product')
+        ->name('products.destroy');
+
+    Route::post('/products/{product}/dropzone', [ProductController::class, 'dropzone'])
+        ->middleware('permission:view-product')
+        ->name('products.dropzone.store');
+
+    Route::delete('images/{image}', [ImageController::class, 'destroy'])
+        ->middleware('permission:delete-product')
+        ->name('images.destroy');
+
+    //Rutas de Customer
+    Volt::route('/customers', 'pages.admin.customers.index')
+        ->middleware('permission:view-customer')
+        ->name('customers.index');
+
+    Volt::route('/customers/create', 'pages.admin.customers.create')
+        ->middleware('permission:create-customer')
+        ->name('customers.create');
+    
+    Volt::route('/customers/{customer}/edit', 'pages.admin.customers.edit')
+        ->middleware('permission:edit-customer')
+        ->name('customers.edit');
+
+    Volt::route('/customers/{customer}/show', 'pages.admin.customers.show')
+        ->middleware('permission:view-customer')
+        ->name('customers.show');
+    
+    Volt::route('/customers/{customer}', 'pages.admin.customers.destroy')
+        ->middleware('permission:delete-customer')
+        ->name('customers.destroy');
+
+    //Rutas de Supplier Proveedores
+    Volt::route('/suppliers', 'pages.admin.suppliers.index')
+        ->middleware('permission:view-supplier')
+        ->name('suppliers.index');
+
+    Volt::route('/suppliers/create', 'pages.admin.suppliers.create')
+        ->middleware('permission:create-supplier')
+        ->name('suppliers.create');
+    
+    Volt::route('/suppliers/{supplier}/edit', 'pages.admin.suppliers.edit')
+        ->middleware('permission:edit-supplier')
+        ->name('suppliers.edit');
+
+    Volt::route('/suppliers/{supplier}/show', 'pages.admin.suppliers.show')
+        ->middleware('permission:view-supplier')
+        ->name('suppliers.show');
+    
+    Volt::route('/suppliers/{supplier}', 'pages.admin.suppliers.destroy')
+        ->middleware('permission:delete-supplier')
+        ->name('suppliers.destroy');
+
+    //Rutas de Warehouse Almacenes
+    Volt::route('/warehouses', 'pages.admin.warehouses.index')
+        ->middleware('permission:view-warehouse')
+        ->name('warehouses.index');
+
+    Volt::route('/warehouses/create', 'pages.admin.warehouses.create')
+        ->middleware('permission:create-warehouse')
+        ->name('warehouses.create');
+    
+    Volt::route('/warehouses/{warehouse}/edit', 'pages.admin.warehouses.edit')
+        ->middleware('permission:edit-warehouse')
+        ->name('warehouses.edit');
+
+    Volt::route('/warehouses/{warehouse}/show', 'pages.admin.warehouses.show')
+        ->middleware('permission:view-warehouse')
+        ->name('warehouses.show');
+    
+    Volt::route('/warehouses/{warehouse}', 'pages.admin.warehouses.destroy')
+        ->middleware('permission:delete-warehouse')
+        ->name('warehouses.destroy');
+
+    //Rutas de Ordenes de Compra
+    Volt::route('/purchase-orders', 'pages.admin.purchase-orders.index')
+        ->middleware('permission:view-purchase-order')
+        ->name('purchase-orders.index');
+
+    Volt::route('/purchase-orders/create', 'pages.admin.purchase-orders.create')
+        ->middleware('permission:create-purchase-order')
+        ->name('purchase-orders.create');
+    
+    Volt::route('/purchase-orders/{purchaseOrder}/edit', 'pages.admin.purchase-orders.edit')
+        ->middleware('permission:edit-purchase-order')
+        ->name('purchase-orders.edit');
+        
+    Volt::route('/purchase-orders/{purchaseOrder}/show', 'pages.admin.purchase-orders.show')
+        ->middleware('permission:view-purchase-order')
+        ->name('purchase-orders.show');
+    
+    Volt::route('/purchase-orders/{purchaseOrder}', 'pages.admin.purchase-orders.destroy')
+        ->middleware('permission:delete-purchase-order')
+        ->name('purchase-orders.destroy');
+
+    //Rutas de Purchase
+    Volt::route('/purchases', 'pages.admin.purchases.index')
+        ->middleware('permission:view-purchase')
+        ->name('purchases.index');
+    
+    Volt::route('/purchases/create', 'pages.admin.purchases.create')
+        ->middleware('permission:create-purchase')
+        ->name('purchases.create');
+    
+    Volt::route('/purchases/{purchase}/edit', 'pages.admin.purchases.edit')
+        ->middleware('permission:edit-purchase')
+        ->name('purchases.edit');
+    
+    Volt::route('/purchases/{purchase}/show', 'pages.admin.purchases.show')
+        ->middleware('permission:view-purchase')
+        ->name('purchases.show');
+
+    Volt::route('/purchases/{purchase}', 'pages.admin.purchases.destroy')
+        ->middleware('permission:delete-purchase')
+        ->name('purchases.destroy');
+
+    //Rutas de Quote
+    Volt::route('/quotes', 'pages.admin.quotes.index')
+        ->middleware('permission:view-quote')
+        ->name('quotes.index');
+
+    Volt::route('/quotes/create', 'pages.admin.quotes.create')
+        ->middleware('permission:create-quote')
+        ->name('quotes.create');
+    
+    Volt::route('/quotes/{quote}/edit', 'pages.admin.quotes.edit')
+        ->middleware('permission:edit-quote')
+        ->name('quotes.edit');
+
+    Volt::route('/quotes/{quote}/show', 'pages.admin.quotes.show')
+        ->middleware('permission:view-quote')
+        ->name('quotes.show');
+    
+    Volt::route('/quotes/{quote}', 'pages.admin.quotes.destroy')
+        ->middleware('permission:delete-quote')
+        ->name('quotes.destroy');
+
+    //Rutas de Sale
+    Volt::route('/sales', 'pages.admin.sales.index')
+        ->middleware('permission:view-sale')
+        ->name('sales.index');
+    
+    Volt::route('/sales/create', 'pages.admin.sales.create')
+        ->middleware('permission:create-sale')
+        ->name('sales.create');
+    
+    Volt::route('/sales/{sale}/edit', 'pages.admin.sales.edit')
+        ->middleware('permission:edit-sale')
+        ->name('sales.edit');
+    
+    Volt::route('/sales/{sale}/show', 'pages.admin.sales.show')
+        ->middleware('permission:view-sale')
+        ->name('sales.show');
+    
+    Volt::route('/sales/{sale}', 'pages.admin.sales.destroy')
+        ->middleware('permission:delete-sale')
+        ->name('sales.destroy');
+
+    //Rutas de Movimientos
+    Volt::route('/movements', 'pages.admin.movements.index')
+        ->middleware('permission:view-movement')
+        ->name('movements.index');
+    
+    Volt::route('/movements/create', 'pages.admin.movements.create')
+        ->middleware('permission:create-movement')
+        ->name('movements.create');
+    
+    Volt::route('/movements/{movement}/edit', 'pages.admin.movements.edit')
+        ->middleware('permission:edit-movement')
+        ->name('movements.edit');
+    
+    Volt::route('/movements/{movement}/show', 'pages.admin.movements.show')
+        ->middleware('permission:view-movement')
+        ->name('movements.show');
+    
+    Volt::route('/movements/{movement}', 'pages.admin.movements.destroy')
+        ->middleware('permission:delete-movement')
+        ->name('movements.destroy');
+
+    //Rutas de Transferencias
+    Volt::route('/transfers', 'pages.admin.transfers.index')
+        ->middleware('permission:view-transfer')
+        ->name('transfers.index');
+        
+    Volt::route('/transfers/create', 'pages.admin.transfers.create')
+        ->middleware('permission:create-transfer')
+        ->name('transfers.create');
+    
+    Volt::route('/transfers/{transfer}/edit', 'pages.admin.transfers.edit')
+        ->middleware('permission:edit-transfer')
+        ->name('transfers.edit');
+
+    Volt::route('/transfers/{transfer}/show', 'pages.admin.transfers.show')
+        ->middleware('permission:view-transfer')
+        ->name('transfers.show');
+
+    Volt::route('/transfers/{transfer}', 'pages.admin.transfers.destroy')
+        ->middleware('permission:delete-transfer')
+        ->name('transfers.destroy');
 });
 
 /* Route::middleware('guest')->group(function () {

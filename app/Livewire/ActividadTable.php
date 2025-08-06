@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\Auth;
 final class ActividadTable extends PowerGridComponent
 {
     use WithExport;
+
+    public string $sortField = 'id';
+    public string $sortDirection = 'desc';
+
     public string $tableName = 'actividad-table';
 
     public function setUp(): array
@@ -82,12 +86,6 @@ final class ActividadTable extends PowerGridComponent
         ];
     }
 
-    #[\Livewire\Attributes\On('edit')]
-    public function edit($rowId): void
-    {
-        $this->js('alert('.$rowId.')');
-    }
-
     public function actions(Actividad $row): array
     {
         $actions = [];
@@ -114,22 +112,11 @@ final class ActividadTable extends PowerGridComponent
             $actions[] = Button::add('delete')
                 ->slot('<i class="fas fa-trash btn-group-icon"></i> ')
                 ->id()
-                ->class('btn-group-item btn-group-item-last')
+                ->class('btn-group-item btn-group-item-last cursor-pointer')
                 ->attributes(['onclick' => 'confirmDelete('.$row->id.')']);
         }
         
         return $actions;
     }
 
-    /*
-    public function actionRules($row): array
-    {
-       return [
-            // Hide button edit for ID 1
-            Rule::button('edit')
-                ->when(fn($row) => $row->id === 1)
-                ->hide(),
-        ];
-    }
-    */
 }

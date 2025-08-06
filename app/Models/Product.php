@@ -4,62 +4,60 @@ namespace App\Models;
 
 use App\Traits\HasCurrencyFormat;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
     use HasCurrencyFormat;
+    use HasFactory;
 
     protected $fillable = [
         'name',
-        'cost_cents',
-        'price_cents',
+        'description',
+        'sku',
+        'barcode',
+        'qrcode',
+        'expedition_date',
+        'expiration_date',
+        'price',
+        'category_id',
     ];
 
-    protected $casts = [
-        'cost_cents' => 'integer',
-        'price_cents' => 'integer',
-        'cost' => 'decimal:2',
-        'price' => 'decimal:2',
-    ];
-
-    /**
-     * Mutador para el costo
-     */
-    public function setCostAttribute($value)
+    //Relacion uno a muchos inversa
+    public function category()
     {
-        $this->attributes['cost_cents'] = $this->convertToCents($value);
+        return $this->belongsTo(Category::class);
     }
 
-    /**
-     * Mutador para el precio
-     */
-    public function setPriceAttribute($value)
+    //Relacion muchos a muchos 
+    public function inventories()
     {
-        $this->attributes['price_cents'] = $this->convertToCents($value);
+        return $this->hasMany(Inventory::class);
     }
 
-    /**
-     * Accessor para el costo formateado
-     */
-    public function getFormattedCostAttribute()
+    //Relacion muchos a muchos polimorfica
+    public function images()
     {
-        return $this->formatMoney($this->cost_cents);
+        return $this->morphMany(Image::class, 'imageable');
     }
 
-    /**
-     * Accessor para el precio formateado
-     */
-    public function getFormattedPriceAttribute()
+    public function purchaseOrders()
     {
-        return $this->formatMoney($this->price_cents);
+        return $this->morphedByMany(PurchaseOrder::class, 'productable');
     }
 
-    /**
-     * Calcula el margen de ganancia
-     */
-    public function getProfitMarginAttribute()
+    public function quotes()
     {
-        if ($this->cost_cents === 0) return 0;
-        return (($this->price_cents - $this->cost_cents) / $this->cost_cents) * 100;
+        return $this->morphedByMany(Quote::class, 'productable');
+    }
+
+    //Accesores
+    protected function image(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->images->count() ? Storage::url($this->images->first()->path) : 'https://www.freeiconspng.com/uploads/no-image-icon-15.png',
+        );
     }
 } 

@@ -3,12 +3,18 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Customer;
+use App\Models\Product;
+use App\Models\Supplier;
+use App\Models\Warehouse;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
+    use HasFactory;
     /**
      * Seed the application's database.
      */
@@ -29,6 +35,13 @@ class DatabaseSeeder extends Seeder
             PaymentOriginSeeder::class,
             TenantSeeder::class,
             AppointmentStatusSeeder::class,
+            CategorySeeder::class,
+            IdentitySeeder::class,
         ]);
+
+        Customer::factory(100)->create();
+        Supplier::factory(100)->create();
+        Product::factory(100)->create();
+        Warehouse::factory(100)->create();
     }
 }

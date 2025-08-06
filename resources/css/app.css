@@ -5,6 +5,8 @@
 @import "@fortawesome/fontawesome-free/css/all.css";
 @import './components.css';
 @import 'aos/dist/aos.css';
+@import 'dropzone/dist/basic.css';
+@import 'dropzone/dist/dropzone.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

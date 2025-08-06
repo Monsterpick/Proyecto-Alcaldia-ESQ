@@ -17,8 +17,13 @@ use Illuminate\Support\Facades\Auth;
 
 final class EstatusTable extends PowerGridComponent
 {
-    public string $tableName = 'estatus-table';
     use WithExport;
+
+    public string $tableName = 'estatus-table';
+
+    public string $sortField = 'id';
+    public string $sortDirection = 'desc';
+
     public function setUp(): array
     {
         return [
@@ -110,7 +115,7 @@ final class EstatusTable extends PowerGridComponent
             $actions[] = Button::add('delete')
                 ->slot('<i class="fas fa-trash btn-group-icon"></i> ')
                 ->id()
-                ->class('btn-group-item btn-group-item-last')
+                ->class('btn-group-item btn-group-item-last cursor-pointer')
                 ->attributes(['onclick' => 'confirmDelete('.$row->id.')']);
         }
 

@@ -48,3 +48,7 @@ php artisan queue:work
 php artisan reverb:start
 
 php artisan make:event
+
+chown -R nevora:nevora /home/nevora/demo.laravel
+chmod -R 755 /home/nevora/demo.laravel/public
+chmod -R 755 /home/nevora/demo.laravel/storage

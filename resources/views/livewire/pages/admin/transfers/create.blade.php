@@ -8,12 +8,12 @@ new class extends Component {
     
     public function rendering(View $view)
     {
-        $view->title('Crear Venta');
+        $view->title('Crear Transferencia');
     }
 
     public function cancel()
     {
-        $this->redirect(route('admin.sales.index'), navigate: true);
+        $this->redirect(route('admin.transfers.index'), navigate: true);
     }
     
 }; ?>
@@ -26,8 +26,8 @@ new class extends Component {
                 'route' => route('admin.dashboard'),
             ],
             [
-                'name' => 'Entradas y Salidas',
-                'route' => route('admin.movements.index'),
+                'name' => 'Transferencias',
+                'route' => route('admin.transfers.index'),
             ],
             [
                 'name' => 'Nuevo',
@@ -37,7 +37,7 @@ new class extends Component {
 
     <x-container class="lg:py-0 lg:px-6">
 
-        <livewire:admin.movementcreate />
+        <livewire:admin.transfercreate />
 
     </x-container>
 </div>

@@ -45,4 +45,10 @@ class Purchase extends Model
     {
         return $this->belongsTo(Warehouse::class);
     }
+
+    //relacion uno a muchos polimorfica
+    public function inventories()
+    {
+        return $this->morphMany(Inventory::class, 'inventoryable');
+    }
 }

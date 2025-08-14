@@ -10,6 +10,7 @@ use App\Models\PurchaseOrder;
 use App\Models\Warehouse;
 use App\Models\Customer;
 use App\Models\Quote;
+use App\Models\Reason;
 
 Route::get('/patients', function (Request $request) {
 
@@ -98,6 +99,9 @@ Route::post('/wharehouses', function (Request $request) {
         ->when($request->search, function ($query, $search) {
             $query->where('name', 'like', "%{$search}%")
                 ->orWhere('location', 'like', "%{$search}%");
+        })
+        ->when($request->exclude, function ($query, $exclude) {
+            $query->where('id', '!=', $exclude);
         })
         ->when($request->selected, function ($query, $selected) {
             $query->whereIn('id', $selected);
@@ -202,3 +206,16 @@ Route::post('/quotes', function (Request $request) {
         ];
     });
 })->name('api.quotes.index');
+
+Route::post('/reasons', function (Request $request) {
+    return Reason::select('id', 'name')
+        ->when($request->search, function ($query, $search) {
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('type', 'like', "%{$search}%");
+        })
+        ->when($request->selected, function ($query, $selected) {
+            $query->whereIn('id', $selected);
+        })
+        ->where('type', $request->input('type', ''))
+        ->get();
+})->name('api.reasons.index');

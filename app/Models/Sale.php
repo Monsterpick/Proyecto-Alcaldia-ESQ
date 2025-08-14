@@ -27,4 +27,10 @@ class Sale extends Model
                     ->withPivot('quantity', 'price', 'subtotal')
                     ->withTimestamps();
     }
+
+    //relacion uno a muchos polimorfica
+    public function inventories()
+    {
+        return $this->morphMany(Inventory::class, 'inventoryable');
+    }
 }

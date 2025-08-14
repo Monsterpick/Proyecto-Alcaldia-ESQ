@@ -288,6 +288,7 @@
             'icon' => 'fa-solid fa-arrows-rotate',
             'active' => request()->routeIs([
                 'admin.movements.*',
+                'admin.transfers.*',
             ]),
             'permission' => 'view-movement',
             'id_submenu' => 'submenu-movimientos',
@@ -304,7 +305,7 @@
                     'icon' => 'fa-solid fa-retweet',
                     'url' => route('admin.transfers.index'),
                     'active' => request()->routeIs('admin.transfers.*'),
-                    'permission' => 'view-movement',
+                    'permission' => 'view-transfer',
                 ],
             ],
         ],

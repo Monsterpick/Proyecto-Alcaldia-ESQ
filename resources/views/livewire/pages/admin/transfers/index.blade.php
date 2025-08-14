@@ -1,42 +1,42 @@
 <?php
 
 use Livewire\Volt\Component;
-use App\Models\Movement;
+use App\Models\Transfer;
 use Illuminate\View\View;
 
 new class extends Component {
     
     public function rendering(View $view)
     {
-        $view->title('Movimientos');
+        $view->title('Transferencias');
     }
 
-    public function deleteMovement(Movement $movement)
+    public function deleteTransfer(Transfer $transfer)
     {
-        if ($movement->inventories->count() > 0) {
+        if ($transfer->inventories->count() > 0) {
             $this->dispatch('showAlert', [
                 'icon' => 'error',
                 'title' => 'Acción no permitida',
-                'text' => 'No puedes eliminar el movimiento porque tiene inventarios asociados',
+                'text' => 'No puedes eliminar la transferencia porque tiene inventarios asociados',
             ]);
             return;
         }
 
         try {
-            $movement->delete();
+            $transfer->delete();
 
             $this->dispatch('showAlert', [
                 'icon' => 'success',
-                'title' => 'Movimiento eliminado',
-                'text' => 'El movimiento se ha eliminado correctamente',
+                'title' => 'Transferencia eliminada',
+                'text' => 'La transferencia se ha eliminado correctamente',
             ]);
 
-            $this->dispatch('pg:eventRefresh-movement-table');
+            $this->dispatch('pg:eventRefresh-transfer-table');
         } catch (\Exception $e) {
             $this->dispatch('showAlert', [
                 'icon' => 'error',
                 'title' => 'Error',
-                'text' => 'Ocurrió un error al intentar eliminar el movimiento',
+                'text' => 'Ocurrió un error al intentar eliminar la transferencia',
             ]);
         }
     }
@@ -51,14 +51,14 @@ new class extends Component {
                 'route' => route('admin.dashboard'),
             ],
             [
-                'name' => 'Entradas y Salidas',
+                'name' => 'Transferencias',
             ],
         ]" />
     </x-slot>
 
     @can('create-customer')
         <x-slot name="action">
-            <x-button info href="{{ route('admin.movements.create') }}" wire:navigate>
+            <x-button info href="{{ route('admin.transfers.create') }}" wire:navigate>
                 <i class="fa-solid fa-plus"></i>
                 Nuevo
             </x-button>
@@ -66,13 +66,13 @@ new class extends Component {
     @endcan
     <x-container class="w-full px-4">
 
-        <livewire:movement-table />
+       <livewire:transfer-table />
         
     </x-container>
 
     @push('scripts')
         <script>
-            function confirmDelete(movement_id) {
+            function confirmDelete(transfer_id) {
                 Swal.fire({
                     title: '¿Estás seguro?',
                     text: 'No podrás revertir esto!',
@@ -84,7 +84,7 @@ new class extends Component {
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        @this.call('deleteMovement', movement_id);
+                        @this.call('deleteTransfer', transfer_id);
                     }
                 });
             }

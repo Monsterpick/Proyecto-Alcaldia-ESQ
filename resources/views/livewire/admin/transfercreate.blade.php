@@ -2,25 +2,21 @@
 
 use Livewire\Volt\Component;
 use Illuminate\View\View;
-use App\Models\PurchaseOrder;
+use App\Models\Transfer;
 use App\Models\Product;
-use App\Models\Purchase;
-use App\Models\Inventory;
-use App\Services\KardexService;
 
 new class extends Component {
     
-    public $voucher_type = 1;
-    public $serie;
+    public $type = 3;
+    public $serie = 'TRANS001';
     public $correlative;
     public $date;
-    public $supplier_id;
-    public $warehouse_id;
+    public $origin_warehouse_id;
+    public $destination_warehouse_id;
     public $total = 0;
     public $discount;
     public $tax;
     public $observation;
-    public $purchase_order_id;
 
     public $products = [];
 
@@ -50,40 +46,28 @@ new class extends Component {
         });
     }
 
-
+    public function mount(){
+        //Buscamos el maximo correlativo de las ordenes de compra y le sumamos 1
+        $this->correlative = Transfer::max('correlative') + 1;
+    }
 
     public function updated($property, $value){
-        if($property == 'purchase_order_id'){
-            $purchaseOrder = PurchaseOrder::find($value);
-
-            if($purchaseOrder){
-                $this->voucher_type = $purchaseOrder->voucher_type;
-                $this->supplier_id = $purchaseOrder->supplier_id;
-
-
-                $this->products = $purchaseOrder->products->map(function($product){
-                    return [
-                        'id' => $product->id,
-                        'name' => $product->name,
-                        'price' => $product->pivot->price,
-                        'quantity' => $product->pivot->quantity,
-                        'subtotal' => $product->pivot->price * $product->pivot->quantity,
-                    ];
-                })->toArray();
-            }
+        if($property === 'type'){
+            $this->destination_warehouse_id = null;
+        }
+        if($property === 'origin_warehouse_id'){
+            $this->destination_warehouse_id = null;
         }
     }
 
-    public function save(KardexService $kardex){
-
+    public function save(){
         $this->validate([
-            'voucher_type' => 'required|integer|min:1|max:4',
-            'serie' => 'required|string|max:99999999',
-            'correlative' => 'required|integer|min:1|max:99999999',
+            'type' => 'required|integer|min:1|max:4',
+            'serie' => 'required|string|max:10',
+            'correlative' => 'required|integer|min:1',
             'date' => 'nullable|date',
-            'purchase_order_id' => 'nullable|exists:purchase_orders,id',
-            'warehouse_id' => 'required|exists:warehouses,id',
-            'supplier_id' => 'required|exists:suppliers,id',
+            'origin_warehouse_id' => 'required|exists:warehouses,id',
+            'destination_warehouse_id' => 'required|different:origin_warehouse_id|exists:warehouses,id',
             'total' => 'required|numeric|min:0',
             'observation' => 'nullable|string|max:255',
             'products' => 'required|array|min:1',
@@ -91,15 +75,18 @@ new class extends Component {
             'products.*.quantity' => 'required|integer|min:1',
             'products.*.price' => 'required|numeric|min:0',
         ],[
-            'voucher_type.required' => 'El tipo de comprobante es requerido',
-            'voucher_type.integer' => 'El tipo de comprobante debe ser un número entero',
-            'voucher_type.min' => 'El tipo de comprobante debe ser mayor a 0',
-            'voucher_type.max' => 'El tipo de comprobante debe ser menor a 5',
+            'type.required' => 'El tipo de comprobante es requerido',
+            'type.integer' => 'El tipo de comprobante debe ser un número entero',
+            'type.min' => 'El tipo de comprobante debe ser mayor a 0',
+            'type.max' => 'El tipo de comprobante debe ser menor a 5',
             'serie.required' => 'La serie es requerida',
             'serie.string' => 'La serie debe ser un texto',
             'serie.max' => 'La serie debe tener menos de 10 caracteres',
-            'supplier_id.required' => 'El proveedor es requerido',
-            'supplier_id.exists' => 'El proveedor no existe',
+            'origin_warehouse_id.required' => 'El almacén de origen es requerido',
+            'origin_warehouse_id.exists' => 'El almacén de origen no existe',
+            'destination_warehouse_id.required' => 'El almacén de destino es requerido',
+            'destination_warehouse_id.exists' => 'El almacén de destino no existe',
+            'destination_warehouse_id.different' => 'El almacén de destino debe ser diferente al almacén de origen',
             'total.required' => 'El total es requerido',
             'total.numeric' => 'El total debe ser un número',
             'total.min' => 'El total debe ser mayor a 0',
@@ -114,8 +101,11 @@ new class extends Component {
             'products.*.price.numeric' => 'El precio debe ser un número',
             'products.*.price.min' => 'El precio debe ser mayor a 0',
         ],[
-            'supplier_id.required' => 'El proveedor es requerido',
-            'supplier_id.exists' => 'El proveedor no existe',
+            'origin_warehouse_id.required' => 'El almacén de origen es requerido',
+            'origin_warehouse_id.exists' => 'El almacén de origen no existe',
+            'destination_warehouse_id.required' => 'El almacén de destino es requerido',
+            'destination_warehouse_id.exists' => 'El almacén de destino no existe',
+            'destination_warehouse_id.different' => 'El almacén de destino debe ser diferente al almacén de origen',
             'total.required' => 'El total es requerido',
             'total.numeric' => 'El total debe ser un número',
             'total.min' => 'El total debe ser mayor a 0',
@@ -135,14 +125,13 @@ new class extends Component {
             'products.*.price.min' => 'El precio debe ser mayor a 0',
         ]);
 
-        $purchase = Purchase::create([
-            'voucher_type' => $this->voucher_type,
+        $transfer = Transfer::create([
+            'type' => $this->type,
             'serie' => $this->serie,
             'correlative' => $this->correlative,
             'date' => $this->date ?? now(),
-            'purchase_order_id' => $this->purchase_order_id,
-            'warehouse_id' => $this->warehouse_id,
-            'supplier_id' => $this->supplier_id,
+            'origin_warehouse_id' => $this->origin_warehouse_id,
+            'destination_warehouse_id' => $this->destination_warehouse_id,
             'total' => $this->total,
             'discount' => $this->discount ?? 0,
             'tax' => $this->tax ?? 0,
@@ -150,71 +139,20 @@ new class extends Component {
         ]);
 
         foreach($this->products as $product){
-            $purchase->products()->attach($product['id'], [
+            $transfer->products()->attach($product['id'], [
                 'quantity' => $product['quantity'],
                 'price' => $product['price'],
                 'subtotal' => $product['price'] * $product['quantity'],
             ]);
-
-            //Kardex
-            $kardex->registerEntry($purchase, $product, $this->warehouse_id, 'Compra #' . $purchase->correlative);
-
-
-            /* $lastRecord = Inventory::where('product_id', $product['id'])
-                ->where('warehouse_id', $this->warehouse_id)
-                ->latest('id')
-                ->first();
-
-            $lastQuantityBalance = $lastRecord?->quantity_balance ?? 0;
-            $lastTotalBalance = $lastRecord?->total_balance ?? 0;
-
-            $newQuantityBalance = $lastQuantityBalance + $product['quantity'];
-            $newTotalBalance = $lastTotalBalance + ($product['price'] * $product['quantity']);
-
-            $newCostBalance = $newTotalBalance / $newQuantityBalance; */
-
-            /* Inventory::create([
-                'detail' => 'Compra #' . $purchase->correlative,
-                'quantity_in' => $product['quantity'],
-                'cost_in' => $product['price'],
-                'total_in' => $product['price'] * $product['quantity'],
-                'quantity_out' => 0,
-                'cost_out' => 0,
-                'total_out' => 0,
-                'quantity_balance' => $newQuantityBalance,
-                'cost_balance' => $newCostBalance,
-                'total_balance' => $newTotalBalance,
-                'product_id' => $product['id'],
-                'warehouse_id' => $this->warehouse_id,
-                'inventoryable_id' => $purchase->id,
-                'inventoryable_type' => Purchase::class,
-            ]); */
-
-            /* $purchase->inventories()->create([
-                'detail' => 'Compra # ' . $purchase->correlative,
-                'quantity_in' => $product['quantity'],
-                'cost_in' => $product['price'],
-                'total_in' => $product['price'] * $product['quantity'],
-                'quantity_out' => 0,
-                'cost_out' => 0,
-                'total_out' => 0,
-                'quantity_balance' => $newQuantityBalance,
-                'cost_balance' => $newCostBalance,
-                'total_balance' => $newTotalBalance,
-                'product_id' => $product['id'],
-                'warehouse_id' => $this->warehouse_id,
-                'inventoryable_id' => $purchase->id,
-                'inventoryable_type' => Purchase::class,
-            ]); */
         }
 
         session()->flash('swal', [
             'icon' => 'success',
-            'title' => 'La compra se ha creado correctamente',
-            'text' => 'La compra se ha creado correctamente',
+            'title' => 'Transferencia creada',
+            'text' => 'La transferencia se ha creado correctamente',
         ]);
 
-        $this->redirect(route('admin.purchases.index'), navigate: true);
+        $this->redirect(route('admin.transfers.index'), navigate: true);
     }
 
     public function addProduct(){
@@ -246,9 +184,9 @@ new class extends Component {
         $this->products[] = [
             'id' => $product->id,
             'name' => $product->name,
-            'price' => 0,
+            'price' => $product->price,
             'quantity' => 1,
-            'subtotal' => 0,
+            'subtotal' => $product->price,
         ];
 
         $this->product_id = null;
@@ -282,72 +220,56 @@ new class extends Component {
 }">
     <x-card >
         <h1 class="text-2xl font-bold">
-            Información de la Orden de Compra
+            Información de la Transferencia
         </h1>
         <p class="text-sm text-gray-600 dark:text-gray-400 py-4">
-            Registre la información de la orden de compra.
+            Registre la información de la transferencia.
         </p>
         <div class="border-t border-gray-200 dark:border-gray-600 mb-4"></div>
 
         <form wire:submit.prevent="save" >
             <div class="space-y-4">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                <x-native-select label="Tipo de Comprobante" wire:model="voucher_type">
-                    <option value="1">Factura</option>
-                    <option value="2">Boleta</option>
-                    <option value="3">Nota de Crédito</option>
-                    <option value="4">Nota de Débito</option>
+                <x-native-select label="Tipo de Transferencia" wire:model.live="type">
+                    <option value="1">Ingreso</option>
+                    <option value="2">Salida</option>
+                    <option value="3">Transferencia</option>
+                    <option value="4">Devolución</option>
                 </x-native-select>
 
-                <div class="grid grid-cols-2 gap-2">
+                <x-input label="Serie" wire:model="serie" placeholder="Serie del comprobante" disabled/>
 
-                    <x-input label="Serie" wire:model="serie" placeholder="Serie del comprobante" />
-                    
-                    <x-input label="Correlativo" wire:model="correlative" placeholder="Correlativo del comprobante"  />
-                </div>
+                <x-input label="Correlativo" wire:model="correlative" placeholder="Correlativo del comprobante" disabled  />
 
                 <x-input label="Fecha" wire:model="date" type="date" />
 
-                <x-select 
-                label="Orden de Compra" 
-                wire:model.live="purchase_order_id" 
-                :async-data="[
-                    'api' => route('api.purchase-orders.index'),
-                    'method' => 'POST',
-                    ]"
-                    option-label="name"
-                    option-value="id"
-                    option-description="description"
-                />
-
-                <div class="col-span-2">
-                    <x-select 
-                    label="Proveedor" 
-                    wire:model="supplier_id" 
-                    :async-data="[
-                        'api' => route('api.suppliers.index'),
-                        'method' => 'POST',
-                        ]"
-                        option-label="name"
-                        option-value="id"
-                />
-                </div>
-
-                <div class="col-span-2">
-                    <x-select 
-                    label="Almacenes" 
-                    wire:model="warehouse_id" 
+                <x-select
+                    class="col-span-2"
+                    label="Almacén de Origen" 
+                    wire:model.live="origin_warehouse_id" 
                     :async-data="[
                         'api' => route('api.warehouses.index'),
                         'method' => 'POST',
                         ]"
                         option-label="name"
                         option-value="id"
-                        option-description="description"
                 />
-                </div>
 
-                
+                <x-select
+                    class="col-span-2"
+                    label="Almacén Destino" 
+                    wire:model="destination_warehouse_id" 
+                    :async-data="[
+                        'api' => route('api.warehouses.index'),
+                        'method' => 'POST',
+                        'params' => [
+                            'type' => $this->type,
+                            'exclude' => $this->origin_warehouse_id,
+                        ]
+                        ]"
+                        option-label="name"
+                        option-value="id"
+                />
             </div>
             
 

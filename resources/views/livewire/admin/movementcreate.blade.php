@@ -2,20 +2,18 @@
 
 use Livewire\Volt\Component;
 use Illuminate\View\View;
-use App\Models\Quote;
+use App\Models\Movement;
 use App\Models\Product;
-use App\Models\Sale;
 use App\Models\Inventory;
 
 new class extends Component {
 
-    public $voucher_type = 1;
-    public $serie = 'F001';
+    public $type = 1;
+    public $serie = 'MOV001';
     public $correlative;
     public $date;
-    public $quote_id;
-    public $customer_id;
     public $warehouse_id;
+    public $reason_id;
     public $total = 0;
     public $discount;
     public $tax;
@@ -24,11 +22,6 @@ new class extends Component {
     public $products = [];
 
     public $product_id;
-
-    public function mount()
-    {
-        $this->correlative = Sale::max('correlative') + 1;
-    }
 
     public function boot()
     {
@@ -54,57 +47,44 @@ new class extends Component {
         });
     }
 
-
+    public function mount()
+    {
+        //Buscamos el maximo correlativo de las ordenes de compra y le sumamos 1
+        $this->correlative = Movement::max('correlative') + 1;
+    }
 
     public function updated($property, $value)
     {
-        if ($property == 'quote_id') {
-            $quote = Quote::find($value);
-
-            if ($quote) {
-                $this->voucher_type = $quote->voucher_type;
-                $this->customer_id = $quote->customer_id;
-
-
-                $this->products = $quote->products->map(function ($product) {
-                    return [
-                        'id' => $product->id,
-                        'name' => $product->name,
-                        'price' => $product->pivot->price,
-                        'quantity' => $product->pivot->quantity,
-                        'subtotal' => $product->pivot->price * $product->pivot->quantity,
-                    ];
-                })->toArray();
-            }
+        if ($property === 'type') {
+            $this->reason_id = null;
         }
     }
 
     public function save()
     {
         $this->validate([
-            'voucher_type' => 'required|integer|min:1|max:4',
-            'serie' => 'required|string|max:99999999',
-            'correlative' => 'required|integer|min:1|max:99999999',
+            'type' => 'required|integer|min:1|max:4',
+            'serie' => 'required|string|max:10',
+            'correlative' => 'required|integer|min:1',
             'date' => 'nullable|date',
-            'quote_id' => 'nullable|exists:quotes,id',
             'warehouse_id' => 'required|exists:warehouses,id',
-            'customer_id' => 'required|exists:customers,id',
             'total' => 'required|numeric|min:0',
             'observation' => 'nullable|string|max:255',
             'products' => 'required|array|min:1',
             'products.*.id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
             'products.*.price' => 'required|numeric|min:0',
+            'reason_id' => 'required|exists:reasons,id',
         ], [
-            'voucher_type.required' => 'El tipo de comprobante es requerido',
-            'voucher_type.integer' => 'El tipo de comprobante debe ser un número entero',
-            'voucher_type.min' => 'El tipo de comprobante debe ser mayor a 0',
-            'voucher_type.max' => 'El tipo de comprobante debe ser menor a 5',
+            'type.required' => 'El tipo de comprobante es requerido',
+            'type.integer' => 'El tipo de comprobante debe ser un número entero',
+            'type.min' => 'El tipo de comprobante debe ser mayor a 0',
+            'type.max' => 'El tipo de comprobante debe ser menor a 5',
             'serie.required' => 'La serie es requerida',
             'serie.string' => 'La serie debe ser un texto',
             'serie.max' => 'La serie debe tener menos de 10 caracteres',
-            'customer_id.required' => 'El cliente es requerido',
-            'customer_id.exists' => 'El cliente no existe',
+            'warehouse_id.required' => 'El almacén es requerido',
+            'warehouse_id.exists' => 'El almacén no existe',
             'total.required' => 'El total es requerido',
             'total.numeric' => 'El total debe ser un número',
             'total.min' => 'El total debe ser mayor a 0',
@@ -119,8 +99,8 @@ new class extends Component {
             'products.*.price.numeric' => 'El precio debe ser un número',
             'products.*.price.min' => 'El precio debe ser mayor a 0',
         ], [
-            'customer_id.required' => 'El cliente es requerido',
-            'customer_id.exists' => 'El cliente no existe',
+            'warehouse_id.required' => 'El almacén es requerido',
+            'warehouse_id.exists' => 'El almacén no existe',
             'total.required' => 'El total es requerido',
             'total.numeric' => 'El total debe ser un número',
             'total.min' => 'El total debe ser mayor a 0',
@@ -140,65 +120,106 @@ new class extends Component {
             'products.*.price.min' => 'El precio debe ser mayor a 0',
         ]);
 
-        $sale = Sale::create([
-            'voucher_type' => $this->voucher_type,
+        $movement = Movement::create([
+            'type' => $this->type,
             'serie' => $this->serie,
             'correlative' => $this->correlative,
             'date' => $this->date ?? now(),
-            'quote_id' => $this->quote_id,
             'warehouse_id' => $this->warehouse_id,
-            'customer_id' => $this->customer_id,
             'total' => $this->total,
             'discount' => $this->discount ?? 0,
             'tax' => $this->tax ?? 0,
             'observation' => $this->observation,
+            'reason_id' => $this->reason_id,
         ]);
 
         foreach ($this->products as $product) {
-            $sale->products()->attach($product['id'], [
+            $movement->products()->attach($product['id'], [
                 'quantity' => $product['quantity'],
                 'price' => $product['price'],
                 'subtotal' => $product['price'] * $product['quantity'],
             ]);
+
+            $lastRecord = Inventory::where('product_id', $product['id'])
+                ->where('warehouse_id', $this->warehouse_id)
+                ->latest('id')
+                ->first();
+
+            $lastQuantityBalance = $lastRecord?->quantity_balance ?? 0;
+            $lastTotalBalance = $lastRecord?->total_balance ?? 0;
+
+            if ($this->type == 1) {
+                $newQuantityBalance = $lastQuantityBalance + $product['quantity'];
+                $newTotalBalance = $lastTotalBalance + ($product['price'] * $product['quantity']);
+                $newCostBalance = $newTotalBalance / ($newQuantityBalance ?: 1); //evitar division por cero
+
+                $movement->inventories()->create([
+                    'detail' => 'Movimiento # ' . $movement->correlative,
+                    'quantity_in' => $product['quantity'],
+                    'cost_in' => $product['price'],
+                    'total_in' => $product['price'] * $product['quantity'],
+                    'quantity_out' => 0,
+                    'cost_out' => 0,
+                    'total_out' => 0,
+                    'quantity_balance' => $newQuantityBalance,
+                    'cost_balance' => $newCostBalance,
+                    'total_balance' => $newTotalBalance,
+                    'product_id' => $product['id'],
+                    'warehouse_id' => $this->warehouse_id,
+                ]);
+
+            } elseif ($this->type == 2) {
+                $newQuantityBalance = $lastQuantityBalance - $product['quantity'];
+                $newTotalBalance = $lastTotalBalance - ($product['price'] * $product['quantity']);
+                $newCostBalance = $newTotalBalance / ($newQuantityBalance ?: 1); //evitar division por cero
+
+                $movement->inventories()->create([
+                    'detail' => 'Movimiento # ' . $movement->correlative,
+                    'quantity_in' => 0,
+                    'cost_in' => 0,
+                    'total_in' => 0,
+                    'quantity_out' => $product['quantity'],
+                    'cost_out' => $product['price'],
+                    'total_out' => $product['price'] * $product['quantity'],
+                    'quantity_balance' => $newQuantityBalance,
+                    'cost_balance' => $newCostBalance,
+                    'total_balance' => $newTotalBalance,
+                    'product_id' => $product['id'],
+                    'warehouse_id' => $this->warehouse_id,
+                ]);
+
+            } elseif ($this->type == 3) {
+                $newQuantityBalance = $lastQuantityBalance + $product['quantity'];
+                $newTotalBalance = $lastTotalBalance + ($product['price'] * $product['quantity']);
+                $newCostBalance = $newTotalBalance / ($newQuantityBalance ?: 1); //evitar division por cero
+
+                $movement->inventories()->create([
+                    'detail' => 'Movimiento # ' . $movement->correlative,
+                    'quantity_in' => $product['quantity'],
+                    'cost_in' => $product['price'],
+                    'total_in' => $product['price'] * $product['quantity'],
+                    'quantity_out' => 0,
+                    'cost_out' => 0,
+                    'total_out' => 0,
+                    'quantity_balance' => $newQuantityBalance,
+                    'cost_balance' => $newCostBalance,
+                    'total_balance' => $newTotalBalance,
+                    'product_id' => $product['id'],
+                    'warehouse_id' => $this->warehouse_id,
+                ]);
+            }
+
+
         }
 
-        //Kardex
-        $lastRecord = Inventory::where('product_id', $product['id'])
-            ->where('warehouse_id', $this->warehouse_id)
-            ->latest('id')
-            ->first();
-
-        $lastQuantityBalance = $lastRecord?->quantity_balance ?? 0;
-        $lastTotalBalance = $lastRecord?->total_balance ?? 0;
-
-        $lastCostBalance = $lastRecord?->cost_balance ?? 0;
-
-        $newQuantityBalance = $lastQuantityBalance - $product['quantity'];
-        $newTotalBalance = $lastTotalBalance - ($lastCostBalance * $product['quantity']);
-        $newCostBalance = $newTotalBalance / ($newQuantityBalance ?? 1); //evitar division por cero
-
-        $sale->inventories()->create([
-            'detail' => 'Venta # ' . $sale->correlative,
-            'quantity_in' => 0,
-            'cost_in' => 0,
-            'total_in' => 0,
-            'quantity_out' => $product['quantity'],
-            'cost_out' => $lastCostBalance,
-            'total_out' => $lastCostBalance * $product['quantity'],
-            'quantity_balance' => $newQuantityBalance,
-            'cost_balance' => $newCostBalance,
-            'total_balance' => $newTotalBalance,
-            'product_id' => $product['id'],
-            'warehouse_id' => $this->warehouse_id,
-        ]);
 
         session()->flash('swal', [
             'icon' => 'success',
-            'title' => 'La venta se ha creado correctamente',
-            'text' => 'La venta se ha creado correctamente',
+            'title' => 'Movimiento creado',
+            'text' => 'El movimiento se ha creado correctamente',
         ]);
 
-        $this->redirect(route('admin.sales.index'), navigate: true);
+        $this->redirect(route('admin.movements.index'), navigate: true);
     }
 
     public function addProduct()
@@ -206,11 +227,15 @@ new class extends Component {
 
         $this->validate([
             'product_id' => 'required|exists:products,id',
+            'warehouse_id' => 'required|exists:warehouses,id',
         ], [
             'product_id.required' => 'El producto es requerido',
             'product_id.exists' => 'El producto no existe',
+            'warehouse_id.required' => 'El almacén es requerido',
+            'warehouse_id.exists' => 'El almacén no existe',
         ], [
             'product_id' => 'Producto',
+            'warehouse_id' => 'Almacén',
         ]);
 
         $existing = collect($this->products)
@@ -228,12 +253,19 @@ new class extends Component {
 
         $product = Product::find($this->product_id);
 
+        $lastRecord = Inventory::where('product_id', $product['id'])
+            ->where('warehouse_id', $this->warehouse_id)
+            ->latest('id')
+            ->first();
+
+        $costBalance = $lastRecord?->cost_balance ?? 0;
+
         $this->products[] = [
             'id' => $product->id,
             'name' => $product->name,
-            'price' => $product->price,
+            'price' => $costBalance,
             'quantity' => 1,
-            'subtotal' => $product->price,
+            'subtotal' => $costBalance,
         ];
 
         $this->product_id = null;
@@ -243,7 +275,7 @@ new class extends Component {
 }; ?>
 
 <div x-data="{
-    products: @entangle('products'),
+    products: @entangle('products').live,
 
     total: @entangle('total'),
 
@@ -267,53 +299,41 @@ new class extends Component {
 }">
     <x-card>
         <h1 class="text-2xl font-bold">
-            Información de la Venta
+            Información del Movimiento
         </h1>
         <p class="text-sm text-gray-600 dark:text-gray-400 py-4">
-            Registre la información de la venta.
+            Registre la información del movimiento.
         </p>
         <div class="border-t border-gray-200 dark:border-gray-600 mb-4"></div>
 
         <form wire:submit.prevent="save">
             <div class="space-y-4">
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                    <x-native-select label="Tipo de Comprobante" wire:model="voucher_type">
-                        <option value="1">Factura</option>
-                        <option value="2">Boleta</option>
-                        <option value="3">Nota de Crédito</option>
-                        <option value="4">Nota de Débito</option>
+                    <x-native-select label="Tipo de Movimiento" wire:model.live="type">
+                        <option value="1">Ingreso</option>
+                        <option value="2">Salida</option>
+                        <option value="3">Devolución</option>
                     </x-native-select>
 
-                    <div class="grid grid-cols-2 gap-2">
+                    <x-input label="Serie" wire:model="serie" placeholder="Serie del comprobante" disabled />
 
-                        <x-input label="Serie" wire:model="serie" placeholder="Serie del comprobante" />
-
-                        <x-input label="Correlativo" wire:model="correlative"
-                            placeholder="Correlativo del comprobante" />
-                    </div>
+                    <x-input label="Correlativo" wire:model="correlative" placeholder="Correlativo del comprobante"
+                        disabled />
 
                     <x-input label="Fecha" wire:model="date" type="date" />
 
-                    <x-select label="Cotización" wire:model.live="quote_id" :async-data="[
-                    'api' => route('api.quotes.index'),
-                    'method' => 'POST',
-                    ]" option-label="name" option-value="id" option-description="description" />
-
-                    <div class="col-span-2">
-                        <x-select label="Cliente" wire:model="customer_id" :async-data="[
-                        'api' => route('api.customers.index'),
-                        'method' => 'POST',
-                        ]" option-label="name" option-value="id" />
-                    </div>
-
-                    <div class="col-span-2">
-                        <x-select label="Almacen" wire:model="warehouse_id" :async-data="[
+                    <x-select class="col-span-2" label="Almacén" wire:model="warehouse_id" :async-data="[
                         'api' => route('api.warehouses.index'),
                         'method' => 'POST',
-                        ]" option-label="name" option-value="id" option-description="description" />
-                    </div>
+                        ]" option-label="name" option-value="id" :disabled="count($products) > 0" />
 
-
+                    <x-select class="col-span-2" label="Razón" wire:model="reason_id" :async-data="[
+                        'api' => route('api.reasons.index'),
+                        'method' => 'POST',
+                        'params' => [
+                            'type' => $this->type,
+                        ]
+                        ]" option-label="name" option-value="id" />
                 </div>
 
 
@@ -335,7 +355,7 @@ new class extends Component {
                             <tr class="text-gray-700 border-y bg-blue-50">
                                 <th class="py-2 px-4">Producto</th>
                                 <th class="py-2 px-4">Cantidad</th>
-                                <th class="py-2 px-4">Precio</th>
+                                <th class="py-2 px-4">Precio costo</th>
                                 <th class="py-2 px-4">Subtotal</th>
                                 <th class="py-2 px-4"></th>
                             </tr>

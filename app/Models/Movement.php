@@ -26,4 +26,20 @@ class Movement extends Model
                     ->withPivot('quantity', 'price', 'subtotal')
                     ->withTimestamps();
     }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
+    public function reason()
+    {
+        return $this->belongsTo(Reason::class);
+    }
+
+    //relacion uno a muchos polimorfica
+    public function inventories()
+    {
+        return $this->morphMany(Inventory::class, 'inventoryable');
+    }
 }

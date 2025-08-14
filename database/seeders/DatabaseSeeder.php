@@ -37,11 +37,12 @@ class DatabaseSeeder extends Seeder
             AppointmentStatusSeeder::class,
             CategorySeeder::class,
             IdentitySeeder::class,
+            ReasonSeeder::class,
+            WarehouseSeeder::class,
         ]);
 
         Customer::factory(100)->create();
         Supplier::factory(100)->create();
         Product::factory(100)->create();
-        Warehouse::factory(100)->create();
     }
 }

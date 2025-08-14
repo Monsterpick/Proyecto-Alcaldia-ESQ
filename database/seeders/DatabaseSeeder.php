@@ -3,10 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Customer;
-use App\Models\Product;
-use App\Models\Supplier;
-use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -28,21 +24,9 @@ class DatabaseSeeder extends Seeder
             MunicipioSeeder::class,
             ParroquiaSeeder::class,
             DefaultUserSeeder::class,
-            ActividadSeeder::class,
             EstatusSeeder::class,
-            PlanSeeder::class,
             PaymentTypeSeeder::class,
             PaymentOriginSeeder::class,
-            TenantSeeder::class,
-            AppointmentStatusSeeder::class,
-            CategorySeeder::class,
-            IdentitySeeder::class,
-            ReasonSeeder::class,
-            WarehouseSeeder::class,
         ]);
-
-        Customer::factory(100)->create();
-        Supplier::factory(100)->create();
-        Product::factory(100)->create();
     }
 }

@@ -28,38 +28,6 @@ class DefaultUserSeeder extends Seeder
 
         $superAdmin->assignRole('Super Admin');
 
-        $patient = User::create([
-            'name' => 'Paciente',
-            'last_name' => 'Paciente',
-            'document' => 'V20428781',
-            'phone' => '+584126713413',
-            'email' => 'paciente@gmail.com',
-            'password' => Hash::make('S0p0rt3!'),
-            'email_verified_at' => now(),
-        ]);
-
-        $patient->assignRole('Paciente');
-
-        Patient::create([
-            'user_id' => $patient->id,
-        ]);
-
-        $doctor = User::create([
-            'name' => 'Doctor',
-            'last_name' => 'Doctor',
-            'document' => 'V20428781',
-            'phone' => '+584126713413',
-            'email' => 'doctor@gmail.com',
-            'password' => Hash::make('S0p0rt3!'),
-            'email_verified_at' => now(),
-        ]);
-
-        $doctor->assignRole('Doctor');
-
-        Doctor::create([
-            'user_id' => $doctor->id,
-        ]);
-
         $admin = User::create([
             'name' => 'Jhonny',
             'last_name' => 'Torres',

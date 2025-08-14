@@ -13,20 +13,6 @@
             'permission' => 'view-dashboard',
         ],
         [
-            'name' => 'Tenants',
-            'icon' => 'fa-solid fa-building',
-            'url' => route('admin.tenants.index'),
-            'active' => request()->routeIs('admin.tenants.*'),
-            'permission' => 'view-tenant',
-        ],
-        [
-            'name' => 'Pagos',
-            'icon' => 'fa-solid fa-circle-dollar-to-slot',
-            'url' => route('admin.tenant-payments.index'),
-            'active' => request()->routeIs('admin.tenant-payments.*'),
-            'permission' => 'view-tenant-payment',
-        ],
-        [
             'header' => 'Administración',
             'permission' => 'view-patient',
         ],
@@ -36,34 +22,6 @@
             'url' => route('admin.users.index'),
             'active' => request()->routeIs('admin.users.*'),
             'permission' => 'view-user',
-        ],
-        [
-            'name' => 'Pacientes',
-            'icon' => 'fa-solid fa-user-injured',
-            'url' => route('admin.patients.index'),
-            'active' => request()->routeIs('admin.patients.*'),
-            'permission' => 'view-patient',
-        ],
-        [
-            'name' => 'Doctores',
-            'icon' => 'fa-solid fa-user-doctor',
-            'url' => route('admin.doctors.index'),
-            'active' => request()->routeIs('admin.doctors.*'),
-            'permission' => 'view-doctor',
-        ],
-        [
-            'name' => 'Citas',
-            'icon' => 'fa-solid fa-calendar-check',
-            'url' => route('admin.appointments.index'),
-            'active' => request()->routeIs('admin.appointments.*'),
-            'permission' => 'view-appointment',
-        ],
-        [
-            'name' => 'Calendario',
-            'icon' => 'fa-solid fa-calendar-days',
-            'url' => route('admin.calendar.index'),
-            'active' => request()->routeIs('admin.calendar.*'),
-            'permission' => 'view-calendar',
         ],
         [
             'header' => 'Configuración de Sistema',
@@ -129,21 +87,21 @@
                     'name' => 'Datos de la empresa',
                     'icon' => 'fa-solid fa-building',
                     'url' => route('admin.settings.general'),
-                    'active' => request()->routeIs('admin.settings.*'),
+                    'active' => request()->routeIs('admin.settings.general.*'),
                     'permission' => 'view-setting',
                 ],
                 [
                     'name' => 'Moneda',
                     'icon' => 'fa-solid fa-money-bill',
                     'url' => route('admin.settings.index'),
-                    'active' => request()->routeIs('admin.settings.*'),
+                    'active' => request()->routeIs('admin.settings.moneda.*'),
                     'permission' => 'view-setting',
                 ],
                 [
                     'name' => 'Logos',
                     'icon' => 'fa-solid fa-image',
                     'url' => route('admin.settings.logo'),
-                    'active' => request()->routeIs('admin.settings.*'),
+                    'active' => request()->routeIs('admin.settings.logo.*'),
                     'permission' => 'view-setting',
                 ],
                 [
@@ -161,20 +119,6 @@
                     'permission' => 'view-permission',
                 ],
                 [
-                    'name' => 'Estatus',
-                    'icon' => 'fa-solid fa-toggle-on',
-                    'url' => route('admin.estatuses.index'),
-                    'active' => request()->routeIs('admin.estatuses.*'),
-                    'permission' => 'view-estatus',
-                ],
-                [
-                    'name' => 'Estatus de Cita',
-                    'icon' => 'fa-solid fa-calendar-days',
-                    'url' => route('admin.appointment-statuses.index'),
-                    'active' => request()->routeIs('admin.appointment-statuses.*'),
-                    'permission' => 'view-appointment-status',
-                ],
-                [
                     'name' => 'Tipos de pago',
                     'icon' => 'fa-solid fa-coins',
                     'url' => route('admin.payment-types.index'),
@@ -188,152 +132,8 @@
                     'active' => request()->routeIs('admin.payment-origins.*'),
                     'permission' => 'view-payment-origin',
                 ],
-                [
-                    'name' => 'Categorías',
-                    'icon' => 'fa-solid fa-tags',
-                    'url' => route('admin.categories.index'),
-                    'active' => request()->routeIs('admin.categories.*'),
-                    'permission' => 'view-category',
-                ],
-                [
-                    'name' => 'Productos',
-                    'icon' => 'fa-solid fa-box',
-                    'url' => route('admin.products.index'),
-                    'active' => request()->routeIs('admin.products.*'),
-                    'permission' => 'view-product',
-                ],
-
-
-                [
-                    'name' => 'Almacenes',
-                    'icon' => 'fa-solid fa-warehouse',
-                    'url' => route('admin.warehouses.index'),
-                    'active' => request()->routeIs('admin.warehouses.*'),
-                    'permission' => 'view-warehouse',
-                ],
             ],
 
-        ],
-        [
-            'name' => 'Compras',
-            'icon' => 'fa-solid fa-cart-shopping',
-            'active' => request()->routeIs([
-                'admin.suppliers.*',
-                'admin.purchase-orders.*',
-                'admin.purchases.*',
-            ]),
-            'permission' => 'view-purchase',
-            'id_submenu' => 'submenu-compras',
-            'submenu' => [
-                [
-                    'name' => 'Proveedores',
-                    'icon' => 'fa-solid fa-truck',
-                    'url' => route('admin.suppliers.index'),
-                    'active' => request()->routeIs('admin.suppliers.*'),
-                    'permission' => 'view-supplier',
-                ],
-                [
-                    'name' => 'Ordenes de compra',
-                    'icon' => 'fa-solid fa-cart-shopping',
-                    'url' => route('admin.purchase-orders.index'),
-                    'active' => request()->routeIs('admin.purchase-orders.*'),
-                    'permission' => 'view-purchase-order',
-                ],
-                [
-                    'name' => 'Compras',
-                    'icon' => 'fa-solid fa-cart-plus',
-                    'url' => route('admin.purchases.index'),
-                    'active' => request()->routeIs('admin.purchases.*'),
-                    'permission' => 'view-purchase',
-                ],
-            ],
-        ],
-        [
-            'name' => 'Ventas',
-            'icon' => 'fa-solid fa-cash-register',
-            'active' => request()->routeIs([
-                'admin.customers.*',
-                'admin.quotes.*',
-                'admin.sales.*',
-            ]),
-            'permission' => 'view-sale',
-            'id_submenu' => 'submenu-ventas',
-            'submenu' => [
-                [
-                    'name' => 'Clientes',
-                    'icon' => 'fa-solid fa-user-group',
-                    'url' => route('admin.customers.index'),
-                    'active' => request()->routeIs('admin.customers.*'),
-                    'permission' => 'view-customer',
-                ],
-                [
-                    'name' => 'Cotizaciones',
-                    'icon' => 'fa-solid fa-file-invoice',
-                    'url' => route('admin.quotes.index'),
-                    'active' => request()->routeIs('admin.quotes.*'),
-                    'permission' => 'view-quote',
-                ],
-                [
-                    'name' => 'Ventas',
-                    'icon' => 'fa-solid fa-file-invoice-dollar',
-                    'url' => route('admin.sales.index'),
-                    'active' => request()->routeIs('admin.sales.*'),
-                    'permission' => 'view-sale',
-                ],
-            ],
-        ],
-
-        [
-            'name' => 'Movimientos',
-            'icon' => 'fa-solid fa-arrows-rotate',
-            'active' => request()->routeIs([
-                'admin.movements.*',
-                'admin.transfers.*',
-            ]),
-            'permission' => 'view-movement',
-            'id_submenu' => 'submenu-movimientos',
-            'submenu' => [
-                [
-                    'name' => 'Entradas y Salidas',
-                    'icon' => 'fa-solid fa-right-left',
-                    'url' => route('admin.movements.index'),
-                    'active' => request()->routeIs('admin.movements.*'),
-                    'permission' => 'view-movement',
-                ],
-                [
-                    'name' => 'Transferencias',
-                    'icon' => 'fa-solid fa-retweet',
-                    'url' => route('admin.transfers.index'),
-                    'active' => request()->routeIs('admin.transfers.*'),
-                    'permission' => 'view-transfer',
-                ],
-            ],
-        ],
-
-        [
-            'name' => 'Reportes',
-            'icon' => 'fa-solid fa-chart-line',
-            'active' => request()->routeIs([
-                'admin.reports.*',
-            ]),
-            'permission' => 'view-report',
-            'id_submenu' => 'submenu-reportes',
-            'submenu' => [
-                [
-                    'name' => 'Entradas y Salidas',
-                    'icon' => 'fa-solid fa-users',
-                    'url' => route('admin.customers.index'),
-                    'active' => request()->routeIs('admin.customers.*'),
-                    'permission' => 'view-customer',
-                ],
-                [
-                    'name' => 'Transferencias',
-                    'icon' => 'fa-solid fa-cart-shopping',
-                    'url' => route('admin.quotes.index'),
-                    'active' => request()->routeIs('admin.quotes.*'),
-                    'permission' => 'view-quote',
-                ],
-            ],
         ],
 
     ];

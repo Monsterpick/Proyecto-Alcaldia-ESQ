@@ -1,24 +1,33 @@
 #!/bin/bash
 
-echo "🚀 Iniciando aplicación..."
+echo "🚀 Iniciando aplicación Laravel..."
 
 # Ejecutar migraciones
 echo "📊 Ejecutando migraciones..."
 php artisan migrate --force
 
-# Limpiar y cachear configuración
-echo "🔧 Optimizando configuración..."
+# Optimizar para producción
+echo "🔧 Optimizando para producción..."
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
 # Crear enlace simbólico de storage
+echo "📁 Configurando storage..."
 php artisan storage:link
 
-# Configurar webhook de Telegram automáticamente
+# Configurar webhook de Telegram
 echo "🤖 Configurando webhook de Telegram..."
 php artisan telegram:setup-webhook
 
-# Iniciar servidor PHP con configuración correcta para archivos estáticos
-echo "✅ Aplicación lista!"
-php -S 0.0.0.0:${PORT:-8080} -t public public/index.php
+# Configurar Nginx para el puerto de Railway
+echo "🌐 Configurando Nginx..."
+sed -i "s/listen 8080;/listen ${PORT:-8080};/" /etc/nginx/sites-available/default
+
+# Iniciar PHP-FPM en background
+echo "⚙️ Iniciando PHP-FPM..."
+php-fpm -D
+
+# Iniciar Nginx en foreground
+echo "✅ Iniciando Nginx..."
+nginx -g "daemon off;"

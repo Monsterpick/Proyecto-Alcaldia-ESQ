@@ -290,23 +290,22 @@ class TelegramBotController extends Controller
                         $telegramUser
                     );
                     
-                    // Ejecutar el comando correspondiente
-                    $commandClass = null;
-                    switch($commandName) {
-                        case 'search':
-                            $commandClass = new \App\Telegram\Commands\SearchCommand();
-                            break;
-                        case 'stats':
-                            $commandClass = new \App\Telegram\Commands\StatsCommand();
-                            break;
-                        case 'help':
-                            $commandClass = new \App\Telegram\Commands\HelpCommand();
-                            break;
-                    }
+                    // Convertir a comando y ejecutar (igual que polling)
+                    $telegram = Telegram::bot();
+                    $commands = $telegram->getCommands();
                     
-                    if ($commandClass) {
-                        $commandClass->make(Telegram::bot(), $update, []);
-                        $commandClass->handle();
+                    foreach ($commands as $command) {
+                        if ($command->getName() === $commandName) {
+                            // Obtener entidades del mensaje
+                            $entities = $message->get('entities', []);
+                            if ($entities instanceof \Illuminate\Support\Collection) {
+                                $entities = $entities->toArray();
+                            }
+                            
+                            // Ejecutar comando (make llama automáticamente a handle)
+                            $command->make($telegram, $update, $entities);
+                            break;
+                        }
                     }
                     
                     return response()->json(['status' => 'ok']);

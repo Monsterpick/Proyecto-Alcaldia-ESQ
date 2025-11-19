@@ -29,16 +29,20 @@ class TelegramBotController extends Controller
             // Obtener información del usuario de Telegram
             $telegramUser = null;
             $chatId = null;
+            $from = null;
             
             if ($message = $update->getMessage()) {
                 $from = $message->getFrom();
                 $chatId = $message->getChat()->getId();
-                $telegramUser = [
-                    'id' => $from->getId(),
-                    'username' => $from->getUsername(),
-                    'first_name' => $from->getFirstName(),
-                    'last_name' => $from->getLastName(),
-                ];
+                
+                if ($from) {
+                    $telegramUser = [
+                        'id' => $from->getId(),
+                        'username' => $from->getUsername(),
+                        'first_name' => $from->getFirstName(),
+                        'last_name' => $from->getLastName(),
+                    ];
+                }
             }
             
             // Procesar flujo de autenticación
@@ -327,7 +331,9 @@ class TelegramBotController extends Controller
                 }
             }
             
-            Telegram::commandsHandler(true);
+            // NO usar commandsHandler aquí para evitar ejecución duplicada
+            // Los comandos ya se manejan en el switch case de arriba
+            // Telegram::commandsHandler(true);
             
             return response()->json(['status' => 'ok']);
         } catch (\Exception $e) {

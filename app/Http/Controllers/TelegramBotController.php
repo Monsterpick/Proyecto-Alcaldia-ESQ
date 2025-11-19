@@ -265,7 +265,7 @@ class TelegramBotController extends Controller
                     }
                     
                     if ($commandClass) {
-                        $commandClass->make(Telegram::bot(), $update, null);
+                        $commandClass->make(Telegram::bot(), $update, []);
                         $commandClass->handle();
                     }
                     

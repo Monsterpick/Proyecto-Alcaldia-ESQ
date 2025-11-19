@@ -28,11 +28,11 @@ WORKDIR /var/www
 # Copiar archivos del proyecto
 COPY . /var/www
 
-# Instalar dependencias de npm y compilar assets
-RUN npm ci && npm run build
-
-# Instalar dependencias de Composer
+# Instalar dependencias de Composer PRIMERO (necesario para Flux CSS)
 RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Instalar dependencias de npm y compilar assets DESPUÉS
+RUN npm ci && npm run build
 
 # Configurar permisos
 RUN chown -R www-data:www-data /var/www \

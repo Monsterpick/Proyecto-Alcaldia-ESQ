@@ -947,9 +947,12 @@ class TelegramBotController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             
+            // Escapar caracteres especiales del mensaje de error para evitar problemas de parsing
+            $errorMsg = str_replace(['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'], '', $e->getMessage());
+            
             Telegram::sendMessage([
                 'chat_id' => $chatId,
-                'text' => "❌ Error al obtener reportes: " . $e->getMessage(),
+                'text' => "❌ Error al obtener reportes.\n\nPor favor intenta nuevamente o contacta al administrador si el problema persiste.",
             ]);
             
             // Registrar error en logs

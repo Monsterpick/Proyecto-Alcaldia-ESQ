@@ -1,14 +1,16 @@
 # Configuración de Nixpacks para Railway
 [phases.setup]
-nixPkgs = ["php82", "php82Packages.composer", "nginx"]
+nixPkgs = ["php82", "php82Packages.composer", "nginx", "nodejs", "npm"]
 
 [phases.install]
 cmds = [
-    "composer install --no-dev --optimize-autoloader --no-interaction"
+    "composer install --no-dev --optimize-autoloader --no-interaction",
+    "npm ci"
 ]
 
 [phases.build]
 cmds = [
+    "npm run build",
     "php artisan config:cache",
     "php artisan route:cache",
     "php artisan view:cache"

@@ -61,16 +61,27 @@ class TelegramBotController extends Controller
             if ($chosenResult = $update->getChosenInlineResult()) {
                 $from = $chosenResult->getFrom();
                 $resultId = $chosenResult->getResultId();
-                $inlineMessageId = $chosenResult->getInlineMessageId();
+                $query = $chosenResult->getQuery();
                 
-                // Si el resultado es un beneficiario (ID numérico)
-                if (is_numeric($resultId)) {
+                logger()->info('========= CHOSEN INLINE RESULT =========', [
+                    'result_id' => $resultId,
+                    'query' => $query,
+                    'from_id' => $from->getId(),
+                ]);
+                
+                // Solo procesar si el resultId NO es "no_results" y es numérico
+                if ($resultId !== 'no_results' && is_numeric($resultId)) {
                     $beneficiaryId = (int)$resultId;
                     $beneficiary = \App\Models\Beneficiary::find($beneficiaryId);
                     
                     if ($beneficiary) {
                         // Contar reportes
                         $reportsCount = \App\Models\Report::where('beneficiary_cedula', $beneficiary->cedula)->count();
+                        
+                        logger()->info('Enviando botón de reportes para beneficiario', [
+                            'beneficiary' => $beneficiary->full_name,
+                            'reports_count' => $reportsCount,
+                        ]);
                         
                         if ($reportsCount > 0) {
                             // Enviar mensaje con botón para ver reportes
@@ -349,17 +360,39 @@ class TelegramBotController extends Controller
                     
                     return response()->json(['status' => 'ok']);
                 } elseif (strpos($text, '/') === 0) {
+                    // Comando escrito con / - ejecutarlo
+                    $commandName = trim(explode(' ', $text)[0], '/');
+                    
                     // Registrar comando ejecutado vía texto
-                    $command = trim(explode(' ', $text)[0], '/');
                     self::logTelegramActivity(
-                        "Comando ejecutado: {$command}",
+                        "Comando ejecutado: {$commandName}",
                         [
-                            'command' => $command,
+                            'command' => $commandName,
                             'full_text' => $text,
                             'action' => 'text_command'
                         ],
                         $telegramUser
                     );
+                    
+                    // Ejecutar el comando (igual que polling)
+                    $telegram = Telegram::bot();
+                    $commands = $telegram->getCommands();
+                    
+                    foreach ($commands as $command) {
+                        if ($command->getName() === $commandName) {
+                            // Obtener entidades del mensaje
+                            $entities = $message->get('entities', []);
+                            if ($entities instanceof \Illuminate\Support\Collection) {
+                                $entities = $entities->toArray();
+                            }
+                            
+                            // Ejecutar comando
+                            $command->make($telegram, $update, $entities);
+                            break;
+                        }
+                    }
+                    
+                    return response()->json(['status' => 'ok']);
                 } else {
                     // Registrar mensaje de texto
                     self::logTelegramActivity(

@@ -908,7 +908,9 @@ class TelegramBotController extends Controller
                             if ($item && $item->product) {
                                 $cantidad = $item->quantity ?? 0;
                                 $unidad = $item->product->unit ?? 'unidades';
-                                return "{$item->product->name} {$cantidad} {$unidad}";
+                                // Escapar caracteres especiales de Markdown
+                                $productName = $this->escapeTelegramMarkdown($item->product->name);
+                                return "{$productName} {$cantidad} {$unidad}";
                             }
                             return null;
                         })->filter()->values();
@@ -916,12 +918,16 @@ class TelegramBotController extends Controller
                         $productosText = $productos->count() > 0 ? $productos->implode(', ') : 'Sin productos';
                         $cantidadItems = $report->items->count();
                         
+                        // Escapar caracteres especiales en nombres
+                        $beneficiaryName = $this->escapeTelegramMarkdown($report->beneficiary_full_name ?? 'Sin nombre');
+                        $reportStatus = $this->escapeTelegramMarkdown(ucfirst($report->status));
+                        
                         $text .= ($index + 1) . ". {$statusEmoji} *{$report->report_code}*\n";
                         $text .= "   • Productos: {$productosText}\n";
                         $text .= "   • Entregas: {$cantidadItems}\n";
-                        $text .= "   • Beneficiario: {$report->beneficiary_full_name}\n";
+                        $text .= "   • Beneficiario: {$beneficiaryName}\n";
                         $text .= "   • Fecha: " . ($report->delivery_date ? $report->delivery_date->format('d/m/Y') : 'N/A') . "\n";
-                        $text .= "   • Estado: " . ucfirst($report->status) . "\n\n";
+                        $text .= "   • Estado: {$reportStatus}\n\n";
                     } catch (\Exception $itemError) {
                         // Si hay error con un reporte específico, continuar con el siguiente
                         logger()->error('Error procesando reporte en bot: ' . $itemError->getMessage(), [
@@ -1032,5 +1038,18 @@ class TelegramBotController extends Controller
         $chartEncoded = urlencode($chartJson);
         
         return "https://quickchart.io/chart?c={$chartEncoded}&width=500&height=300&backgroundColor=white";
+    }
+    
+    /**
+     * Escapar caracteres especiales de Markdown de Telegram
+     */
+    private function escapeTelegramMarkdown($text)
+    {
+        // Escapar caracteres especiales de Markdown
+        $specialChars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
+        foreach ($specialChars as $char) {
+            $text = str_replace($char, '\\' . $char, $text);
+        }
+        return $text;
     }
 }

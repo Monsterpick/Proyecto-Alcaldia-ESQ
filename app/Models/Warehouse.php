@@ -11,6 +11,10 @@ class Warehouse extends Model
     protected $fillable = [
         'name',
         'location',
+        'description',
+        'responsible',
+        'phone',
+        'is_active',
     ];
 
     public function inventories()

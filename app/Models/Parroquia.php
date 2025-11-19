@@ -16,5 +16,10 @@ class Parroquia extends Model
         return $this->belongsTo(Municipio::class);
     }
 
+    public function circuitosComunales()
+    {
+        return $this->hasMany(CircuitoComunal::class);
+    }
+
     protected $fillable = ['municipio_id', 'parroquia'];
 }

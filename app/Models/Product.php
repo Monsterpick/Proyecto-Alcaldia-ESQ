@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasCurrencyFormat;
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\Storage;
@@ -12,17 +13,21 @@ class Product extends Model
 {
     use HasCurrencyFormat;
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
+        'category_id',
         'name',
+        'unit_type',
         'description',
+        'observation',
         'sku',
         'barcode',
         'qrcode',
         'expedition_date',
         'expiration_date',
         'price',
-        'category_id',
+        'is_active',
     ];
 
     //Relacion uno a muchos inversa

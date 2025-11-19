@@ -26,7 +26,7 @@ new class extends Component {
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <a href="{{ ('/') }}" class="flex ms-2 md:me-24" target="_blank">
-                    <img src="{{ asset(path: 'logo_nexa_18.png') }}" class="h-8 me-3" alt="Nevora Logo" />
+                    <img src="{{ asset(path: '6.png') }}" class="h-8 me-3" alt="Logo Icon" />
                     <span
                         class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white"></span>
                 </a>
@@ -46,7 +46,7 @@ new class extends Component {
                             </span>
                         </x-slot>
                         <x-dropdown.header label="Configuración">
-                            <x-dropdown.item icon="user" label="Mi Perfil" :href="route('admin.profile.index')" wire:navigate />
+                            <x-dropdown.item icon="user" label="Mi Perfil" :href="route('admin.settings.profile')" wire:navigate />
                         </x-dropdown.header>
                         <x-dropdown.item separator label="Cerrar Sesión" wire:click="logout" icon="arrow-right-start-on-rectangle" />
                     </x-dropdown>

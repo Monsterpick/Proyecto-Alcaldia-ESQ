@@ -23,10 +23,13 @@ class DatabaseSeeder extends Seeder
             EstadoSeeder::class,
             MunicipioSeeder::class,
             ParroquiaSeeder::class,
+            CircuitoComunalSeeder::class, // 85 Circuitos Comunales organizados por parroquia
             DefaultUserSeeder::class,
             EstatusSeeder::class,
             PaymentTypeSeeder::class,
             PaymentOriginSeeder::class,
+            CategorySeeder::class,
+            WarehouseSeeder::class,
         ]);
     }
 }

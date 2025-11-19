@@ -17,23 +17,23 @@ class DefaultUserSeeder extends Seeder
     public function run(): void
     {
         $superAdmin = User::create([
-            'name' => 'Silvio',
-            'last_name' => 'Ramírez',
-            'document' => 'V20428781',
-            'phone' => '+584126713413',
-            'email' => 'silvio.ramirez.m@gmail.com',
-            'password' => Hash::make('S0p0rt3!'),
+            'name' => 'Gex',
+            'last_name' => 'y Angel',
+            'document' => 'V00000000',
+            'phone' => '+584120000000',
+            'email' => 'ag@gmail.com',
+            'password' => Hash::make('1234'),
             'email_verified_at' => now(),
         ]);
 
         $superAdmin->assignRole('Super Admin');
 
         $admin = User::create([
-            'name' => 'Jhonny',
-            'last_name' => 'Torres',
+            'name' => 'Alejandro',
+            'last_name' => 'Admin',
             'document' => 'V20428781',
             'phone' => '+584126713413',
-            'email' => 'jhonnytorresforro@gmail.com',
+            'email' => 'alejandro@admin.com',
             'password' => Hash::make('123456789'),
             'email_verified_at' => now(),
         ]);

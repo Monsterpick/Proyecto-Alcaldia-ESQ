@@ -84,7 +84,7 @@ class SettingsSeeder extends Seeder
             /* Settings generales de la empresa */
             [
                 'key' => 'name',
-                'value' => 'OPTIRANGO',
+                'value' => 'Sistema Web de Gestion de la Alcaldia del Municipio Escuque',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Nombre de la Empresa',
@@ -94,7 +94,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'razon_social',
-                'value' => 'OPTIRANGO, C.A.',
+                'value' => 'Sistema Web de Gestion de la Alcaldia del Municipio Escuque',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Razón Social',
@@ -114,7 +114,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'direccion_fiscal',
-                'value' => 'AV. URDANETA ESQ PELOTA EDIF CENTRO PROFESIONAL URDANETA',
+                'value' => 'Avenida principal, Municipio Escuque, Estado Trujillo.',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Dirección Fiscal',
@@ -124,7 +124,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'description',
-                'value' => 'Más que una óptica...',
+                'value' => 'Sistema de control de beneficios sociales',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Descripción',
@@ -134,7 +134,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'long_description',
-                'value' => 'En Ópti Rango, nos dedicamos a ofrecer soluciones visuales de la más alta calidad. Con años de experiencia y un equipo de profesionales comprometidos, garantizamos una atención personalizada y productos que se adaptan a tus necesidades y estilo de vida.',
+                'value' => 'Sistema Web de Gestion de la Alcaldia del Municipio Escuque es un sistema integral para la gestión y control de beneficios sociales. Facilitamos la administración eficiente de programas de ayuda social, garantizando transparencia y acceso equitativo a los beneficiarios.',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Descripción Larga',
@@ -194,7 +194,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'telefono_principal',
-                'value' => '+584246406797',
+                'value' => '04163762183',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Teléfono Principal',
@@ -204,7 +204,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'telefono_secundario',
-                'value' => '+584126426797',
+                'value' => '04163762183',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Teléfono Secundario',
@@ -214,7 +214,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'email_principal',
-                'value' => 'jhonnytorresforro@gmail.com',
+                'value' => 'ag@gmail.com',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Email Principal',
@@ -224,7 +224,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'email_secundario',
-                'value' => 'silvio.ramirez.m@gmail.com',
+                'value' => 'alejandro@admin.com',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Email Secundario',
@@ -234,7 +234,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'domain',
-                'value' => 'optirango.nevora.app',
+                'value' => 'escuque.nevora.app',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Dominio',
@@ -244,7 +244,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'actividad',
-                'value' => 'Optica',
+                'value' => 'Control de Beneficios Sociales',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Actividad',
@@ -255,9 +255,9 @@ class SettingsSeeder extends Seeder
             [
                 'key' => 'servicios',
                 'value' => json_encode([
-                    ['icon' => 'fa-solid fa-lightbulb', 'color' => 'blue', 'title' => 'Innovación Primero', 'description' => 'Utilizamos investigación de vanguardia con métodos de aprendizaje avanzados para crear tecnología revolucionaria.'],
-                    ['icon' => 'fa-solid fa-users', 'color' => 'green', 'title' => 'Espíritu Colaborativo', 'description' => 'Nuestra diversidad de talentos se centra en cooperaciones de colaboración para evaluar y crear soluciones empresariales.'],
-                    ['icon' => 'fa-solid fa-handshake', 'color' => 'blue', 'title' => 'Integridad y Confianza', 'description' => 'Nuestros desarrollos transparentes son diseñados para lograr el desarrollo ético sostenible en el negocio óptico.'],
+                    ['icon' => 'fa-solid fa-hands-helping', 'color' => 'blue', 'title' => 'Gestión Eficiente', 'description' => 'Sistema integral para la administración y control de beneficios sociales con tecnología de vanguardia.'],
+                    ['icon' => 'fa-solid fa-users', 'color' => 'green', 'title' => 'Atención Personalizada', 'description' => 'Enfoque centrado en las necesidades de cada beneficiario, garantizando un servicio de calidad.'],
+                    ['icon' => 'fa-solid fa-shield-alt', 'color' => 'blue', 'title' => 'Transparencia y Confianza', 'description' => 'Procesos transparentes y seguros para garantizar el acceso equitativo a los beneficios sociales.'],
                 ]),
                 'type' => 'json',
                 'group' => 'general',
@@ -271,7 +271,7 @@ class SettingsSeeder extends Seeder
 
             [
                 'key' => 'logo',
-                'value' => 'images/1_logo.png',
+                'value' => '',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Logo',
@@ -281,7 +281,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'logo_background_solid',
-                'value' => 'images/2_logo_background_solid.png',
+                'value' => '',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Logo Background Solid',
@@ -291,7 +291,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'logo_grey',
-                'value' => 'images/3_logo_grey.png',
+                'value' => '',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Logo Grey',
@@ -301,7 +301,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'logo_horizontal',
-                'value' => 'images/4_logo_horizontal.png',
+                'value' => '',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Logo Horizontal',
@@ -311,7 +311,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'logo_horizontal_background_solid',
-                'value' => 'images/5_logo_horizontal_background_solid.jpg',
+                'value' => '',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Logo Horizontal Background Solid',
@@ -321,7 +321,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'logo_icon',
-                'value' => 'images/6_logo_icon.png',
+                'value' => '',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Logo Icon',
@@ -331,7 +331,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'logo_icon_grey',
-                'value' => 'images/7_logo_icon_grey.png',
+                'value' => '',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Logo Icon Grey',

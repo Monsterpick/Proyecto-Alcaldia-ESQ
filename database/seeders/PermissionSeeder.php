@@ -118,6 +118,103 @@ class PermissionSeeder extends Seeder
             'edit-payment-origin',
             'delete-payment-origin',
             'download-payment-origin',
+
+            // Settings
+            'view-setting',
+            'create-setting',
+            'edit-setting',
+            'delete-setting',
+            'download-setting',
+
+            // Direcciones
+            'view-direccion',
+
+            // General
+            'view-general',
+
+            // Profile
+            'profile-setting',
+
+            // Inventario/Almacén
+            'view-inventory',
+            'create-inventory',
+            'edit-inventory',
+            'delete-inventory',
+            'download-inventory',
+
+            // Productos
+            'view-product',
+            'create-product',
+            'edit-product',
+            'delete-product',
+            'download-product',
+
+            // Almacenes
+            'view-warehouse',
+            'create-warehouse',
+            'edit-warehouse',
+            'delete-warehouse',
+            'download-warehouse',
+
+            // Categorías
+            'view-category',
+            'create-category',
+            'edit-category',
+            'delete-category',
+            'download-category',
+
+            // Movimientos
+            'view-movement',
+            'create-movement',
+            'edit-movement',
+            'delete-movement',
+            'download-movement',
+
+            // Ajustes de Stock
+            'view-stock-adjustment',
+            'create-stock-adjustment',
+            'edit-stock-adjustment',
+            'delete-stock-adjustment',
+            'download-stock-adjustment',
+
+            // Entrada de Inventario
+            'view-inventory-entry',
+            'create-inventory-entry',
+            'edit-inventory-entry',
+            'delete-inventory-entry',
+            'download-inventory-entry',
+
+            // Salida de Inventario
+            'view-inventory-exit',
+            'create-inventory-exit',
+            'edit-inventory-exit',
+            'delete-inventory-exit',
+            'download-inventory-exit',
+
+            // Proyectos Comunitarios
+            'view-community-project',
+            'create-community-project',
+            'edit-community-project',
+            'delete-community-project',
+            'download-community-project',
+
+            // Proyectos en Proceso
+            'view-project-in-progress',
+            'create-project-in-progress',
+            'edit-project-in-progress',
+            'delete-project-in-progress',
+
+            // Proyectos Ejecutados
+            'view-project-executed',
+            'create-project-executed',
+            'edit-project-executed',
+            'delete-project-executed',
+
+            // Proyectos Propuestos
+            'view-project-proposed',
+            'create-project-proposed',
+            'edit-project-proposed',
+            'delete-project-proposed',
         ];
 
         // Looping and Inserting Array's Permissions into Permission Table

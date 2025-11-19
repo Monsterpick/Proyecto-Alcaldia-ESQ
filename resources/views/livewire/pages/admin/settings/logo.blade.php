@@ -166,7 +166,7 @@ new class extends Component {
                                 <input type="file" wire:model="temp_logo" class="hidden" accept="image/*">
                             </label>
                         </div>
-                        <img src="{{ $temp_logo ? $temp_logo->temporaryUrl() : ($logo ? Storage::url($logo) : Storage::url('images/placeholder.png')) }}"
+                        <img src="{{ $temp_logo ? $temp_logo->temporaryUrl() : ($logo ? Storage::url($logo) : asset('1.png')) }}"
                             alt="Logo Principal"
                             class="w-full h-48 object-contain rounded-lg border">
                     </figure>
@@ -187,7 +187,7 @@ new class extends Component {
                                 <input type="file" wire:model="temp_logo_background_solid" class="hidden" accept="image/*">
                             </label>
                         </div>
-                        <img src="{{ $temp_logo_background_solid ? $temp_logo_background_solid->temporaryUrl() : ($logo_background_solid ? Storage::url($logo_background_solid) : Storage::url('images/placeholder.png')) }}"
+                        <img src="{{ $temp_logo_background_solid ? $temp_logo_background_solid->temporaryUrl() : ($logo_background_solid ? Storage::url($logo_background_solid) : asset('2.png')) }}"
                             alt="Logo con Fondo Sólido"
                             class="w-full h-48 object-contain rounded-lg border">
                     </figure>
@@ -208,7 +208,7 @@ new class extends Component {
                                 <input type="file" wire:model="temp_logo_grey" class="hidden" accept="image/*">
                             </label>
                         </div>
-                        <img src="{{ $temp_logo_grey ? $temp_logo_grey->temporaryUrl() : ($logo_grey ? Storage::url($logo_grey) : Storage::url('images/placeholder.png')) }}"
+                        <img src="{{ $temp_logo_grey ? $temp_logo_grey->temporaryUrl() : ($logo_grey ? Storage::url($logo_grey) : asset('3.png')) }}"
                             alt="Logo Escala de Grises"
                             class="w-full h-48 object-contain rounded-lg border">
                     </figure>
@@ -229,7 +229,7 @@ new class extends Component {
                                 <input type="file" wire:model="temp_logo_horizontal" class="hidden" accept="image/*">
                             </label>
                         </div>
-                        <img src="{{ $temp_logo_horizontal ? $temp_logo_horizontal->temporaryUrl() : ($logo_horizontal ? Storage::url($logo_horizontal) : Storage::url('images/placeholder.png')) }}"
+                        <img src="{{ $temp_logo_horizontal ? $temp_logo_horizontal->temporaryUrl() : ($logo_horizontal ? Storage::url($logo_horizontal) : asset('4.png')) }}"
                             alt="Logo Horizontal"
                             class="w-full h-48 object-contain rounded-lg border">
                     </figure>
@@ -250,7 +250,7 @@ new class extends Component {
                                 <input type="file" wire:model="temp_logo_horizontal_background_solid" class="hidden" accept="image/*">
                             </label>
                         </div>
-                        <img src="{{ $temp_logo_horizontal_background_solid ? $temp_logo_horizontal_background_solid->temporaryUrl() : ($logo_horizontal_background_solid ? Storage::url($logo_horizontal_background_solid) : Storage::url('images/placeholder.png')) }}"
+                        <img src="{{ $temp_logo_horizontal_background_solid ? $temp_logo_horizontal_background_solid->temporaryUrl() : ($logo_horizontal_background_solid ? Storage::url($logo_horizontal_background_solid) : asset('5.png')) }}"
                             alt="Logo Horizontal con Fondo Sólido"
                             class="w-full h-48 object-contain rounded-lg border">
                     </figure>
@@ -271,7 +271,7 @@ new class extends Component {
                                 <input type="file" wire:model="temp_logo_icon" class="hidden" accept="image/*">
                             </label>
                         </div>
-                        <img src="{{ $temp_logo_icon ? $temp_logo_icon->temporaryUrl() : ($logo_icon ? Storage::url($logo_icon) : Storage::url('images/placeholder.png')) }}"
+                        <img src="{{ $temp_logo_icon ? $temp_logo_icon->temporaryUrl() : ($logo_icon ? Storage::url($logo_icon) : asset('6.png')) }}"
                             alt="Logo Icono"
                             class="w-full h-48 object-contain rounded-lg border">
                     </figure>
@@ -292,7 +292,7 @@ new class extends Component {
                                 <input type="file" wire:model="temp_logo_icon_grey" class="hidden" accept="image/*">
                             </label>
                         </div>
-                        <img src="{{ $temp_logo_icon_grey ? $temp_logo_icon_grey->temporaryUrl() : ($logo_icon_grey ? Storage::url($logo_icon_grey) : Storage::url('images/placeholder.png')) }}"
+                        <img src="{{ $temp_logo_icon_grey ? $temp_logo_icon_grey->temporaryUrl() : ($logo_icon_grey ? Storage::url($logo_icon_grey) : asset('7.png')) }}"
                             alt="Logo Icono Gris"
                             class="w-full h-48 object-contain rounded-lg border">
                     </figure>

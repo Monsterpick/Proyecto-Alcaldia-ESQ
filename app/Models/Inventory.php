@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class Inventory extends Model
 {
+    use LogsActivity;
     protected $fillable = [
         'product_id',
         'warehouse_id',

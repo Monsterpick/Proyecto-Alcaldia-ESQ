@@ -10,12 +10,13 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        return redirect()->route('admin.dashboard');
     })->name('dashboard');
 
-    Route::get('/settings/profile', function () {
-        return view('livewire.pages.patient.settings.profile');
-    })->name('settings.profile');
+    // Ruta de perfil movida a admin.php
+    // Route::get('/settings/profile', function () {
+    //     return view('livewire.pages.patient.settings.profile');
+    // })->name('settings.profile');
 
 
 

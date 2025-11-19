@@ -219,3 +219,12 @@ Route::post('/reasons', function (Request $request) {
         ->where('type', $request->input('type', ''))
         ->get();
 })->name('api.reasons.index');
+
+// Rutas del Bot de Telegram
+Route::prefix('telegram')->group(function () {
+    Route::post('/webhook', [App\Http\Controllers\TelegramBotController::class, 'webhook']);
+    Route::post('/set-webhook', [App\Http\Controllers\TelegramBotController::class, 'setWebhook']);
+    Route::post('/remove-webhook', [App\Http\Controllers\TelegramBotController::class, 'removeWebhook']);
+    Route::get('/me', [App\Http\Controllers\TelegramBotController::class, 'getMe']);
+    Route::post('/test', [App\Http\Controllers\TelegramBotController::class, 'sendTestMessage']);
+});

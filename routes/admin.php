@@ -5,6 +5,7 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\PaymentReceiptController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\MapController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -16,8 +17,6 @@ Route::middleware(['auth'])->group(function () {
 
     //Ruta de Dashboard
     Volt::route('/dashboard', 'pages.admin.dashboard.index')->name('dashboard');
-
-    Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
 
     // Rutas para la gestión de usuarios
     Volt::route('/users', 'pages.admin.users.index')
@@ -145,6 +144,11 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:delete-parroquia')
         ->name('parroquias.destroy');
 
+    // Rutas para la gestión de circuitos comunales (solo lectura)
+    Volt::route('/circuitos-comunales', 'pages.admin.circuitos-comunales.index')
+        ->middleware('permission:view-parroquia')
+        ->name('circuitos-comunales.index');
+
     // Rutas para la gestión de tipos de pago
     Volt::route('/payment-types', 'pages.admin.payment-types.index')
         ->middleware('permission:view-payment-type')
@@ -205,7 +209,71 @@ Route::middleware(['auth'])->group(function () {
 
     Volt::route('/settings/profile', 'pages.admin.profile.index')
         ->middleware('permission:profile-setting')
-        ->name('profile.index');
+        ->name('settings.profile');
+
+    // Rutas para Categorías de Inventario
+    Volt::route('/categories', 'pages.admin.categories.index')
+        ->middleware('permission:view-category')
+        ->name('categories.index');
+
+    // Rutas para Almacenes
+    Volt::route('/warehouses', 'pages.admin.warehouses.index')
+        ->middleware('permission:view-warehouse')
+        ->name('warehouses.index');
+
+    // Rutas para Productos
+    Volt::route('/products', 'pages.admin.products.index')
+        ->middleware('permission:view-product')
+        ->name('products.index');
+
+    // Rutas para Ajustes de Stock
+    Volt::route('/stock-adjustments', 'pages.admin.stock-adjustments.index')
+        ->middleware('permission:view-stock-adjustment')
+        ->name('stock-adjustments.index');
+
+    // Rutas para Movimientos de Inventario
+    Volt::route('/inventory-entries', 'pages.admin.inventory-entries.index')
+        ->middleware('permission:view-inventory-entry')
+        ->name('inventory-entries.index');
+
+    Volt::route('/inventory-exits', 'pages.admin.inventory-exits.index')
+        ->middleware('permission:view-inventory-exit')
+        ->name('inventory-exits.index');
+
+    Volt::route('/movements', 'pages.admin.movements.index')
+        ->middleware('permission:view-movement')
+        ->name('movements.index');
+
+    // Rutas para Beneficiarios
+    Route::get('/beneficiaries', \App\Livewire\Pages\Admin\Beneficiaries\Index::class)
+        ->name('beneficiaries.index');
+    
+    Route::get('/beneficiaries/create', \App\Livewire\Pages\Admin\Beneficiaries\Create::class)
+        ->name('beneficiaries.create');
+    
+    Route::get('/beneficiaries/{id}/edit', \App\Livewire\Pages\Admin\Beneficiaries\Edit::class)
+        ->name('beneficiaries.edit');
+
+    // Rutas para Reportes de Entregas
+    Volt::route('/reports', 'pages.admin.reports.index')
+        ->name('reports.index');
+
+    Volt::route('/reports/create', 'pages.admin.reports.create')
+        ->name('reports.create');
+
+    Volt::route('/reports/{id}', 'pages.admin.reports.show')
+        ->name('reports.show');
+
+    Volt::route('/reports/{id}/edit', 'pages.admin.reports.edit')
+        ->name('reports.edit');
+
+    // Rutas para el Mapa de Geolocalización
+    Volt::route('/map', 'pages.admin.map.index')
+        ->name('map.index');
+
+    // Rutas para el Registro de Actividades
+    Volt::route('/activity-logs', 'pages.admin.activity-logs.index')
+        ->name('activity-logs.index');
 
 });
 

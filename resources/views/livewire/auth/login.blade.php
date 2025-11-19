@@ -40,9 +40,9 @@ new #[Layout('livewire.layout.client.client')] class extends Component {
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        if (Auth::user()->hasRole(['admin', 'Super Admin', 'Doctor', 'Recepcionista', 'Administrador'])) {
+        if (Auth::user()->hasRole(['admin', 'Super Admin', 'Coordinador', 'Operador', 'Administrador'])) {
             $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: false);
-        } else if (Auth::user()->hasRole(['Paciente', 'user'])) {
+        } else if (Auth::user()->hasRole(['Beneficiario', 'user'])) {
             $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
         }
     }
@@ -78,14 +78,25 @@ new #[Layout('livewire.layout.client.client')] class extends Component {
 }; ?>
 
 <div class="flex flex-col gap-12">
-    <section class="bg-gray-50 dark:bg-gray-900">
-        <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-            <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-                <img class="w-70 h-12 mr-2" src="{{ Storage::url('images/4_logo_horizontal.png') }}" alt="logo">
-            </a>
-            <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+    <section class="relative bg-gray-50 dark:bg-gray-900 overflow-hidden">
+        <!-- Imagen de fondo -->
+        <div class="absolute inset-0" style="background-image: url('{{ asset('fondo4.png') }}'); background-size: cover; background-position: center center; background-repeat: no-repeat;"></div>
+        <!-- Overlay oscuro -->
+        <div class="absolute inset-0 bg-slate-950/60"></div>
+        <div class="relative flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+            <div class="flex flex-col items-center mb-6 text-center">
+                <div class="bg-white rounded-2xl p-6 shadow-2xl border-2 border-gray-300 transform hover:scale-105 hover:shadow-blue-500/50 transition-all duration-300">
+                    <h1 class="text-3xl font-bold text-black mb-2">
+                        Sistema Web de Gestion de la Alcaldia del Municipio Escuque
+                    </h1>
+                    <p class="text-sm text-gray-800 font-semibold">
+                        Sistema de gestión de beneficios sociales
+                    </p>
+                </div>
+            </div>
+            <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0 border-2 border-gray-300 transform hover:scale-105 hover:shadow-blue-500/50 transition-all duration-300">
                 <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                    <h1 class="text-xl text-center font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                    <h1 class="text-xl text-center font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
                         Inicia sesión en tu cuenta
                     </h1>
                     <form wire:submit="login" class="space-y-4 md:space-y-6">
@@ -105,19 +116,16 @@ new #[Layout('livewire.layout.client.client')] class extends Component {
                                     <x-checkbox id="remember" aria-describedby="remember" type="checkbox" wire:model="remember" />
                                 </div>
                                 <div class="ml-3 text-sm">
-                                    <label for="remember" class="text-gray-500 dark:text-gray-300">Recordarme</label>
+                                    <label for="remember" class="text-gray-700">Recordarme</label>
                                 </div>
                             </div>
-                            {{-- <a href="#" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">¿Olvidaste tu contraseña?</a> --}}
+                            {{-- <a href="#" class="text-sm font-medium text-primary-600 hover:underline">¿Olvidaste tu contraseña?</a> --}}
                         </div>
                         <x-button info type="submit" class="w-full" label="Iniciar sesión" icon="arrow-right-end-on-rectangle" spinner/>
-                        {{-- <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                            ¿No tienes una cuenta? <a href="#" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Registrate</a>
+                        {{-- <p class="text-sm font-light text-gray-500">
+                            ¿No tienes una cuenta? <a href="#" class="font-medium text-primary-600 hover:underline">Registrate</a>
                         </p> --}}
                     </form>
-                </div>
-                <div class="flex justify-center items-center mb-4">
-                    <livewire:components.teme-switcher />
                 </div>
             </div>
         </div>

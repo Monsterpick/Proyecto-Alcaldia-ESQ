@@ -39,7 +39,7 @@ php artisan migrate --force
 php artisan queue:restart
 php artisan down
 php artisan up
-curl -I optirango.nevora.app
+curl -I escuque.nevora.app
 
 Revisar el subdominio
 

@@ -19,6 +19,6 @@ php artisan storage:link
 echo "🤖 Configurando webhook de Telegram..."
 php artisan telegram:setup-webhook
 
-# Iniciar servidor PHP
+# Iniciar servidor PHP con configuración correcta para archivos estáticos
 echo "✅ Aplicación lista!"
-php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+php -S 0.0.0.0:${PORT:-8080} -t public public/index.php

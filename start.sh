@@ -2,15 +2,14 @@
 
 echo "🚀 Iniciando aplicación Laravel..."
 
-# Ejecutar migraciones
-echo "📊 Ejecutando migraciones..."
-php artisan migrate --force
+# Variable para forzar reset completo (cambiar a false después del reset)
+FORCE_RESET=true
 
-# Ejecutar seeders solo la primera vez (si no existe archivo flag)
-FLAG_FILE="/var/www/storage/app/.seeders_executed"
-
-if [ ! -f "$FLAG_FILE" ]; then
-    echo "🌱 Primera inicialización - Cargando datos del sistema..."
+if [ "$FORCE_RESET" = true ]; then
+    echo "🔄 RESETEANDO BASE DE DATOS COMPLETAMENTE..."
+    php artisan migrate:fresh --force
+    
+    echo "🌱 Cargando datos limpios del sistema..."
     
     # Seeders base
     php artisan db:seed --class=PermissionSeeder --force
@@ -33,11 +32,11 @@ if [ ! -f "$FLAG_FILE" ]; then
     # Usuario Super Admin
     php artisan db:seed --class=SuperAdminSeeder --force
     
-    # Crear archivo flag para no volver a ejecutar
-    touch "$FLAG_FILE"
-    echo "✅ Datos iniciales cargados correctamente"
+    echo "✅ Base de datos reseteada y datos cargados correctamente"
 else
-    echo "⏭️ Base de datos ya inicializada, omitiendo seeders"
+    echo "📊 Ejecutando migraciones..."
+    php artisan migrate --force
+    echo "⏭️ Omitiendo reset - Base de datos mantenida"
 fi
 
 # Optimizar para producción

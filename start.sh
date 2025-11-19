@@ -3,7 +3,7 @@
 echo "🚀 Iniciando aplicación Laravel..."
 
 # Variable para forzar reset completo (cambiar a false después del reset)
-FORCE_RESET=true
+FORCE_RESET=false
 
 if [ "$FORCE_RESET" = true ]; then
     echo "🔄 RESETEANDO BASE DE DATOS COMPLETAMENTE..."

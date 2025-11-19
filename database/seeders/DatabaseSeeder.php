@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             PaymentOriginSeeder::class,
             CategorySeeder::class,
             WarehouseSeeder::class,
+            DashboardDataSeeder::class, // Datos de inventario para gráficos del dashboard
         ]);
     }
 }

@@ -39,7 +39,13 @@ else
     echo "⏭️ Omitiendo reset - Base de datos mantenida"
 fi
 
-# Optimizar para producción
+# Limpiar y optimizar
+echo "🔧 Limpiando cachés..."
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+
 echo "🔧 Optimizando para producción..."
 php artisan config:cache
 php artisan route:cache

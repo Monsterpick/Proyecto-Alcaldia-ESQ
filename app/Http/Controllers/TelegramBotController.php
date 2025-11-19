@@ -299,7 +299,13 @@ class TelegramBotController extends Controller
             
             return response()->json(['status' => 'ok']);
         } catch (\Exception $e) {
-            logger()->error('Telegram Webhook Error: ' . $e->getMessage());
+            // Log detallado del error
+            logger()->error('========= TELEGRAM WEBHOOK ERROR =========', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             
             // Registrar error
             self::logError('Error en webhook de Telegram', $e, [

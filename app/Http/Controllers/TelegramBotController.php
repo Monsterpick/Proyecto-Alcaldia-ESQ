@@ -57,6 +57,45 @@ class TelegramBotController extends Controller
                 }
             }
             
+            // Manejar chosen inline result (cuando el usuario selecciona un resultado)
+            if ($chosenResult = $update->getChosenInlineResult()) {
+                $from = $chosenResult->getFrom();
+                $resultId = $chosenResult->getResultId();
+                $inlineMessageId = $chosenResult->getInlineMessageId();
+                
+                // Si el resultado es un beneficiario (ID numérico)
+                if (is_numeric($resultId)) {
+                    $beneficiaryId = (int)$resultId;
+                    $beneficiary = \App\Models\Beneficiary::find($beneficiaryId);
+                    
+                    if ($beneficiary) {
+                        // Contar reportes
+                        $reportsCount = \App\Models\Report::where('beneficiary_cedula', $beneficiary->cedula)->count();
+                        
+                        if ($reportsCount > 0) {
+                            // Enviar mensaje con botón para ver reportes
+                            Telegram::sendMessage([
+                                'chat_id' => $from->getId(),
+                                'text' => "📋 *{$beneficiary->full_name}* tiene *{$reportsCount}* reporte(s) registrado(s).\n\nPresiona el botón para verlos:",
+                                'parse_mode' => 'Markdown',
+                                'reply_markup' => json_encode([
+                                    'inline_keyboard' => [
+                                        [
+                                            [
+                                                'text' => "📋 Ver Todos los Reportes ({$reportsCount})",
+                                                'callback_data' => "beneficiary_{$beneficiaryId}_0"
+                                            ]
+                                        ]
+                                    ]
+                                ])
+                            ]);
+                        }
+                    }
+                }
+                
+                return response()->json(['status' => 'ok']);
+            }
+            
             // Manejar inline queries
             if ($inlineQuery = $update->getInlineQuery()) {
                 $from = $inlineQuery->getFrom();
@@ -454,21 +493,7 @@ class TelegramBotController extends Controller
             $status = $beneficiary->status === 'active' ? '✅' : '❌';
             $description = "{$beneficiary->full_cedula} | {$beneficiary->municipality}, {$beneficiary->state}";
             
-            // Crear botón para ver todos los reportes
-            $keyboard = null;
-            if ($reports->count() > 0) {
-                $keyboard = [
-                    'inline_keyboard' => [
-                        [
-                            [
-                                'text' => "📋 Ver Todos los Reportes ({$reports->count()})",
-                                'callback_data' => "beneficiary_{$beneficiary->id}_0"
-                            ]
-                        ]
-                    ]
-                ];
-            }
-            
+            // NO agregar botón aquí - se enviará en chosen_inline_result
             $result = [
                 'type' => 'article',
                 'id' => (string)$beneficiary->id,
@@ -479,10 +504,6 @@ class TelegramBotController extends Controller
                     'parse_mode' => 'Markdown',
                 ],
             ];
-            
-            if ($keyboard) {
-                $result['reply_markup'] = $keyboard;
-            }
             
             $results[] = $result;
         }

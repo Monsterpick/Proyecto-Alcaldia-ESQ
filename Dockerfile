@@ -1,6 +1,6 @@
 FROM php:8.2-fpm
 
-# Instalar dependencias del sistema
+# Instalar dependencias del sistema incluyendo Node.js
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y \
     nginx \
     supervisor \
     libpq-dev \
-    libzip-dev
+    libzip-dev \
+    nodejs \
+    npm
 
 # Instalar extensiones de PHP
 RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip
@@ -25,6 +27,9 @@ WORKDIR /var/www
 
 # Copiar archivos del proyecto
 COPY . /var/www
+
+# Instalar dependencias de npm y compilar assets
+RUN npm ci && npm run build
 
 # Instalar dependencias de Composer
 RUN composer install --no-dev --optimize-autoloader --no-interaction

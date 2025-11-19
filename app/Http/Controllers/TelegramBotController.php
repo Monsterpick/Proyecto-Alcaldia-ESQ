@@ -143,6 +143,13 @@ class TelegramBotController extends Controller
                     'callback_query_id' => $callbackQuery->getId(),
                 ]);
                 
+                // Manejar solicitudes de PDF
+                if (strpos($data, 'pdf_') === 0) {
+                    $reportId = str_replace('pdf_', '', $data);
+                    $this->sendReportPdf($callbackChatId, $reportId, $telegramUser);
+                    return response()->json(['status' => 'ok']);
+                }
+                
                 // Manejar callbacks de parroquias
                 if (strpos($data, 'parish_') === 0) {
                     $this->handleParishCallback($callbackChatId, $data, $telegramUser);
@@ -922,7 +929,8 @@ class TelegramBotController extends Controller
                         $beneficiaryName = $this->escapeTelegramMarkdown($report->beneficiary_full_name ?? 'Sin nombre');
                         $reportStatus = $this->escapeTelegramMarkdown(ucfirst($report->status));
                         
-                        $text .= ($index + 1) . ". {$statusEmoji} *{$report->report_code}*\n";
+                        $pdfIcon = $report->pdf_path ? '📄' : '❌';
+                        $text .= ($index + 1) . ". {$statusEmoji} *{$report->report_code}* {$pdfIcon}\n";
                         $text .= "   • Productos: {$productosText}\n";
                         $text .= "   • Entregas: {$cantidadItems}\n";
                         $text .= "   • Beneficiario: {$beneficiaryName}\n";
@@ -939,11 +947,33 @@ class TelegramBotController extends Controller
                 }
             }
             
-            Telegram::sendMessage([
+            // Crear botones inline para descargar PDFs de reportes que los tengan
+            $inlineKeyboard = [];
+            foreach ($latestReports as $index => $report) {
+                if ($report->pdf_path && file_exists(storage_path('app/public/' . $report->pdf_path))) {
+                    $inlineKeyboard[] = [
+                        [
+                            'text' => "📄 PDF #{$report->report_code}",
+                            'callback_data' => "pdf_{$report->id}"
+                        ]
+                    ];
+                }
+            }
+            
+            $messageParams = [
                 'chat_id' => $chatId,
                 'text' => $text,
                 'parse_mode' => 'Markdown',
-            ]);
+            ];
+            
+            // Agregar teclado inline solo si hay PDFs disponibles
+            if (!empty($inlineKeyboard)) {
+                $messageParams['reply_markup'] = json_encode([
+                    'inline_keyboard' => $inlineKeyboard
+                ]);
+            }
+            
+            Telegram::sendMessage($messageParams);
         
         } catch (\Exception $e) {
             logger()->error('Error en showParishReports: ' . $e->getMessage(), [
@@ -1051,5 +1081,77 @@ class TelegramBotController extends Controller
             $text = str_replace($char, '\\' . $char, $text);
         }
         return $text;
+    }
+    
+    /**
+     * Enviar PDF de un reporte específico
+     */
+    private function sendReportPdf($chatId, $reportId, $telegramUser)
+    {
+        try {
+            $report = \App\Models\Report::find($reportId);
+            
+            if (!$report) {
+                Telegram::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "❌ Reporte no encontrado.",
+                ]);
+                return;
+            }
+            
+            if (!$report->pdf_path) {
+                Telegram::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "❌ Este reporte no tiene PDF generado.",
+                ]);
+                return;
+            }
+            
+            $pdfPath = storage_path('app/public/' . $report->pdf_path);
+            
+            if (!file_exists($pdfPath)) {
+                Telegram::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "❌ El archivo PDF no existe en el servidor.",
+                ]);
+                
+                logger()->error('PDF no encontrado en servidor', [
+                    'report_id' => $reportId,
+                    'pdf_path' => $report->pdf_path,
+                    'full_path' => $pdfPath
+                ]);
+                return;
+            }
+            
+            // Enviar el documento PDF
+            Telegram::sendDocument([
+                'chat_id' => $chatId,
+                'document' => \Telegram\Bot\FileUpload\InputFile::create($pdfPath, basename($pdfPath)),
+                'caption' => "📄 Reporte: {$report->report_code}\n👤 Beneficiario: {$report->beneficiary_full_name}",
+            ]);
+            
+            // Registrar actividad
+            self::logTelegramActivity(
+                "Descargó PDF del reporte: {$report->report_code}",
+                [
+                    'report_id' => $report->id,
+                    'report_code' => $report->report_code,
+                    'action' => 'pdf_download',
+                ],
+                $telegramUser
+            );
+            
+        } catch (\Exception $e) {
+            logger()->error('Error enviando PDF: ' . $e->getMessage(), [
+                'report_id' => $reportId,
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            Telegram::sendMessage([
+                'chat_id' => $chatId,
+                'text' => "❌ Error al enviar el PDF. Por favor intenta nuevamente.",
+            ]);
+        }
     }
 }

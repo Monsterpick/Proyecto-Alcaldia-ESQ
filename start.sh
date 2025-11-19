@@ -6,30 +6,39 @@ echo "🚀 Iniciando aplicación Laravel..."
 echo "📊 Ejecutando migraciones..."
 php artisan migrate --force
 
-# Ejecutar seeders base (permisos, roles, configuración)
-echo "🌱 Ejecutando seeders del sistema..."
-php artisan db:seed --class=PermissionSeeder --force
-php artisan db:seed --class=RoleSeeder --force
-php artisan db:seed --class=SettingsSeeder --force
+# Ejecutar seeders solo la primera vez (si no existe archivo flag)
+FLAG_FILE="/var/www/storage/app/.seeders_executed"
 
-# Seeders de datos geográficos
-echo "🗺️ Cargando datos geográficos..."
-php artisan db:seed --class=EstadoSeeder --force
-php artisan db:seed --class=MunicipioSeeder --force
-php artisan db:seed --class=ParroquiaSeeder --force
-php artisan db:seed --class=CircuitoComunalSeeder --force
-
-# Seeders de catálogos
-echo "📋 Cargando catálogos..."
-php artisan db:seed --class=EstatusSeeder --force
-php artisan db:seed --class=PaymentTypeSeeder --force
-php artisan db:seed --class=PaymentOriginSeeder --force
-php artisan db:seed --class=CategorySeeder --force
-php artisan db:seed --class=WarehouseSeeder --force
-
-# Crear usuario Super Admin
-echo "👤 Creando usuario Super Admin..."
-php artisan db:seed --class=SuperAdminSeeder --force
+if [ ! -f "$FLAG_FILE" ]; then
+    echo "🌱 Primera inicialización - Cargando datos del sistema..."
+    
+    # Seeders base
+    php artisan db:seed --class=PermissionSeeder --force
+    php artisan db:seed --class=RoleSeeder --force
+    php artisan db:seed --class=SettingsSeeder --force
+    
+    # Datos geográficos
+    php artisan db:seed --class=EstadoSeeder --force
+    php artisan db:seed --class=MunicipioSeeder --force
+    php artisan db:seed --class=ParroquiaSeeder --force
+    php artisan db:seed --class=CircuitoComunalSeeder --force
+    
+    # Catálogos
+    php artisan db:seed --class=EstatusSeeder --force
+    php artisan db:seed --class=PaymentTypeSeeder --force
+    php artisan db:seed --class=PaymentOriginSeeder --force
+    php artisan db:seed --class=CategorySeeder --force
+    php artisan db:seed --class=WarehouseSeeder --force
+    
+    # Usuario Super Admin
+    php artisan db:seed --class=SuperAdminSeeder --force
+    
+    # Crear archivo flag para no volver a ejecutar
+    touch "$FLAG_FILE"
+    echo "✅ Datos iniciales cargados correctamente"
+else
+    echo "⏭️ Base de datos ya inicializada, omitiendo seeders"
+fi
 
 # Optimizar para producción
 echo "🔧 Optimizando para producción..."

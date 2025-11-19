@@ -6,7 +6,13 @@ echo "🚀 Iniciando aplicación Laravel..."
 echo "📊 Ejecutando migraciones..."
 php artisan migrate --force
 
-# Crear usuario Super Admin (solo si no existe)
+# Ejecutar seeders base (permisos, roles, configuración)
+echo "🌱 Ejecutando seeders iniciales..."
+php artisan db:seed --class=PermissionSeeder --force
+php artisan db:seed --class=RoleSeeder --force
+php artisan db:seed --class=SettingsSeeder --force
+
+# Crear usuario Super Admin
 echo "👤 Creando usuario Super Admin..."
 php artisan db:seed --class=SuperAdminSeeder --force
 

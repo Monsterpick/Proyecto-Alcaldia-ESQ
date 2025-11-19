@@ -266,6 +266,17 @@ class TelegramBotController extends Controller
                     'last_name' => $from->getLastName(),
                 ];
                 
+                // IGNORAR mensajes que son resultados de inline queries
+                // Estos contienen "INFORMACIÓN DEL BENEFICIARIO" u otros textos largos
+                if (strpos($text, 'INFORMACIÓN DEL BENEFICIARIO') !== false ||
+                    strpos($text, '👤 INFORMACIÓN DEL') !== false ||
+                    strpos($text, 'REPORTES DE:') !== false) {
+                    logger()->info('========= MENSAJE IGNORADO (inline result) =========', [
+                        'text_preview' => substr($text, 0, 50),
+                    ]);
+                    return response()->json(['status' => 'ok']);
+                }
+                
                 // Log para debugging
                 logger()->info('========= MENSAJE RECIBIDO =========', [
                     'text' => $text,

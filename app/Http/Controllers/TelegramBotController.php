@@ -32,8 +32,12 @@ class TelegramBotController extends Controller
             $from = null;
             
             if ($message = $update->getMessage()) {
+                $chat = $message->getChat();
                 $from = $message->getFrom();
-                $chatId = $message->getChat()->getId();
+                
+                if ($chat) {
+                    $chatId = $chat->getId();
+                }
                 
                 if ($from) {
                     $telegramUser = [

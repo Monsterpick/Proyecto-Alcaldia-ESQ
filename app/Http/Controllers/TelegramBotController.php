@@ -262,6 +262,7 @@ class TelegramBotController extends Controller
                 
                 // Mapear otros botones del teclado a comandos
                 $commandMap = [
+                    '🔍 Buscar Beneficiario' => 'search',
                     '📊 Estadísticas' => 'stats',
                     '❓ Ayuda' => 'help',
                 ];
@@ -284,6 +285,9 @@ class TelegramBotController extends Controller
                     // Ejecutar el comando correspondiente
                     $commandClass = null;
                     switch($commandName) {
+                        case 'search':
+                            $commandClass = new \App\Telegram\Commands\SearchCommand();
+                            break;
                         case 'stats':
                             $commandClass = new \App\Telegram\Commands\StatsCommand();
                             break;

@@ -150,6 +150,27 @@ class TelegramBotController extends Controller
                     return response()->json(['status' => 'ok']);
                 }
                 
+                // Manejar callbacks de beneficiario (ver reportes)
+                if (strpos($data, 'beneficiary_') === 0) {
+                    $messageId = $callbackQuery->getMessage()->getMessageId();
+                    $this->handleBeneficiaryReports($callbackChatId, $messageId, $data, $telegramUser);
+                    return response()->json(['status' => 'ok']);
+                }
+                
+                // Manejar callbacks de paginación de reportes
+                if (strpos($data, 'page_') === 0) {
+                    $messageId = $callbackQuery->getMessage()->getMessageId();
+                    // Convertir page_beneficiary_id_page a beneficiary_id_page
+                    $callbackData = str_replace('page_', '', $data);
+                    $this->handleBeneficiaryReports($callbackChatId, $messageId, $callbackData, $telegramUser);
+                    return response()->json(['status' => 'ok']);
+                }
+                
+                // Ignorar callback "noop" (botón de indicador de página)
+                if ($data === 'noop') {
+                    return response()->json(['status' => 'ok']);
+                }
+                
                 // Manejar callbacks de parroquias
                 if (strpos($data, 'parish_') === 0) {
                     $this->handleParishCallback($callbackChatId, $data, $telegramUser);
@@ -324,12 +345,16 @@ class TelegramBotController extends Controller
     }
     
     /**
-     * Manejar inline queries
+     * Manejar inline queries (búsqueda en tiempo real)
+     * (Implementación exacta del modo polling)
      */
     protected function handleInlineQuery($inlineQuery)
     {
+        $from = $inlineQuery->getFrom();
         $query = $inlineQuery->getQuery();
         $queryId = $inlineQuery->getId();
+        
+        logger()->info("🔍 Búsqueda inline: '{$query}'");
         
         // Si no hay query, no buscar
         if (empty(trim($query))) {
@@ -341,7 +366,7 @@ class TelegramBotController extends Controller
             return;
         }
         
-        // Buscar beneficiarios
+        // Buscar beneficiarios por nombre o cédula
         $beneficiaries = \App\Models\Beneficiary::where(function($q) use ($query) {
             $q->where('first_name', 'LIKE', "%{$query}%")
               ->orWhere('last_name', 'LIKE', "%{$query}%")
@@ -352,6 +377,7 @@ class TelegramBotController extends Controller
         
         $results = [];
         
+        // Si no hay resultados, enviar mensaje informativo
         if ($beneficiaries->count() === 0) {
             $results[] = [
                 'type' => 'article',
@@ -359,47 +385,128 @@ class TelegramBotController extends Controller
                 'title' => '❌ No se encontraron beneficiarios',
                 'description' => "No hay coincidencias para: {$query}",
                 'input_message_content' => [
-                    'message_text' => "❌ *No se encontraron beneficiarios*\n\nNo hay coincidencias para la búsqueda: *{$query}*",
+                    'message_text' => "❌ *No se encontraron beneficiarios*\n\nNo hay coincidencias para la búsqueda: *{$query}*\n\nIntenta buscar por:\n• Nombre\n• Apellido\n• Cédula",
                     'parse_mode' => 'Markdown',
                 ],
             ];
         }
         
         foreach ($beneficiaries as $beneficiary) {
+            // Buscar reportes del beneficiario (solo por cédula sin el tipo de documento)
             $reports = \App\Models\Report::where('beneficiary_cedula', $beneficiary->cedula)
                 ->orderBy('delivery_date', 'desc')
                 ->get();
             
+            // Construir mensaje detallado (CORTO)
             $text = "👤 *INFORMACIÓN DEL BENEFICIARIO*\n\n";
+            
+            // Datos personales
             $text .= "📋 *Datos Personales:*\n";
             $text .= "• *Nombre:* {$beneficiary->full_name}\n";
             $text .= "• *Cédula:* {$beneficiary->full_cedula}\n";
+            $text .= "• *Fecha de nacimiento:* " . ($beneficiary->birth_date ? $beneficiary->birth_date->format('d/m/Y') : 'N/A') . "\n";
+            
+            if ($beneficiary->birth_date) {
+                $age = $beneficiary->birth_date->age;
+                $text .= "• *Edad:* {$age} años\n";
+            }
+            
             $text .= "• *Estado:* " . ($beneficiary->status === 'active' ? '✅ Activo' : '❌ Inactivo') . "\n\n";
             
+            // Datos de contacto
+            $text .= "📞 *Contacto:*\n";
+            $text .= "• *Teléfono:* " . ($beneficiary->phone ?: 'N/A') . "\n";
+            $text .= "• *Email:* " . ($beneficiary->email ?: 'N/A') . "\n\n";
+            
+            // Ubicación
             $text .= "📍 *Ubicación:*\n";
-            $text .= "• {$beneficiary->municipality}, {$beneficiary->state}\n\n";
+            $text .= "• *Estado:* {$beneficiary->state}\n";
+            $text .= "• *Municipio:* {$beneficiary->municipality}\n";
+            $text .= "• *Parroquia:* " . ($beneficiary->parish ?: 'N/A') . "\n";
             
-            $text .= "📦 *Reportes:* {$reports->count()}\n";
+            if ($beneficiary->address) {
+                $text .= "• *Dirección:* {$beneficiary->address}\n";
+            }
             
+            // Información de reportes
+            if ($reports->count() > 0) {
+                $text .= "\n📊 *Total de reportes:* {$reports->count()}\n";
+            } else {
+                $text .= "\n📊 *Total de reportes:* 0\n";
+            }
+            
+            $text .= "\n🕐 Consultado: " . now()->format('d/m/Y H:i');
+            
+            // Crear el resultado inline
             $status = $beneficiary->status === 'active' ? '✅' : '❌';
+            $description = "{$beneficiary->full_cedula} | {$beneficiary->municipality}, {$beneficiary->state}";
             
-            $results[] = [
+            // Crear botón para ver todos los reportes
+            $keyboard = null;
+            if ($reports->count() > 0) {
+                $keyboard = [
+                    'inline_keyboard' => [
+                        [
+                            [
+                                'text' => "📋 Ver Todos los Reportes ({$reports->count()})",
+                                'callback_data' => "beneficiary_{$beneficiary->id}_0"
+                            ]
+                        ]
+                    ]
+                ];
+            }
+            
+            $result = [
                 'type' => 'article',
                 'id' => (string)$beneficiary->id,
                 'title' => "{$status} {$beneficiary->full_name}",
-                'description' => "{$beneficiary->full_cedula}",
+                'description' => $description,
                 'input_message_content' => [
                     'message_text' => $text,
                     'parse_mode' => 'Markdown',
                 ],
             ];
+            
+            if ($keyboard) {
+                $result['reply_markup'] = $keyboard;
+            }
+            
+            $results[] = $result;
         }
         
-        Telegram::answerInlineQuery([
-            'inline_query_id' => $queryId,
-            'results' => json_encode($results),
-            'cache_time' => 30,
-        ]);
+        // Enviar resultados
+        try {
+            Telegram::answerInlineQuery([
+                'inline_query_id' => $queryId,
+                'results' => json_encode($results),
+                'cache_time' => 30,
+            ]);
+            
+            logger()->info("✅ Enviados " . count($results) . " resultados");
+            
+            // Registrar búsqueda
+            if ($beneficiaries->count() > 0) {
+                $telegramUser = [
+                    'id' => $from->getId(),
+                    'username' => $from->getUsername(),
+                    'first_name' => $from->getFirstName(),
+                    'last_name' => $from->getLastName()
+                ];
+                
+                self::logTelegramActivity(
+                    "Buscó beneficiarios: '{$query}' ({$beneficiaries->count()} resultados)",
+                    [
+                        'query' => $query,
+                        'results_count' => $beneficiaries->count(),
+                        'action' => 'inline_search_beneficiaries'
+                    ],
+                    $telegramUser
+                );
+            }
+            
+        } catch (\Exception $e) {
+            logger()->error("❌ Error enviando resultados: " . $e->getMessage());
+        }
     }
 
     /**
@@ -1144,6 +1251,211 @@ class TelegramBotController extends Controller
                 'text' => "❌ *Error al descargar el PDF*\n\n" .
                          "No se pudo generar o enviar el PDF del reporte.\n" .
                          "Error: " . $e->getMessage(),
+                'parse_mode' => 'Markdown'
+            ]);
+        }
+    }
+    
+    /**
+     * Manejar reportes de beneficiario con paginación
+     * (Implementación exacta del modo polling)
+     */
+    private function handleBeneficiaryReports($chatId, $messageId, $callbackData, $telegramUser)
+    {
+        try {
+            // Extraer ID del beneficiario del callback
+            // Formato: beneficiary_{id}_{page}
+            $parts = explode('_', $callbackData);
+            $beneficiaryId = $parts[1] ?? null;
+            $page = isset($parts[2]) ? (int)$parts[2] : 0;
+            
+            if (!$beneficiaryId) {
+                throw new \Exception('ID de beneficiario no válido');
+            }
+            
+            // Obtener beneficiario
+            $beneficiary = \App\Models\Beneficiary::find($beneficiaryId);
+            
+            if (!$beneficiary) {
+                throw new \Exception('Beneficiario no encontrado');
+            }
+            
+            // Obtener todos los reportes del beneficiario
+            $allReports = \App\Models\Report::where('beneficiary_cedula', $beneficiary->cedula)
+                ->with(['items.product.category', 'categories'])
+                ->orderBy('delivery_date', 'desc')
+                ->get();
+            
+            $totalReports = $allReports->count();
+            
+            if ($totalReports === 0) {
+                // Si no hay messageId, enviar nuevo mensaje; si no, editar
+                if (!$messageId) {
+                    Telegram::sendMessage([
+                        'chat_id' => $chatId,
+                        'text' => "👤 *{$beneficiary->full_name}*\n\n❌ No hay reportes registrados para este beneficiario.",
+                        'parse_mode' => 'Markdown'
+                    ]);
+                } else {
+                    Telegram::editMessageText([
+                        'chat_id' => $chatId,
+                        'message_id' => $messageId,
+                        'text' => "👤 *{$beneficiary->full_name}*\n\n❌ No hay reportes registrados para este beneficiario.",
+                        'parse_mode' => 'Markdown'
+                    ]);
+                }
+                return;
+            }
+            
+            // Configuración de paginación
+            $perPage = 4; // 4 reportes por página
+            $totalPages = ceil($totalReports / $perPage);
+            $page = max(0, min($page, $totalPages - 1)); // Asegurar que la página esté en rango
+            
+            // Obtener reportes de la página actual y reindexar
+            $reports = $allReports->slice($page * $perPage, $perPage)->values();
+            
+            // Construir mensaje
+            $text = "👤 *REPORTES DE: {$beneficiary->full_name}*\n";
+            $text .= "📋 Cédula: {$beneficiary->full_cedula}\n";
+            $text .= "📍 {$beneficiary->parish}, {$beneficiary->municipality}\n\n";
+            $text .= "📊 Total de reportes: *{$totalReports}*\n";
+            $text .= "📄 Página " . ($page + 1) . " de {$totalPages}\n\n";
+            $text .= "━━━━━━━━━━━━━━━━━━\n\n";
+            
+            foreach ($reports as $index => $report) {
+                $statusIcon = match($report->status) {
+                    'delivered' => '✅',
+                    'in_process' => '🔄',
+                    'not_delivered' => '❌',
+                    default => '❓'
+                };
+                
+                $statusText = match($report->status) {
+                    'delivered' => 'Entregado',
+                    'in_process' => 'En proceso',
+                    'not_delivered' => 'No entregado',
+                    default => 'Desconocido'
+                };
+                
+                $text .= "{$statusIcon} *{$report->report_code}*\n";
+                $text .= "📅 Fecha: " . $report->delivery_date->format('d/m/Y') . "\n";
+                $text .= "📊 Estado: {$statusText}\n";
+                
+                // Mostrar productos
+                if ($report->items->count() > 0) {
+                    $productNames = $report->items->map(function($item) {
+                        return "{$item->product->name} ({$item->quantity})";
+                    })->take(2)->implode(', ');
+                    
+                    $text .= "📦 Productos: {$productNames}";
+                    if ($report->items->count() > 2) {
+                        $more = $report->items->count() - 2;
+                        $text .= " y {$more} más";
+                    }
+                    $text .= "\n";
+                }
+                
+                $text .= "\n";
+            }
+            
+            // Crear botones de paginación y descarga
+            $buttons = [];
+            
+            // Crear botones de PDF (2 por fila)
+            $pdfButtons = [];
+            $row = [];
+            foreach ($reports as $index => $report) {
+                $reportNumber = ($page * $perPage) + $index + 1;
+                $row[] = [
+                    'text' => "📄 #{$reportNumber}",
+                    'callback_data' => "pdf_{$report->id}"
+                ];
+                
+                if (count($row) == 2) {
+                    $pdfButtons[] = $row;
+                    $row = [];
+                }
+            }
+            if (count($row) > 0) {
+                $pdfButtons[] = $row;
+            }
+            
+            // Agregar botones de PDF
+            $buttons = array_merge($buttons, $pdfButtons);
+            
+            // Botones de navegación (solo si hay más de una página)
+            if ($totalPages > 1) {
+                $navButtons = [];
+                
+                // Botón anterior
+                if ($page > 0) {
+                    $navButtons[] = [
+                        'text' => '⬅️ Anterior',
+                        'callback_data' => "beneficiary_{$beneficiaryId}_" . ($page - 1)
+                    ];
+                }
+                
+                // Indicador de página
+                $navButtons[] = [
+                    'text' => "📑 " . ($page + 1) . "/{$totalPages}",
+                    'callback_data' => "noop"
+                ];
+                
+                // Botón siguiente
+                if ($page < $totalPages - 1) {
+                    $navButtons[] = [
+                        'text' => 'Siguiente ➡️',
+                        'callback_data' => "beneficiary_{$beneficiaryId}_" . ($page + 1)
+                    ];
+                }
+                
+                $buttons[] = $navButtons;
+            }
+            
+            // Enviar o editar el mensaje con los reportes
+            if (!$messageId) {
+                // Si no hay messageId (viene de inline query), enviar nuevo mensaje
+                Telegram::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => $text,
+                    'parse_mode' => 'Markdown',
+                    'reply_markup' => json_encode([
+                        'inline_keyboard' => $buttons
+                    ])
+                ]);
+            } else {
+                // Si hay messageId, editar el mensaje existente
+                Telegram::editMessageText([
+                    'chat_id' => $chatId,
+                    'message_id' => $messageId,
+                    'text' => $text,
+                    'parse_mode' => 'Markdown',
+                    'reply_markup' => json_encode([
+                        'inline_keyboard' => $buttons
+                    ])
+                ]);
+            }
+            
+            // Registrar actividad
+            self::logTelegramActivity(
+                "Consultó reportes del beneficiario: {$beneficiary->full_name} (Página " . ($page + 1) . ")",
+                [
+                    'beneficiary_id' => $beneficiary->id,
+                    'beneficiary_name' => $beneficiary->full_name,
+                    'total_reports' => $totalReports,
+                    'page' => $page + 1,
+                    'action' => 'view_beneficiary_reports'
+                ],
+                $telegramUser
+            );
+            
+        } catch (\Exception $e) {
+            logger()->error("❌ Error mostrando reportes de beneficiario: " . $e->getMessage());
+            
+            Telegram::sendMessage([
+                'chat_id' => $chatId,
+                'text' => "❌ *Error*\n\nNo se pudieron cargar los reportes del beneficiario.\nError: " . $e->getMessage(),
                 'parse_mode' => 'Markdown'
             ]);
         }

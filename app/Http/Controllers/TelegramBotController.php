@@ -929,8 +929,7 @@ class TelegramBotController extends Controller
                         $beneficiaryName = $this->escapeTelegramMarkdown($report->beneficiary_full_name ?? 'Sin nombre');
                         $reportStatus = $this->escapeTelegramMarkdown(ucfirst($report->status));
                         
-                        $pdfIcon = $report->pdf_path ? '📄' : '❌';
-                        $text .= ($index + 1) . ". {$statusEmoji} *{$report->report_code}* {$pdfIcon}\n";
+                        $text .= ($index + 1) . ". {$statusEmoji} *{$report->report_code}*\n";
                         $text .= "   • Productos: {$productosText}\n";
                         $text .= "   • Entregas: {$cantidadItems}\n";
                         $text .= "   • Beneficiario: {$beneficiaryName}\n";
@@ -947,13 +946,14 @@ class TelegramBotController extends Controller
                 }
             }
             
-            // Crear botones inline para descargar PDFs de reportes que los tengan
+            // Crear botones inline para descargar PDFs
+            // Siempre mostrar los botones, el PDF se generará si no existe
             $inlineKeyboard = [];
-            foreach ($latestReports as $index => $report) {
-                if ($report->pdf_path && file_exists(storage_path('app/public/' . $report->pdf_path))) {
+            if ($latestReports->count() > 0) {
+                foreach ($latestReports as $index => $report) {
                     $inlineKeyboard[] = [
                         [
-                            'text' => "📄 PDF #{$report->report_code}",
+                            'text' => "📄 Descargar PDF - {$report->report_code}",
                             'callback_data' => "pdf_{$report->id}"
                         ]
                     ];
@@ -1085,50 +1085,44 @@ class TelegramBotController extends Controller
     
     /**
      * Enviar PDF de un reporte específico
+     * (Implementación exacta del modo polling)
      */
     private function sendReportPdf($chatId, $reportId, $telegramUser)
     {
         try {
-            $report = \App\Models\Report::find($reportId);
+            // Obtener el reporte con sus relaciones
+            $report = \App\Models\Report::with(['items.product', 'categories', 'user'])->findOrFail($reportId);
             
-            if (!$report) {
-                Telegram::sendMessage([
-                    'chat_id' => $chatId,
-                    'text' => "❌ Reporte no encontrado.",
-                ]);
-                return;
+            // Usar el servicio de PDF
+            $pdfService = app(\App\Services\ReportPdfService::class);
+            
+            // Verificar si el PDF existe, si no, generarlo
+            if (!$pdfService->pdfExists($report)) {
+                logger()->info("📄 Generando PDF para reporte {$report->report_code}...");
+                $pdfService->generatePdf($report);
             }
             
-            if (!$report->pdf_path) {
-                Telegram::sendMessage([
-                    'chat_id' => $chatId,
-                    'text' => "❌ Este reporte no tiene PDF generado.",
-                ]);
-                return;
+            // Obtener la ruta del PDF
+            $pdfPath = $pdfService->getPdfPath($report);
+            
+            if (!$pdfPath || !file_exists($pdfPath)) {
+                throw new \Exception('El archivo PDF no existe');
             }
             
-            $pdfPath = storage_path('app/public/' . $report->pdf_path);
+            logger()->info("📄 Enviando PDF: {$pdfPath}");
             
-            if (!file_exists($pdfPath)) {
-                Telegram::sendMessage([
-                    'chat_id' => $chatId,
-                    'text' => "❌ El archivo PDF no existe en el servidor.",
-                ]);
-                
-                logger()->error('PDF no encontrado en servidor', [
-                    'report_id' => $reportId,
-                    'pdf_path' => $report->pdf_path,
-                    'full_path' => $pdfPath
-                ]);
-                return;
-            }
-            
-            // Enviar el documento PDF
+            // Enviar el PDF como documento
             Telegram::sendDocument([
                 'chat_id' => $chatId,
-                'document' => \Telegram\Bot\FileUpload\InputFile::create($pdfPath, basename($pdfPath)),
-                'caption' => "📄 Reporte: {$report->report_code}\n👤 Beneficiario: {$report->beneficiary_full_name}",
+                'document' => \Telegram\Bot\FileUpload\InputFile::create($pdfPath),
+                'caption' => "📄 *Reporte:* {$report->report_code}\n" .
+                            "📅 *Fecha:* " . ($report->delivery_date ? $report->delivery_date->format('d/m/Y') : 'N/A') . "\n" .
+                            "👤 *Beneficiario:* {$report->beneficiary_full_name}\n" .
+                            "📍 *Parroquia:* {$report->parish}",
+                'parse_mode' => 'Markdown'
             ]);
+            
+            logger()->info("✅ PDF enviado exitosamente");
             
             // Registrar actividad
             self::logTelegramActivity(
@@ -1136,21 +1130,21 @@ class TelegramBotController extends Controller
                 [
                     'report_id' => $report->id,
                     'report_code' => $report->report_code,
-                    'action' => 'pdf_download',
+                    'parish' => $report->parish,
+                    'action' => 'download_report_pdf'
                 ],
                 $telegramUser
             );
             
         } catch (\Exception $e) {
-            logger()->error('Error enviando PDF: ' . $e->getMessage(), [
-                'report_id' => $reportId,
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            logger()->error("❌ Error descargando PDF: " . $e->getMessage());
             
             Telegram::sendMessage([
                 'chat_id' => $chatId,
-                'text' => "❌ Error al enviar el PDF. Por favor intenta nuevamente.",
+                'text' => "❌ *Error al descargar el PDF*\n\n" .
+                         "No se pudo generar o enviar el PDF del reporte.\n" .
+                         "Error: " . $e->getMessage(),
+                'parse_mode' => 'Markdown'
             ]);
         }
     }

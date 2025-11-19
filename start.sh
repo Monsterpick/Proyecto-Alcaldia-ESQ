@@ -7,10 +7,25 @@ echo "📊 Ejecutando migraciones..."
 php artisan migrate --force
 
 # Ejecutar seeders base (permisos, roles, configuración)
-echo "🌱 Ejecutando seeders iniciales..."
+echo "🌱 Ejecutando seeders del sistema..."
 php artisan db:seed --class=PermissionSeeder --force
 php artisan db:seed --class=RoleSeeder --force
 php artisan db:seed --class=SettingsSeeder --force
+
+# Seeders de datos geográficos
+echo "🗺️ Cargando datos geográficos..."
+php artisan db:seed --class=EstadoSeeder --force
+php artisan db:seed --class=MunicipioSeeder --force
+php artisan db:seed --class=ParroquiaSeeder --force
+php artisan db:seed --class=CircuitoComunalSeeder --force
+
+# Seeders de catálogos
+echo "📋 Cargando catálogos..."
+php artisan db:seed --class=EstatusSeeder --force
+php artisan db:seed --class=PaymentTypeSeeder --force
+php artisan db:seed --class=PaymentOriginSeeder --force
+php artisan db:seed --class=CategorySeeder --force
+php artisan db:seed --class=WarehouseSeeder --force
 
 # Crear usuario Super Admin
 echo "👤 Creando usuario Super Admin..."

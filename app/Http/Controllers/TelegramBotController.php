@@ -546,7 +546,7 @@ class TelegramBotController extends Controller
             Telegram::answerInlineQuery([
                 'inline_query_id' => $queryId,
                 'results' => json_encode($results),
-                'cache_time' => 30,
+                'cache_time' => 0,  // Sin caché - siempre resultados frescos
             ]);
             
             logger()->info("✅ Enviados " . count($results) . " resultados");

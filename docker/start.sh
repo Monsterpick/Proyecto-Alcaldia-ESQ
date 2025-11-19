@@ -1,14 +1,30 @@
 #!/bin/bash
 
-echo "🚀 Iniciando aplicación Laravel..."
+echo " Iniciando Sistema de Gestión..."
 
-# Variable para forzar reset completo (cambiar a false después del reset)
+# Esperar a que MySQL esté listo
+echo " Esperando a que MySQL esté disponible..."
+max_tries=30
+count=0
+until php artisan db:monitor 2>/dev/null || [ $count -eq $max_tries ]; do
+    count=$((count + 1))
+    echo "   Intento $count/$max_tries..."
+    sleep 2
+done
+
+if [ $count -eq $max_tries ]; then
+    echo " MySQL no está disponible después de 60 segundos"
+    exit 1
+fi
+
+echo " MySQL está listo!"
+
+# Verificar si las variables de entorno están configuradas false después del reset
 FORCE_RESET=false
 
 if [ "$FORCE_RESET" = true ]; then
-    echo "🔄 RESETEANDO BASE DE DATOS COMPLETAMENTE..."
+    echo " RESETEANDO BASE DE DATOS COMPLETAMENTE..."
     php artisan migrate:fresh --force
-    
     echo "🌱 Cargando datos limpios del sistema..."
     
     # Seeders base
@@ -32,6 +48,9 @@ if [ "$FORCE_RESET" = true ]; then
     # Usuario Super Admin
     php artisan db:seed --class=SuperAdminSeeder --force
     
+    # Datos de dashboard (IMPORTANTE PARA GRÁFICOS)
+    php artisan db:seed --class=DashboardDataSeeder --force
+    
     echo "✅ Base de datos reseteada y datos cargados correctamente"
 else
     echo "📊 Ejecutando migraciones..."
@@ -39,14 +58,12 @@ else
     echo "⏭️ Omitiendo reset - Base de datos mantenida"
 fi
 
-# Limpiar y optimizar MUY agresivamente
-echo "🔧 Limpiando cachés agresivamente..."
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-php artisan event:clear
-php artisan optimize:clear
+# Limpiar cachés (SIN optimize:clear para evitar errores de BD)
+echo "🔧 Limpiando cachés..."
+php artisan config:clear || true
+php artisan route:clear || true
+php artisan view:clear || true
+php artisan event:clear || true
 
 # Limpiar archivos de caché manualmente
 rm -rf bootstrap/cache/*.php 2>/dev/null || true

@@ -6,6 +6,10 @@ echo "🚀 Iniciando aplicación Laravel..."
 echo "📊 Ejecutando migraciones..."
 php artisan migrate --force
 
+# Crear usuario Super Admin (solo si no existe)
+echo "👤 Creando usuario Super Admin..."
+php artisan db:seed --class=SuperAdminSeeder --force
+
 # Optimizar para producción
 echo "🔧 Optimizando para producción..."
 php artisan config:cache

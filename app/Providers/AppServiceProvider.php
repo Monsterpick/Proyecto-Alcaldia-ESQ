@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\URL;
+use App\Models\Beneficiary;
+use App\Models\Report;
+use App\Models\Product;
+use App\Observers\StatsCacheObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +27,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Registrar observers para limpiar cache automáticamente
+        Beneficiary::observe(StatsCacheObserver::class);
+        Report::observe(StatsCacheObserver::class);
+        Product::observe(StatsCacheObserver::class);
+        
         // Forzar HTTPS en producción
         if (config('app.env') === 'production') {
             URL::forceScheme('https');

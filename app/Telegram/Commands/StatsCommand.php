@@ -5,6 +5,7 @@ namespace App\Telegram\Commands;
 use App\Models\Beneficiary;
 use App\Models\Report;
 use App\Models\Product;
+use App\Services\StatsService;
 use App\Traits\LogsActivity;
 use App\Telegram\Traits\RequiresAuth;
 use Telegram\Bot\Commands\Command;
@@ -34,17 +35,20 @@ class StatsCommand extends Command
             'first_name' => $from->getFirstName(),
             'last_name' => $from->getLastName(),
         ];
-        // Obtener estadísticas globales
-        $totalBeneficiaries = Beneficiary::count();
-        $activeBeneficiaries = Beneficiary::where('status', 'active')->count();
-        $inactiveBeneficiaries = Beneficiary::where('status', 'inactive')->count();
+        // Obtener estadísticas globales (cacheadas para mejor rendimiento)
+        $stats = StatsService::getTelegramStats();
+        $generalStats = StatsService::getGeneralStats();
         
-        $totalReports = Report::count();
-        $deliveredReports = Report::where('status', 'delivered')->count();
-        $inProcessReports = Report::where('status', 'in_process')->count();
-        $notDeliveredReports = Report::where('status', 'not_delivered')->count();
+        $totalBeneficiaries = $generalStats['beneficiaries'];
+        $activeBeneficiaries = $generalStats['beneficiaries_active'];
+        $inactiveBeneficiaries = $totalBeneficiaries - $activeBeneficiaries;
         
-        $totalProducts = Product::count();
+        $totalReports = $generalStats['reports'];
+        $deliveredReports = $generalStats['reports_delivered'];
+        $inProcessReports = $generalStats['reports_in_process'];
+        $notDeliveredReports = $totalReports - $deliveredReports - $inProcessReports;
+        
+        $totalProducts = $generalStats['products'];
         
         // Obtener estadísticas por parroquia
         $parishes = ['Sabana Libre', 'La Unión', 'Santa Rita', 'Escuque'];

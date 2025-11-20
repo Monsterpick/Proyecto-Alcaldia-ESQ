@@ -35,8 +35,8 @@ class StatsService
                 'reports' => Report::count(),
                 'reports_delivered' => Report::where('status', 'delivered')->count(),
                 'reports_in_process' => Report::where('status', 'in_process')->count(),
-                'products' => Product::where('is_active', true)->count(),
-                'users' => User::where('is_active', true)->count(),
+                'products' => Product::count(),
+                'users' => User::count(),
             ];
         });
     }
@@ -205,7 +205,7 @@ class StatsService
             return [
                 'beneficiaries' => Beneficiary::count(),
                 'reports' => Report::count(),
-                'products' => Product::where('is_active', true)->count(),
+                'products' => Product::count(),
                 'reports_today' => Report::whereDate('delivery_date', today())->count(),
                 'reports_this_week' => Report::whereBetween('delivery_date', [
                     now()->startOfWeek(),

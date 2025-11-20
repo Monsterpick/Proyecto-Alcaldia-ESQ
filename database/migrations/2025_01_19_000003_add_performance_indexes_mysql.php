@@ -50,8 +50,8 @@ return new class extends Migration
             if (!$indexExists('reports', 'idx_reports_status')) {
                 $table->index('status', 'idx_reports_status');
             }
-            if (!$indexExists('reports', 'idx_reports_user_id')) {
-                $table->index('user_id', 'idx_reports_user_id');
+            if (!$indexExists('reports', 'idx_reports_created_by')) {
+                $table->index('created_by', 'idx_reports_created_by');
             }
         });
 
@@ -126,7 +126,7 @@ return new class extends Migration
             $table->dropIndex('idx_reports_beneficiary_cedula');
             $table->dropIndex('idx_reports_delivery_date');
             $table->dropIndex('idx_reports_status');
-            $table->dropIndex('idx_reports_user_id');
+            $table->dropIndex('idx_reports_created_by');
         });
 
         Schema::table('report_items', function (Blueprint $table) {

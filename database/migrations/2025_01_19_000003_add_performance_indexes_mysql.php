@@ -34,8 +34,8 @@ return new class extends Migration
             if (!$indexExists('beneficiaries', 'idx_beneficiaries_municipality')) {
                 $table->index('municipality', 'idx_beneficiaries_municipality');
             }
-            if (!$indexExists('beneficiaries', 'idx_beneficiaries_parish')) {
-                $table->index('parish', 'idx_beneficiaries_parish');
+            if (!$indexExists('beneficiaries', 'idx_beneficiaries_parroquia_id')) {
+                $table->index('parroquia_id', 'idx_beneficiaries_parroquia_id');
             }
         });
 
@@ -119,7 +119,7 @@ return new class extends Migration
             $table->dropIndex('idx_beneficiaries_names');
             $table->dropIndex('idx_beneficiaries_status');
             $table->dropIndex('idx_beneficiaries_municipality');
-            $table->dropIndex('idx_beneficiaries_parish');
+            $table->dropIndex('idx_beneficiaries_parroquia_id');
         });
 
         Schema::table('reports', function (Blueprint $table) {

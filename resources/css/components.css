@@ -1,0 +1,91 @@
+/* Estilos de Tabla */
+.table-container {
+    @apply relative overflow-x-auto bg-white rounded-lg shadow-sm dark:bg-gray-800 border border-gray-200 dark:border-gray-700;
+}
+
+.table-default {
+    @apply w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400;
+}
+
+.table-header {
+    @apply text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400;
+}
+
+.table-header-cell {
+    @apply px-6 py-3;
+}
+
+.table-row {
+    @apply bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700;
+}
+
+.table-cell {
+    @apply px-6 py-4;
+}
+
+.table-cell-title {
+    @apply px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white;
+}
+
+/* Botones Agrupados */
+.btn-group {
+    @apply inline-flex rounded-md shadow-sm -space-x-px;
+}
+
+.btn-group-item {
+    @apply relative inline-flex items-center justify-center text-sm font-medium text-gray-700 bg-gray-50 border border-gray-300 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white;
+}
+
+.btn-group-item-first {
+    @apply rounded-s-lg;
+}
+
+.btn-group-item-middle {
+    @apply border-l-0;
+}
+
+.btn-group-item-last {
+    @apply rounded-e-lg border-l-0;
+}
+
+.btn-group-icon {
+    @apply w-4 h-4;
+}
+
+/* Variantes de colores para botones agrupados */
+.btn-group-blue .btn-group-item {
+    @apply hover:text-blue-700 focus:ring-blue-700 focus:text-blue-700 dark:focus:ring-blue-500;
+}
+
+.btn-group-red .btn-group-item {
+    @apply hover:text-red-700 focus:ring-red-700 focus:text-red-700 dark:focus:ring-red-500;
+}
+
+.btn-group-green .btn-group-item {
+    @apply hover:text-green-700 focus:ring-green-700 focus:text-green-700 dark:focus:ring-green-500;
+}
+
+.btn-group-yellow .btn-group-item {
+    @apply hover:text-yellow-700 focus:ring-yellow-700 focus:text-yellow-700 dark:focus:ring-yellow-500;
+}
+
+/* Tamaños para botones agrupados */
+.btn-group-sm .btn-group-item {
+    @apply w-8 h-8;
+}
+
+.btn-group-sm .btn-group-icon {
+    @apply w-3.5 h-3.5;
+}
+
+.btn-group-item {
+    @apply w-9 h-9;
+}
+
+.btn-group-lg .btn-group-item {
+    @apply w-10 h-10;
+}
+
+.btn-group-lg .btn-group-icon {
+    @apply w-5 h-5;
+}

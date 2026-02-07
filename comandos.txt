@@ -1,0 +1,56 @@
+
+php artisan make:volt counter
+
+Para las rutas del sistema central
+
+php artisan make:volt pages/users/index
+php artisan make:volt pages/users/create
+php artisan make:volt pages/users/edit
+php artisan make:volt pages/users/show
+
+
+Para las rutas de los tenants
+php artisan make:volt pages/tenancy/users/index
+php artisan make:volt pages/tenancy/users/create
+php artisan make:volt pages/tenancy/users/edit
+php artisan make:volt pages/tenancy/users/show
+
+php artisan powergrid:create
+
+php artisan db:seed --class=classNameTableSeeder
+php artisan tenants:migrate
+php artisan tenants:rollback
+
+php artisan make:job CreateFrameworkDirectoriesForTenant
+
+
+Al commit anterior
+git reset --hard HEAD
+git reset --hard
+git log --oneline
+git status -s
+
+composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+npm install
+npm run build
+
+php artisan config:cache && php artisan event:cache && php artisan route:cache && php artisan view:cache && php artisan auth:clear-resets
+php artisan migrate --force
+php artisan queue:restart
+php artisan down
+php artisan up
+curl -I escuque.nevora.app
+
+Revisar el subdominio
+
+
+php artisan queue:work
+php artisan reverb:start
+
+php artisan make:event
+
+chown -R nevora:nevora /home/nevora/demo.laravel
+chmod -R 755 /home/nevora/demo.laravel/public
+chmod -R 755 /home/nevora/demo.laravel/storage
+
+composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader

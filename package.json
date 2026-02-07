@@ -1,0 +1,40 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-free": "^6.7.2",
+        "@fullcalendar/core": "^6.1.18",
+        "@fullcalendar/daygrid": "^6.1.18",
+        "@fullcalendar/list": "^6.1.18",
+        "@fullcalendar/timegrid": "^6.1.18",
+        "@tailwindcss/forms": "^0.5.10",
+        "@tailwindcss/vite": "^4.0.7",
+        "aos": "^2.3.4",
+        "autoprefixer": "^10.4.20",
+        "axios": "^1.7.4",
+        "concurrently": "^9.0.1",
+        "dropzone": "^6.0.0-beta.2",
+        "flowbite": "^3.1.2",
+        "fullcalendar": "^6.1.18",
+        "laravel-vite-plugin": "^1.0",
+        "lightweight-charts": "^5.0.8",
+        "sortablejs": "^1.15.6",
+        "sweetalert2": "^11.6.13",
+        "swiper": "^11.2.10",
+        "tailwindcss": "^4.0.7",
+        "vite": "^6.0"
+    },
+    "optionalDependencies": {
+        "@rollup/rollup-linux-x64-gnu": "4.9.5",
+        "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
+        "lightningcss-linux-x64-gnu": "^1.29.1"
+    },
+    "devDependencies": {
+        "laravel-echo": "^2.1.6",
+        "pusher-js": "^8.4.0"
+    }
+}

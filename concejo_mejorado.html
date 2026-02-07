@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concejo Municipal - Portal Oficial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS (Animate On Scroll) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1d4ed8',
+                        secondary: '#3b82f6',
+                        accent: '#2563eb',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out',
+                        'fade-in-down': 'fadeInDown 0.5s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                        'slide-in-left': 'slideInLeft 0.5s ease-out',
+                        'slide-in-right': 'slideInRight 0.5s ease-out',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'float': 'float 6s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        fadeInDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.9)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' }
+                        },
+                        slideInLeft: {
+                            '0%': { opacity: '0', transform: 'translateX(-50px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' }
+                        },
+                        slideInRight: {
+                            '0%': { opacity: '0', transform: 'translateX(50px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary-color: #1d4ed8;
+            --secondary-color: #3b82f6;
+            --accent-color: #2563eb;
+            --light-bg: #f8fafc;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+            --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.1), 0 3px 10px rgba(0, 0, 0, 0.05);
+            --shadow-large: 0 20px 25px rgba(0, 0, 0, 0.1), 0 8px 10px rgba(0, 0, 0, 0.04);
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #1e293b;
+            background-color: var(--light-bg);
+            scroll-behavior: smooth;
+        }
+        
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+        
+        /* Gradientes personalizados */
+        .gradient-primary {
+            background: var(--gradient-2);
+        }
+        
+        .gradient-hero {
+            background: linear-gradient(135deg, rgba(29, 78, 216, 0.95) 0%, rgba(59, 130, 246, 0.85) 100%);
+        }
+        
+        /* Efectos de hover mejorados */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-large);
+        }
+        
+        .btn-primary {
+            background: var(--gradient-2);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        /* Efecto parallax suave */
+        .parallax {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Efectos de texto */
+        .text-gradient {
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Navegación sticky mejorada */
+        .navbar-scroll {
+            backdrop-filter: blur(20px);
+            background: rgba(29, 78, 216, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Animación de documentos */
+        .document-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .document-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--shadow-large);
+        }
+        
+        /* Efecto de carga para imágenes */
+        .img-loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Mejoras responsivas */
+        @media (max-width: 768px) {
+            .mobile-padding { padding: 1rem; }
+            .mobile-text { font-size: 0.875rem; }
+        }
+        
+        /* Indicadores de notificación */
+        .notification-badge {
+            position: relative;
+        }
+        
+        .notification-badge::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        /* Efecto de typing para títulos importantes */
+        .typing-effect {
+            border-right: 2px solid var(--primary-color);
+            animation: typing 3s steps(40) 1s 1 normal both, blink 1s infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header con navegación mejorada -->
+    <header class="gradient-primary text-white shadow-2xl sticky top-0 z-50 navbar-scroll" id="navbar">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row items-center justify-between py-4">
+                <div class="flex items-center space-x-3" data-aos="fade-right">
+                    <div class="bg-white bg-opacity-20 p-2 rounded-xl">
+                        <i class="fas fa-landmark text-2xl animate-float"></i>
+                    </div>
+                    <div>
+                        <a href="#" class="text-2xl font-bold tracking-tight block">Concejo Municipal</a>
+                        <p class="text-blue-100 text-sm">Transparencia y Compromiso</p>
+                    </div>
+                </div>
+                
+                <nav class="hidden lg:flex space-x-6" data-aos="fade-left" data-aos-delay="200">
+                    <a href="#inicio" class="nav-link font-medium hover:text-blue-200 transition-all duration-300 flex items-center px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-10">
+                        <i class="fas fa-home mr-2"></i> Inicio
+                    </a>
+                    <a href="#nosotros" class="nav-link font-medium hover:text-blue-200 transition-all duration-300 flex items-center px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-10">
+                        <i class="fas fa-info-circle mr-2"></i> Nosotros
+                    </a>
+                    <a href="#documentos" class="nav-link font-medium hover:text-blue-200 transition-all duration-300 flex items-center px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 notification-badge">
+                        <i class="fas fa-file-alt mr-2"></i> Documentos Legales
+                    </a>
+                    <a href="#noticias" class="nav-link font-medium hover:text-blue-200 transition-all duration-300 flex items-center px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-10">
+                        <i class="fas fa-newspaper mr-2"></i> Noticias
+                    </a>
+                    <a href="#participacion" class="nav-link font-medium hover:text-blue-200 transition-all duration-300 flex items-center px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-10">
+                        <i class="fas fa-users mr-2"></i> Participación
+                    </a>
+                    <a href="#contacto" class="nav-link font-medium hover:text-blue-200 transition-all duration-300 flex items-center px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-10">
+                        <i class="fas fa-envelope mr-2"></i> Contacto
+                    </a>
+                </nav>
+                
+                <!-- Buscador en header -->
+                <div class="hidden lg:flex items-center space-x-4" data-aos="fade-left" data-aos-delay="400">
+                    <div class="relative">
+                        <input type="text" placeholder="Buscar documentos..." class="bg-white bg-opacity-20 text-white placeholder-blue-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:bg-opacity-30 transition-all">
+                        <i class="fas fa-search absolute right-3 top-3 text-blue-200"></i>
+                    </div>
+                </div>
+                
+                <button class="lg:hidden text-xl" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <!-- Menú móvil mejorado -->
+            <div class="lg:hidden hidden py-4 border-t border-white border-opacity-20" id="mobile-menu">
+                <div class="space-y-2">
+                    <a href="#inicio" class="block py-3 hover:bg-white hover:bg-opacity-10 px-4 rounded-lg transition-all"><i class="fas fa-home mr-3"></i>Inicio</a>
+                    <a href="#nosotros" class="block py-3 hover:bg-white hover:bg-opacity-10 px-4 rounded-lg transition-all"><i class="fas fa-info-circle mr-3"></i>Nosotros</a>
+                    <a href="#documentos" class="block py-3 hover:bg-white hover:bg-opacity-10 px-4 rounded-lg transition-all"><i class="fas fa-file-alt mr-3"></i>Documentos Legales</a>
+                    <a href="#noticias" class="block py-3 hover:bg-white hover:bg-opacity-10 px-4 rounded-lg transition-all"><i class="fas fa-newspaper mr-3"></i>Noticias</a>
+                    <a href="#participacion" class="block py-3 hover:bg-white hover:bg-opacity-10 px-4 rounded-lg transition-all"><i class="fas fa-users mr-3"></i>Participación</a>
+                    <a href="#contacto" class="block py-3 hover:bg-white hover:bg-opacity-10 px-4 rounded-lg transition-all"><i class="fas fa-envelope mr-3"></i>Contacto</a>
+                </div>
+                <div class="mt-4 pt-4 border-t border-white border-opacity-20">
+                    <input type="text" placeholder="Buscar documentos..." class="w-full bg-white bg-opacity-20 text-white placeholder-blue-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-white">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section Mejorado -->
+    <section id="inicio" class="relative h-screen flex items-center justify-center overflow-hidden">
+        <!-- Background con parallax -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary via-secondary to-accent opacity-90"></div>
+            <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=2942&auto=format&fit=crop" 
+                 alt="Concejo Municipal" 
+                 class="w-full h-full object-cover parallax">
+        </div>
+        
+        <!-- Partículas animadas de fondo -->
+        <div class="absolute inset-0 z-10">
+            <div class="particle absolute top-20 left-10 w-2 h-2 bg-white bg-opacity-30 rounded-full animate-float"></div>
+            <div class="particle absolute top-40 right-20 w-3 h-3 bg-blue-200 bg-opacity-40 rounded-full animate-bounce-slow"></div>
+            <div class="particle absolute bottom-32 left-1/4 w-1 h-1 bg-white bg-opacity-50 rounded-full animate-pulse-slow"></div>
+        </div>
+        
+        <!-- Contenido principal -->
+        <div class="relative z-20 text-center text-white px-4 max-w-6xl mx-auto">
+            <div data-aos="fade-up" data-aos-duration="1000">
+                <h1 class="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
+                    <span class="block text-gradient">Concejo Municipal</span>
+                    <span class="block text-3xl lg:text-4xl font-normal text-blue-100 mt-2">
+                        Al Servicio de la Comunidad
+                    </span>
+                </h1>
+            </div>
+            
+            <div data-aos="fade-up" data-aos-delay="300" data-aos-duration="1000">
+                <p class="text-xl lg:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+                    Promovemos la transparencia, la participación ciudadana y el desarrollo municipal 
+                    a través de ordenanzas, resoluciones y políticas públicas efectivas.
+                </p>
+            </div>
+            
+            <div data-aos="fade-up" data-aos-delay="600" data-aos-duration="1000" class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="#documentos" class="btn-primary px-8 py-4 rounded-xl font-semibold text-lg flex items-center space-x-2 shadow-lg">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Ver Documentos</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="#noticias" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-primary transition-all duration-300 flex items-center space-x-2">
+                    <i class="fas fa-newspaper"></i>
+                    <span>Últimas Noticias</span>
+                </a>
+            </div>
+            
+            <!-- Estadísticas destacadas -->
+            <div data-aos="fade-up" data-aos-delay="900" data-aos-duration="1000" class="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="text-3xl lg:text-4xl font-bold mb-2" id="counter-laws">0</div>
+                    <div class="text-blue-200 text-sm lg:text-base">Ordenanzas Vigentes</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl lg:text-4xl font-bold mb-2" id="counter-sessions">0</div>
+                    <div class="text-blue-200 text-sm lg:text-base">Sesiones este Año</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl lg:text-4xl font-bold mb-2" id="counter-citizens">0</div>
+                    <div class="text-blue-200 text-sm lg:text-base">Ciudadanos Atendidos</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl lg:text-4xl font-bold mb-2" id="counter-projects">0</div>
+                    <div class="text-blue-200 text-sm lg:text-base">Proyectos Aprobados</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Indicador de scroll -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
+            <i class="fas fa-chevron-down text-2xl"></i>
+        </div>
+    </section>
+
+    <!-- Sección de Accesos Rápidos -->
+    <section class="py-16 bg-white relative overflow-hidden">
+        <!-- Elementos decorativos -->
+        <div class="absolute top-0 left-0 w-64 h-64 bg-blue-50 rounded-full -translate-x-32 -translate-y-32"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tr from-blue-50 to-purple-50 rounded-full translate-x-48 translate-y-48"></div>
+        
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl lg:text-5xl font-bold text-primary mb-4">Accesos Rápidos</h2>
+                <div class="w-24 h-1 bg-accent mx-auto mb-6"></div>
+                <p class="text-gray-600 text-lg max-w-3xl mx-auto">
+                    Encuentre rápidamente la información que necesita sobre nuestras actividades legislativas
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Ordenanzas Municipales -->
+                <div class="card-hover document-card p-8 rounded-2xl" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-primary text-4xl mb-6 text-center">
+                        <div class="bg-blue-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-4 text-center">Ordenanzas Municipales</h3>
+                    <p class="text-gray-600 mb-6 text-center leading-relaxed">
+                        Consulte las ordenanzas vigentes y en discusión del municipio
+                    </p>
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-success mr-2"></i>
+                            <span>247 Ordenanzas Vigentes</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-clock text-warning mr-2"></i>
+                            <span>12 En Discusión</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn-primary w-full text-center py-3 rounded-xl font-medium flex items-center justify-center space-x-2">
+                        <span>Ver Ordenanzas</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Gacetas Oficiales -->
+                <div class="card-hover document-card p-8 rounded-2xl" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-primary text-4xl mb-6 text-center">
+                        <div class="bg-green-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-4 text-center">Gacetas Oficiales</h3>
+                    <p class="text-gray-600 mb-6 text-center leading-relaxed">
+                        Acceda a las publicaciones oficiales del municipio
+                    </p>
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-calendar text-primary mr-2"></i>
+                            <span>Gaceta Nº 2025-001</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-download text-success mr-2"></i>
+                            <span>Descargas Disponibles</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn-primary w-full text-center py-3 rounded-xl font-medium flex items-center justify-center space-x-2">
+                        <span>Ver Gacetas</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Resoluciones -->
+                <div class="card-hover document-card p-8 rounded-2xl" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-primary text-4xl mb-6 text-center">
+                        <div class="bg-purple-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto">
+                            <i class="fas fa-file-signature"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-4 text-center">Resoluciones</h3>
+                    <p class="text-gray-600 mb-6 text-center leading-relaxed">
+                        Consulte las resoluciones emitidas por el concejo
+                    </p>
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-file-alt text-primary mr-2"></i>
+                            <span>89 Resoluciones 2025</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-star text-warning mr-2"></i>
+                            <span>Destacadas del Mes</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn-primary w-full text-center py-3 rounded-xl font-medium flex items-center justify-center space-x-2">
+                        <span>Ver Resoluciones</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Agenda Legislativa -->
+                <div class="card-hover document-card p-8 rounded-2xl" data-aos="fade-up" data-aos-delay="400">
+                    <div class="text-primary text-4xl mb-6 text-center">
+                        <div class="bg-yellow-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-4 text-center">Agenda Legislativa</h3>
+                    <p class="text-gray-600 mb-6 text-center leading-relaxed">
+                        Conozca las próximas sesiones y audiencias públicas
+                    </p>
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-clock text-warning mr-2"></i>
+                            <span>Próxima Sesión: 25 Ene</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-users text-primary mr-2"></i>
+                            <span>Audiencia Pública</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn-primary w-full text-center py-3 rounded-xl font-medium flex items-center justify-center space-x-2">
+                        <span>Ver Agenda</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Participación Ciudadana -->
+                <div class="card-hover document-card p-8 rounded-2xl" data-aos="fade-up" data-aos-delay="500">
+                    <div class="text-primary text-4xl mb-6 text-center">
+                        <div class="bg-red-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-4 text-center">Participación Ciudadana</h3>
+                    <p class="text-gray-600 mb-6 text-center leading-relaxed">
+                        Participe en consultas públicas y procesos democráticos
+                    </p>
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-poll text-primary mr-2"></i>
+                            <span>3 Consultas Activas</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-comment text-success mr-2"></i>
+                            <span>Buzón de Sugerencias</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn-primary w-full text-center py-3 rounded-xl font-medium flex items-center justify-center space-x-2">
+                        <span>Participar</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Transparencia -->
+                <div class="card-hover document-card p-8 rounded-2xl" data-aos="fade-up" data-aos-delay="600">
+                    <div class="text-primary text-4xl mb-6 text-center">
+                        <div class="bg-indigo-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-4 text-center">Portal de Transparencia</h3>
+                    <p class="text-gray-600 mb-6 text-center leading-relaxed">
+                        Acceso a información pública y rendición de cuentas
+                    </p>
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-chart-bar text-primary mr-2"></i>
+                            <span>Informes Financieros</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-handshake text-success mr-2"></i>
+                            <span>Contratos Públicos</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn-primary w-full text-center py-3 rounded-xl font-medium flex items-center justify-center space-x-2">
+                        <span>Ver Transparencia</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Documentos Legales -->
+    <section id="documentos" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl lg:text-5xl font-bold text-primary mb-4">Documentos Legales</h2>
+                <div class="w-24 h-1 bg-accent mx-auto mb-6"></div>
+                <p class="text-gray-600 text-lg max-w-3xl mx-auto">
+                    Acceda a la documentación oficial del municipio con nuestro sistema de búsqueda avanzada
+                </p>
+            </div>
+
+            <!-- Buscador Avanzado -->
+            <div class="max-w-4xl mx-auto mb-12" data-aos="fade-up" data-aos-delay="200">
+                <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                    <h3 class="text-2xl font-bold text-primary mb-6 text-center">Buscador de Documentos</h3>
+                    <div class="grid md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
+                            <select class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="">Todos</option>
+                                <option value="ordenanza">Ordenanzas</option>
+                                <option value="resolucion">Resoluciones</option>
+                                <option value="gaceta">Gacetas</option>
+                                <option value="decreto">Decretos</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Año</label>
+                            <select class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="">Todos</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Área Temática</label>
+                            <select class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="">Todas</option>
+                                <option value="urbanism">Urbanismo</option>
+                                <option value="environment">Medio Ambiente</option>
+                                <option value="finance">Hacienda</option>
+                                <option value="social">Desarrollo Social</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button class="btn-primary w-full py-3 rounded-lg font-medium flex items-center justify-center space-x-2">
+                                <i class="fas fa-search"></i>
+                                <span>Buscar</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <input type="text" placeholder="Buscar por palabras clave..." class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documentos Destacados -->
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Documento 1 -->
+                <div class="document-card p-6 rounded-2xl" data-aos="fade-up" data-aos-delay="300">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-medium">
+                            Ordenanza
+                        </div>
+                        <div class="text-gray-500 text-sm">
+                            <i class="fas fa-calendar mr-1"></i> 15 Ene 2025
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-primary mb-3">
+                        Ordenanza Municipal sobre Gestión de Residuos Sólidos
+                    </h3>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        Nueva normativa para la clasificación, recolección y tratamiento de residuos sólidos en el municipio.
+                    </p>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-sm text-gray-500">
+                            <i class="fas fa-file-pdf text-red-500 mr-1"></i> PDF - 2.3 MB
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            <i class="fas fa-download mr-1"></i> 1,247 descargas
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <a href="#" class="flex-1 bg-primary text-white py-2 px-4 rounded-lg text-center font-medium hover:bg-blue-800 transition-colors">
+                            <i class="fas fa-eye mr-2"></i>Ver
+                        </a>
+                        <a href="#" class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg text-center font-medium hover:bg-gray-200 transition-colors">
+                            <i class="fas fa-download mr-2"></i>Descargar
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Documento 2 -->
+                <div class="document-card p-6 rounded-2xl" data-aos="fade-up" data-aos-delay="400">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">
+                            Resolución
+                        </div>
+                        <div class="text-gray-500 text-sm">
+                            <i class="fas fa-calendar mr-1"></i> 12 Ene 2025
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-primary mb-3">
+                        Resolución N° 001-2025 sobre Presupuesto Municipal
+                    </h3>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        Aprobación del presupuesto municipal para el ejercicio fiscal 2025 y distribución de recursos.
+                    </p>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-sm text-gray-500">
+                            <i class="fas fa-file-pdf text-red-500 mr-1"></i> PDF - 1.8 MB
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            <i class="fas fa-download mr-1"></i> 892 descargas
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <a href="#" class="flex-1 bg-primary text-white py-2 px-4 rounded-lg text-center font-medium hover:bg-blue-800 transition-colors">
+                            <i class="fas fa-eye mr-2"></i>Ver
+                        </a>
+                        <a href="#" class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg text-center font-medium hover:bg-gray-200 transition-colors">
+                            <i class="fas fa-download mr-2"></i>Descargar
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Documento 3 -->
+                <div class="document-card p-6 rounded-2xl" data-aos="fade-up" data-aos-delay="500">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm font-medium">
+                            Gaceta Oficial
+                        </div>
+                        <div class="text-gray-500 text-sm">
+                            <i class="fas fa-calendar mr-1"></i> 8 Ene 2025
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-primary mb-3">
+                        Gaceta Municipal N° 2025-001
+                    </h3>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        Publicación oficial con ordenanzas, resoluciones y comunicados del municipio correspondientes a enero 2025.
+                    </p>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-sm text-gray-500">
+                            <i class="fas fa-file-pdf text-red-500 mr-1"></i> PDF - 4.1 MB
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            <i class="fas fa-download mr-1"></i> 2,156 descargas
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <a href="#" class="flex-1 bg-primary text-white py-2 px-4 rounded-lg text-center font-medium hover:bg-blue-800 transition-colors">
+                            <i class="fas fa-eye mr-2"></i>Ver
+                        </a>
+                        <a href="#" class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg text-center font-medium hover:bg-gray-200 transition-colors">
+                            <i class="fas fa-download mr-2"></i>Descargar
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón ver todos -->
+            <div class="text-center mt-12" data-aos="fade-up" data-aos-delay="600">
+                <a href="#" class="btn-primary px-8 py-4 rounded-xl font-semibold text-lg flex items-center space-x-2 mx-auto max-w-max">
+                    <span>Ver Todos los Documentos</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Sobre Nosotros -->
+    <section id="nosotros" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div data-aos="fade-right">
+                    <h2 class="text-4xl lg:text-5xl font-bold text-primary mb-6">Nuestra Misión</h2>
+                    <div class="w-24 h-1 bg-accent mb-8"></div>
+                    <p class="text-gray-700 text-lg leading-relaxed mb-6">
+                        El Concejo Municipal es el órgano encargado de la función legislativa a nivel local. 
+                        Trabajamos incansablemente para crear, reformar y derogar ordenanzas que promuevan 
+                        el desarrollo sostenible y mejoren la calidad de vida de nuestros ciudadanos.
+                    </p>
+                    <p class="text-gray-700 text-lg leading-relaxed mb-8">
+                        Nos comprometemos con la transparencia, la participación ciudadana y la rendición 
+                        de cuentas, garantizando que cada decisión tomada refleje las necesidades y 
+                        aspiraciones de nuestra comunidad.
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-blue-50 p-6 rounded-xl border-l-4 border-primary">
+                            <h4 class="font-bold text-primary mb-2 flex items-center">
+                                <i class="fas fa-eye text-secondary mr-2"></i>Visión
+                            </h4>
+                            <p class="text-gray-600 text-sm">
+                                Ser el referente municipal en legislación transparente y participativa.
+                            </p>
+                        </div>
+                        <div class="bg-green-50 p-6 rounded-xl border-l-4 border-success">
+                            <h4 class="font-bold text-primary mb-2 flex items-center">
+                                <i class="fas fa-bullseye text-success mr-2"></i>Misión
+                            </h4>
+                            <p class="text-gray-600 text-sm">
+                                Legislar con excelencia para el desarrollo integral de nuestro municipio.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div data-aos="fade-left" data-aos-delay="200">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1547342898-d1d4d3f56b3c?q=80&w=2940&auto=format&fit=crop" 
+                             alt="Concejo Municipal" 
+                             class="rounded-2xl shadow-2xl">
+                        <div class="absolute -bottom-6 -right-6 bg-primary text-white p-6 rounded-xl shadow-lg">
+                            <div class="text-2xl font-bold">15+</div>
+                            <div class="text-sm">Años de Servicio</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Valores institucionales -->
+            <div class="mt-20" data-aos="fade-up">
+                <h3 class="text-3xl font-bold text-primary mb-12 text-center">Nuestros Valores</h3>
+                <div class="grid md:grid-cols-4 gap-8">
+                    <div class="text-center">
+                        <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-handshake text-primary text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-primary mb-2">Transparencia</h4>
+                        <p class="text-gray-600 text-sm">Gestión abierta y accesible para todos los ciudadanos</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-users text-success text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-primary mb-2">Participación</h4>
+                        <p class="text-gray-600 text-sm">Involucramos a la ciudadanía en las decisiones municipales</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-balance-scale text-purple-600 text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-primary mb-2">Justicia</h4>
+                        <p class="text-gray-600 text-sm">Legislación equitativa que beneficie a toda la comunidad</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-leaf text-yellow-600 text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-primary mb-2">Sostenibilidad</h4>
+                        <p class="text-gray-600 text-sm">Desarrollo responsable que preserve nuestro entorno</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Noticias -->
+    <section id="noticias" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl lg:text-5xl font-bold text-primary mb-4">Últimas Noticias</h2>
+                <div class="w-24 h-1 bg-accent mx-auto mb-6"></div>
+                <p class="text-gray-600 text-lg max-w-3xl mx-auto">
+                    Manténgase informado sobre las actividades, decisiones y eventos del Concejo Municipal
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8 mb-12">
+                <!-- Noticia Principal -->
+                <div class="lg:col-span-2 card-hover bg-white rounded-2xl overflow-hidden shadow-lg" data-aos="fade-up" data-aos-delay="100">
+                    <div class="relative h-64 lg:h-80 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1552581234-26160f608093?q=80&w=2940&auto=format&fit=crop" 
+                             alt="Noticia Principal" 
+                             class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                        <div class="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full font-semibold">
+                            <i class="fas fa-star mr-2"></i>Destacada
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
+                            <div class="text-white text-sm mb-2">
+                                <i class="fas fa-calendar mr-2"></i>20 de Enero, 2025
+                            </div>
+                            <h3 class="text-white text-2xl font-bold mb-2">
+                                Aprobada Nueva Ordenanza de Movilidad Urbana Sostenible
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 leading-relaxed mb-4">
+                            El Concejo Municipal aprobó por unanimidad la nueva ordenanza que promueve el transporte 
+                            público eficiente, ciclovías seguras y reducción de emisiones vehiculares en el municipio.
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                <span><i class="fas fa-user mr-1"></i>Secretaría de Prensa</span>
+                                <span><i class="fas fa-eye mr-1"></i>2,845 vistas</span>
+                            </div>
+                            <a href="#" class="text-primary font-medium hover:underline flex items-center">
+                                Leer más <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Noticias Secundarias -->
+                <div class="space-y-6">
+                    <div class="card-hover bg-white rounded-xl p-6 shadow-lg" data-aos="fade-up" data-aos-delay="200">
+                        <div class="flex space-x-4">
+                            <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=2942&auto=format&fit=crop" 
+                                 alt="Noticia" 
+                                 class="w-20 h-20 object-cover rounded-lg flex-shrink-0">
+                            <div>
+                                <div class="text-gray-500 text-sm mb-1">
+                                    <i class="fas fa-calendar mr-1"></i>18 Ene 2025
+                                </div>
+                                <h4 class="font-bold text-primary mb-2 leading-tight">
+                                    Audiencia Pública sobre Presupuesto Participativo
+                                </h4>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Los ciudadanos podrán proponer y votar proyectos para el 20% del presupuesto municipal.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-hover bg-white rounded-xl p-6 shadow-lg" data-aos="fade-up" data-aos-delay="300">
+                        <div class="flex space-x-4">
+                            <img src="https://images.unsplash.com/photo-1549492161-12c8b03046f4?q=80&w=2940&auto=format&fit=crop" 
+                                 alt="Noticia" 
+                                 class="w-20 h-20 object-cover rounded-lg flex-shrink-0">
+                            <div>
+                                <div class="text-gray-500 text-sm mb-1">
+                                    <i class="fas fa-calendar mr-1"></i>15 Ene 2025
+                                </div>
+                                <h4 class="font-bold text-primary mb-2 leading-tight">
+                                    Reconocimiento a Concejales por Transparencia
+                                </h4>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    El municipio recibió premio nacional por implementar herramientas de gobierno abierto.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-hover bg-white rounded-xl p-6 shadow-lg" data-aos="fade-up" data-aos-delay="400">
+                        <div class="flex space-x-4">
+                            <img src="https://images.unsplash.com/photo-1621211100589-3221b6d19483?q=80&w=2940&auto=format&fit=crop" 
+                                 alt="Noticia" 
+                                 class="w-20 h-20 object-cover rounded-lg flex-shrink-0">
+                            <div>
+                                <div class="text-gray-500 text-sm mb-1">
+                                    <i class="fas fa-calendar mr-1"></i>12 Ene 2025
+                                </div>
+                                <h4 class="font-bold text-primary mb-2 leading-tight">
+                                    Nueva Plataforma Digital de Trámites
+                                </h4>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Los ciudadanos ya pueden realizar más de 50 trámites municipales de forma online.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón ver todas las noticias -->
+            <div class="text-center" data-aos="fade-up" data-aos-delay="500">
+                <a href="#" class="btn-primary px-8 py-4 rounded-xl font-semibold text-lg flex items-center space-x-2 mx-auto max-w-max">
+                    <span>Ver Todas las Noticias</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Participación Ciudadana -->
+    <section id="participacion" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl lg:text-5xl font-bold text-primary mb-4">Participación Ciudadana</h2>
+                <div class="w-24 h-1 bg-accent mx-auto mb-6"></div>
+                <p class="text-gray-600 text-lg max-w-3xl mx-auto">
+                    Su voz importa. Participe activamente en la construcción de nuestro municipio
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Formulario de Sugerencias -->
+                <div data-aos="fade-right">
+                    <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100">
+                        <h3 class="text-2xl font-bold text-primary mb-6 flex items-center">
+                            <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>
+                            Portal de Sugerencias
+                        </h3>
+                        <form class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nombre completo*</label>
+                                    <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Correo electrónico*</label>
+                                    <input type="email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Área de interés*</label>
+                                <select class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                                    <option value="">Seleccione un área</option>
+                                    <option value="urbanismo">Urbanismo y Obras Públicas</option>
+                                    <option value="ambiente">Medio Ambiente</option>
+                                    <option value="social">Desarrollo Social</option>
+                                    <option value="economia">Desarrollo Económico</option>
+                                    <option value="seguridad">Seguridad Ciudadana</option>
+                                    <option value="otros">Otros</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Su propuesta o sugerencia*</label>
+                                <textarea rows="4" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Describa su propuesta o sugerencia..."></textarea>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                <label class="ml-2 text-sm text-gray-700">Acepto los términos y condiciones</label>
+                            </div>
+                            
+                            <button type="submit" class="btn-primary w-full py-4 rounded-xl font-semibold text-lg flex items-center justify-center space-x-2">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Enviar Sugerencia</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Consultas Activas y Estadísticas -->
+                <div data-aos="fade-left" data-aos-delay="200">
+                    <div class="space-y-8">
+                        <!-- Consultas Activas -->
+                        <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                            <h3 class="text-2xl font-bold text-primary mb-6 flex items-center">
+                                <i class="fas fa-poll text-green-500 mr-3"></i>
+                                Consultas Activas
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="border border-gray-200 rounded-lg p-4 hover:border-primary transition-colors">
+                                    <h4 class="font-semibold text-primary mb-2">Proyecto de Parque Ecológico</h4>
+                                    <p class="text-gray-600 text-sm mb-3">¿Está de acuerdo con la construcción del nuevo parque ecológico en la zona norte?</p>
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm text-gray-500">
+                                            <i class="fas fa-users mr-1"></i>1,247 participantes
+                                        </div>
+                                        <a href="#" class="text-primary font-medium text-sm hover:underline">Participar</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="border border-gray-200 rounded-lg p-4 hover:border-primary transition-colors">
+                                    <h4 class="font-semibold text-primary mb-2">Horarios de Transporte Público</h4>
+                                    <p class="text-gray-600 text-sm mb-3">Ayúdanos a mejorar los horarios del transporte público municipal.</p>
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm text-gray-500">
+                                            <i class="fas fa-users mr-1"></i>892 participantes
+                                        </div>
+                                        <a href="#" class="text-primary font-medium text-sm hover:underline">Participar</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Estadísticas de Participación -->
+                        <div class="bg-gradient-to-br from-primary to-secondary rounded-2xl p-8 text-white">
+                            <h3 class="text-2xl font-bold mb-6 flex items-center">
+                                <i class="fas fa-chart-bar mr-3"></i>
+                                Participación Ciudadana
+                            </h3>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold mb-2" id="participation-count">0</div>
+                                    <div class="text-blue-100 text-sm">Ciudadanos Participando</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold mb-2" id="suggestions-count">0</div>
+                                    <div class="text-blue-100 text-sm">Sugerencias Recibidas</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold mb-2" id="implemented-count">0</div>
+                                    <div class="text-blue-100 text-sm">Propuestas Implementadas</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold mb-2">98%</div>
+                                    <div class="text-blue-100 text-sm">Satisfacción Ciudadana</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Contacto -->
+    <section id="contacto" class="py-20 bg-gray-900 text-white relative overflow-hidden">
+        <!-- Elementos decorativos -->
+        <div class="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-primary to-transparent opacity-20 rounded-full -translate-x-48 -translate-y-48"></div>
+        <div class="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-tl from-secondary to-transparent opacity-20 rounded-full translate-x-40 translate-y-40"></div>
+        
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl lg:text-5xl font-bold mb-4">Contáctenos</h2>
+                <div class="w-24 h-1 bg-white mx-auto mb-6"></div>
+                <p class="text-gray-300 text-lg max-w-3xl mx-auto">
+                    Estamos aquí para servirle. Contáctenos para consultas, sugerencias o cualquier información que necesite
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-12">
+                <!-- Información de Contacto -->
+                <div class="lg:col-span-1" data-aos="fade-right">
+                    <div class="space-y-8">
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-primary p-3 rounded-lg">
+                                <i class="fas fa-map-marker-alt text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl mb-2">Ubicación</h3>
+                                <p class="text-gray-300">
+                                    Av. Principal, Centro Municipal<br>
+                                    Edificio del Concejo, Piso 2<br>
+                                    Ciudad, Estado, Venezuela
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-primary p-3 rounded-lg">
+                                <i class="fas fa-phone text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl mb-2">Teléfonos</h3>
+                                <p class="text-gray-300">
+                                    +58 212 555-1234<br>
+                                    +58 212 555-5678 (Fax)
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-primary p-3 rounded-lg">
+                                <i class="fas fa-envelope text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl mb-2">Correo Electrónico</h3>
+                                <p class="text-gray-300">
+                                    info@concejomunicipal.gob.ve<br>
+                                    secretaria@concejomunicipal.gob.ve
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-primary p-3 rounded-lg">
+                                <i class="fas fa-clock text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl mb-2">Horario de Atención</h3>
+                                <p class="text-gray-300">
+                                    Lunes a Viernes: 8:00 AM - 4:00 PM<br>
+                                    Sábados: 8:00 AM - 12:00 PM
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mapa y Formulario -->
+                <div class="lg:col-span-2" data-aos="fade-left" data-aos-delay="200">
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-2xl">
+                        <!-- Mapa -->
+                        <div class="h-64 bg-gray-200 relative">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3923.105881380863!2d-66.90373492416601!3d10.49857408970736!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8c2a58ad00000000%3A0x9e0a0a0a0a0a0a0a!2sPalacio%20Federal%20Legislativo!5e0!3m2!1ses!2sve!4v1620000000000!5m2!1ses!2sve" 
+                                width="100%" 
+                                height="100%" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy">
+                            </iframe>
+                        </div>
+                        
+                        <!-- Formulario de Contacto -->
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold text-primary mb-6">Envíenos un Mensaje</h3>
+                            <form class="space-y-4">
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <input type="text" placeholder="Nombre" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900">
+                                    <input type="email" placeholder="Correo electrónico" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900">
+                                </div>
+                                <input type="text" placeholder="Asunto" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900">
+                                <textarea rows="4" placeholder="Mensaje" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900"></textarea>
+                                <button type="submit" class="btn-primary w-full py-3 rounded-lg font-semibold flex items-center justify-center space-x-2">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>Enviar Mensaje</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-16">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-4 gap-8 mb-12">
+                <div data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="bg-primary p-2 rounded-lg">
+                            <i class="fas fa-landmark text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold text-lg">Concejo Municipal</h3>
+                            <p class="text-gray-400 text-sm">Servicio y Transparencia</p>
+                        </div>
+                    </div>
+                    <p class="mb-6 leading-relaxed">
+                        Trabajamos por el desarrollo integral de nuestro municipio, 
+                        promoviendo la participación ciudadana y la transparencia en cada decisión.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="bg-gray-700 p-2 rounded-lg hover:bg-primary transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="bg-gray-700 p-2 rounded-lg hover:bg-primary transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="bg-gray-700 p-2 rounded-lg hover:bg-primary transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="bg-gray-700 p-2 rounded-lg hover:bg-primary transition-colors">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div data-aos="fade-up" data-aos-delay="200">
+                    <h3 class="text-white font-bold text-lg mb-6">Enlaces Rápidos</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#inicio" class="hover:text-white transition-colors flex items-center"><i class="fas fa-chevron-right mr-2 text-primary text-xs"></i>Inicio</a></li>
+                        <li><a href="#nosotros" class="hover:text-white transition-colors flex items-center"><i class="fas fa-chevron-right mr-2 text-primary text-xs"></i>Sobre Nosotros</a></li>
+                        <li><a href="#documentos" class="hover:text-white transition-colors flex items-center"><i class="fas fa-chevron-right mr-2 text-primary text-xs"></i>Documentos Legales</a></li>
+                        <li><a href="#noticias" class="hover:text-white transition-colors flex items-center"><i class="fas fa-chevron-right mr-2 text-primary text-xs"></i>Noticias</a></li>
+                        <li><a href="#participacion" class="hover:text-white transition-colors flex items-center"><i class="fas fa-chevron-right mr-2 text-primary text-xs"></i>Participación</a></li>
+                    </ul>
+                </div>
+                
+                <div data-aos="fade-up" data-aos-delay="300">
+                    <h3 class="text-white font-bold text-lg mb-6">Documentos</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="hover:text-white transition-colors flex items-center"><i class="fas fa-file-pdf mr-2 text-red-400"></i>Reglamento Interno</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors flex items-center"><i class="fas fa-file-excel mr-2 text-green-400"></i>Presupuesto 2025</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors flex items-center"><i class="fas fa-file-alt mr-2 text-blue-400"></i>Plan de Desarrollo</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors flex items-center"><i class="fas fa-file-word mr-2 text-blue-600"></i>Formatos Oficiales</a></li>
+                    </ul>
+                </div>
+                
+                <div data-aos="fade-up" data-aos-delay="400">
+                    <h3 class="text-white font-bold text-lg mb-6">Boletín Informativo</h3>
+                    <p class="mb-4">Reciba las últimas noticias y actualizaciones directamente en su correo electrónico.</p>
+                    <form class="space-y-3">
+                        <input type="email" placeholder="Su correo electrónico" class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <button type="submit" class="btn-primary w-full py-3 rounded-lg font-medium flex items-center justify-center space-x-2">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Suscribirse</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-8 text-center" data-aos="fade-up" data-aos-delay="500">
+                <p class="mb-4">&copy; 2025 Concejo Municipal. Todos los derechos reservados.</p>
+                <div class="flex flex-wrap justify-center space-x-6 text-sm">
+                    <a href="#" class="hover:text-white transition-colors">Aviso Legal</a>
+                    <a href="#" class="hover:text-white transition-colors">Política de Privacidad</a>
+                    <a href="#" class="hover:text-white transition-colors">Términos de Uso</a>
+                    <a href="#" class="hover:text-white transition-colors">Mapa del Sitio</a>
+                    <a href="#" class="hover:text-white transition-colors">Accesibilidad</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botón Back to Top -->
+    <button id="backToTop" class="fixed bottom-6 right-6 bg-primary text-white p-3 rounded-full shadow-lg hover:bg-blue-800 transition-all duration-300 transform scale-0 z-50">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script>
+        // Inicializar AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            easing: 'ease-out-cubic'
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('navbar-scroll');
+            } else {
+                navbar.classList.remove('navbar-scroll');
+            }
+        });
+
+        // Mobile menu toggle
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // Close mobile menu if open
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                }
+            });
+        });
+
+        // Counter animations
+        function animateCounter(element, target, duration = 2000) {
+            let start = 0;
+            const increment = target / (duration / 16);
+            const timer = setInterval(() => {
+                start += increment;
+                element.textContent = Math.floor(start);
+                if (start >= target) {
+                    element.textContent = target.toLocaleString();
+                    clearInterval(timer);
+                }
+            }, 16);
+        }
+
+        // Intersection Observer for counters
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = {
+                        'counter-laws': 247,
+                        'counter-sessions': 48,
+                        'counter-citizens': 12540,
+                        'counter-projects': 89,
+                        'participation-count': 3420,
+                        'suggestions-count': 156,
+                        'implemented-count': 78
+                    };
+                    
+                    Object.entries(counters).forEach(([id, target]) => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            animateCounter(element, target);
+                        }
+                    });
+                    
+                    counterObserver.disconnect();
+                }
+            });
+        });
+
+        // Start observing when hero section is visible
+        const heroSection = document.querySelector('#inicio');
+        if (heroSection) {
+            counterObserver.observe(heroSection);
+        }
+
+        // Back to top button
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 300) {
+                backToTopButton.classList.remove('scale-0');
+                backToTopButton.classList.add('scale-100');
+            } else {
+                backToTopButton.classList.remove('scale-100');
+                backToTopButton.classList.add('scale-0');
+            }
+        });
+
+        backToTopButton.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Loading animation for images
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('load', function() {
+                this.classList.remove('img-loading');
+            });
+            
+            if (!img.complete) {
+                img.classList.add('img-loading');
+            }
+        });
+
+        // Enhanced hover effects for cards
+        document.querySelectorAll('.card-hover').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+                this.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.15)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+                this.style.boxShadow = '';
+            });
+        });
+
+        // Form validation and submission
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Add loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<div class="spinner mr-2"></div> Enviando...';
+                submitBtn.disabled = true;
+                
+                // Simulate form submission
+                setTimeout(() => {
+                    submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Enviado';
+                    submitBtn.classList.add('bg-green-500');
+                    
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('bg-green-500');
+                        form.reset();
+                    }, 2000);
+                }, 1500);
+            });
+        });
+
+        // Progressive loading for content
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const contentObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections for progressive loading
+        document.querySelectorAll('section').forEach(section => {
+            contentObserver.observe(section);
+        });
+
+        // Console welcome message
+        console.log(
+            '%cBienvenido al Portal del Concejo Municipal',
+            'color: #1d4ed8; font-size: 20px; font-weight: bold;'
+        );
+        console.log(
+            '%cEste sitio web está optimizado para la transparencia y participación ciudadana.',
+            'color: #6b7280; font-size: 14px;'
+        );
+    </script>
+</body>
+</html>

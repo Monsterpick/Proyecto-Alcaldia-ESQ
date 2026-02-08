@@ -94,7 +94,7 @@ Route::post('/customers', function (Request $request) {
         ->get();
 })->name('api.customers.index');
 
-Route::post('/wharehouses', function (Request $request) {
+Route::post('/warehouses', function (Request $request) {
     return Warehouse::select('id', 'name', 'location as description')
         ->when($request->search, function ($query, $search) {
             $query->where('name', 'like', "%{$search}%")

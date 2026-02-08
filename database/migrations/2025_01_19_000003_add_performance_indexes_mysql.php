@@ -14,7 +14,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Helper para verificar si un índice existe
+        // Solo ejecutar en MySQL (producción/local). En SQLite (tests) se omite.
+        if (Schema::getConnection()->getDriverName() !== 'mysql') {
+            return;
+        }
+
         $indexExists = function ($table, $indexName) {
             $indexes = DB::select("SHOW INDEX FROM {$table} WHERE Key_name = ?", [$indexName]);
             return count($indexes) > 0;
@@ -114,6 +118,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (Schema::getConnection()->getDriverName() !== 'mysql') {
+            return;
+        }
+
         Schema::table('beneficiaries', function (Blueprint $table) {
             $table->dropIndex('idx_beneficiaries_cedula');
             $table->dropIndex('idx_beneficiaries_names');

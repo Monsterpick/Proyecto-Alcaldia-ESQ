@@ -228,3 +228,10 @@ Route::prefix('telegram')->group(function () {
     Route::get('/me', [App\Http\Controllers\TelegramBotController::class, 'getMe']);
     Route::post('/test', [App\Http\Controllers\TelegramBotController::class, 'sendTestMessage']);
 });
+
+// Ruta de login API para React
+Route::middleware('web')->group(function () {
+    Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])
+        ->middleware('guest')
+        ->name('api.login');
+});

@@ -37,14 +37,53 @@ new class extends Component {
         ],
         [
             'header' => 'Beneficiarios',
-            'permission' => 'view-dashboard',
+            'permission' => 'view-beneficiary',
         ],
         [
             'name' => 'Beneficiarios',
             'icon' => 'fa-solid fa-user-group',
             'url' => route('admin.beneficiaries.index'),
             'active' => request()->routeIs('admin.beneficiaries.*'),
-            'permission' => 'view-dashboard',
+            'permission' => 'view-beneficiary',
+        ],
+        [
+            'header' => 'Directores',
+            'permission' => 'view-director',
+        ],
+        [
+            'name' => 'Directores',
+            'icon' => 'fa-solid fa-user-tie',
+            'href' => '#',
+            'active' => request()->routeIs([
+                'admin.departamentos.*',
+                'admin.directores.*',
+                'admin.solicitudes.*',
+            ]),
+            'id_submenu' => 'submenu-directores',
+            'permission' => 'view-director',
+            'submenu' => [
+                [
+                    'name' => 'Departamentos/Directores',
+                    'icon' => 'fa-solid fa-building-user',
+                    'url' => route('admin.departamentos.index'),
+                    'active' => request()->routeIs('admin.departamentos.*'),
+                    'permission' => 'view-departamento',
+                ],
+                [
+                    'name' => 'Listado de Directores',
+                    'icon' => 'fa-solid fa-address-card',
+                    'url' => route('admin.directores.index'),
+                    'active' => request()->routeIs('admin.directores.index'),
+                    'permission' => 'view-director',
+                ],
+                [
+                    'name' => 'Solicitudes de Alcaldía Digital',
+                    'icon' => 'fa-solid fa-file-lines',
+                    'url' => route('admin.solicitudes.index'),
+                    'active' => request()->routeIs('admin.solicitudes.*'),
+                    'permission' => 'view-solicitud',
+                ],
+            ],
         ],
         [
             'header' => 'Inventario/Almacén',
@@ -130,68 +169,28 @@ new class extends Component {
         ],
         [
             'header' => 'Reportes y Entregas',
-            'permission' => 'view-dashboard',
+            'permission' => 'view-report',
         ],
         [
             'name' => 'Reportes de Entregas',
             'icon' => 'fa-solid fa-file-alt',
             'url' => route('admin.reports.index'),
             'active' => request()->routeIs('admin.reports.*'),
-            'permission' => 'view-dashboard',
+            'permission' => 'view-report',
         ],
         [
             'name' => 'Mapa de Geolocalización',
             'icon' => 'fa-solid fa-map-location-dot',
             'url' => route('admin.map.index'),
             'active' => request()->routeIs('admin.map.*'),
-            'permission' => 'view-dashboard',
+            'permission' => 'view-map',
         ],
         [
             'name' => 'Registro de Actividades',
             'icon' => 'fa-solid fa-clipboard-list',
             'url' => route('admin.activity-logs.index'),
             'active' => request()->routeIs('admin.activity-logs.*'),
-            'permission' => 'view-dashboard',
-        ],
-        [
-            'header' => 'Proyectos Comunitarios',
-            'permission' => 'view-community-project',
-        ],
-        [
-            'name' => 'Proyectos',
-            'icon' => 'fa-solid fa-diagram-project',
-            'href' => '#',
-            'active' => request()->routeIs([
-                'admin.community-projects.*',
-                'admin.projects-in-progress.*',
-                'admin.projects-executed.*',
-                'admin.projects-proposed.*',
-            ]),
-            'id_submenu' => 'submenu-projects',
-            'permission' => 'view-community-project',
-            'submenu' => [
-                [
-                    'name' => 'En Proceso',
-                    'icon' => 'fa-solid fa-spinner',
-                    'url' => '#',
-                    'active' => request()->routeIs('admin.projects-in-progress.*'),
-                    'permission' => 'view-project-in-progress',
-                ],
-                [
-                    'name' => 'Ejecutados',
-                    'icon' => 'fa-solid fa-check-circle',
-                    'url' => '#',
-                    'active' => request()->routeIs('admin.projects-executed.*'),
-                    'permission' => 'view-project-executed',
-                ],
-                [
-                    'name' => 'Propuestos',
-                    'icon' => 'fa-solid fa-lightbulb',
-                    'url' => '#',
-                    'active' => request()->routeIs('admin.projects-proposed.*'),
-                    'permission' => 'view-project-proposed',
-                ],
-            ],
+            'permission' => 'view-activitylog',
         ],
         [
             'header' => 'Configuración de Sistema',
@@ -242,7 +241,7 @@ new class extends Component {
             ],
         ],
         [
-            'name' => 'General',
+            'name' => 'Config General',
             'icon' => 'fa-solid fa-gears',
             'href' => '#',
             'active' => request()->routeIs([
@@ -258,7 +257,7 @@ new class extends Component {
                 'admin.warehouses.*',
             ]),
             'id_submenu' => 'submenu-general',
-            'permission' => 'view-general',
+            'permission' => 'view-super-admin-config',
             'submenu' => [
                 [
                     'name' => 'Datos de la empresa',
@@ -279,6 +278,13 @@ new class extends Component {
                     'icon' => 'fa-solid fa-image',
                     'url' => route('admin.settings.logo'),
                     'active' => request()->routeIs('admin.settings.logo.*'),
+                    'permission' => 'view-setting',
+                ],
+                [
+                    'name' => 'Colores Institucional',
+                    'icon' => 'fa-solid fa-palette',
+                    'url' => route('admin.settings.colors'),
+                    'active' => request()->routeIs('admin.settings.colors'),
                     'permission' => 'view-setting',
                 ],
                 [
@@ -315,35 +321,67 @@ new class extends Component {
 
     ];
 
+    // Analista: solo Directores (Departamentos, Listado, Solicitudes). Sin Panel/estadísticas.
+    if (Auth::check() && Auth::user()->hasRole('Analista')) {
+        $links = array_values(array_filter($links, function ($link) {
+            if (isset($link['header'])) {
+                return ($link['header'] ?? '') === 'Directores';
+            }
+            return ($link['permission'] ?? '') === 'view-director';
+        }));
+    }
+
+    // Director: solo Solicitudes de su departamento y Perfil
+    if (Auth::check() && Auth::user()->hasRole('Director')) {
+        $links = [
+            [
+                'name' => 'Solicitudes de mi departamento',
+                'icon' => 'fa-solid fa-file-lines',
+                'url' => route('admin.solicitudes.index'),
+                'active' => request()->routeIs('admin.solicitudes.*'),
+                'permission' => 'view-solicitud',
+            ],
+            [
+                'name' => 'Perfil',
+                'icon' => 'fa-solid fa-user',
+                'url' => route('admin.settings.profile'),
+                'active' => request()->routeIs('admin.settings.profile'),
+                'permission' => 'profile-setting',
+            ],
+        ];
+    }
+
+    // Operador: Panel, Beneficiarios, Inventario, Movimientos, Reportes, Mapa (no Config, Direcciones, Usuarios)
+    if (Auth::check() && Auth::user()->hasRole('Operador')) {
+        $operadorPerms = ['view-dashboard', 'view-beneficiary', 'view-inventory', 'view-movement', 'view-report', 'view-map'];
+        $links = array_values(array_filter($links, function ($link) use ($operadorPerms) {
+            $perm = $link['permission'] ?? '';
+            if (isset($link['header'])) {
+                return in_array($perm, $operadorPerms);
+            }
+            return in_array($perm, $operadorPerms);
+        }));
+    }
+
 @endphp
 
 <aside id="logo-sidebar"
-    class="fixed top-0 left-0 z-40 w-64 h-[100dvh] transition-transform -translate-x-full sm:translate-x-0"
+    class="fixed top-0 left-0 z-40 w-64 h-[100dvh] pt-[3.5rem] sm:pt-[3.75rem] transition-transform -translate-x-full sm:translate-x-0"
     style="background-color: var(--color-bg-primary); border-right: 1px solid var(--color-border-primary);"
     :class="{
         'translate-x-0 ease-out': sidebarOpen,
         '-translate-x-full ease-in': !sidebarOpen
     }" aria-label="Sidebar">
-    
-    <!-- Header del Sidebar con Logo -->
-    <div class="px-5 py-6 bg-gradient-to-r from-blue-600 to-indigo-600" style="border-bottom: 1px solid var(--color-border-primary);">
-        <div class="flex items-center justify-between gap-3">
-            <a href="{{ route('admin.dashboard') }}" wire:navigate class="flex items-center gap-3 flex-1">
-                <img src="{{ asset('1.png') }}" alt="NEVORA Logo" class="h-10 w-auto object-contain">
-                <div>
-                    <h2 class="text-sm font-bold text-white leading-tight">Sistema Web de Gestion</h2>
-                    <p class="text-sm font-semibold text-blue-100">Alcaldia del Municipio Escuque</p>
-                </div>
-            </a>
-            <!-- Botón cerrar sidebar en móvil -->
-            <button @click="sidebarOpen = false" class="sm:hidden text-white hover:bg-white/10 p-2 rounded-lg transition-colors">
-                <i class="fa-solid fa-times text-xl"></i>
-            </button>
-        </div>
-    </div>
 
     <!-- Contenido Principal del Sidebar -->
-    <div class="flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent" style="height: calc(100vh - 220px);">
+    <div class="flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent" style="height: calc(100vh - 3.75rem);">
+        @if (Auth::check() && Auth::user()->hasRole('Director') && !Auth::user()->password_changed_at)
+            <a href="{{ route('admin.settings.profile') }}" wire:navigate
+               class="mx-3 mt-3 mb-2 flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-left text-sm font-medium text-amber-800 transition hover:bg-amber-100 dark:border-amber-600 dark:bg-amber-900/30 dark:text-amber-200 dark:hover:bg-amber-900/50">
+                <i class="fa-solid fa-shield-halved shrink-0"></i>
+                <span>No has actualizado tu contraseña <span class="text-amber-600 dark:text-amber-400">(recomendado)</span></span>
+            </a>
+        @endif
         <ul class="space-y-1 px-3 py-4 font-medium flex-1">
             @foreach ($links as $link)
                 @can($link['permission'])
@@ -406,58 +444,4 @@ new class extends Component {
         </ul>
     </div>
 
-    <!-- Footer del Sidebar con Info del Usuario -->
-    @if(Auth::check())
-    <div class="absolute bottom-0 left-0 right-0" style="border-top: 1px solid var(--color-border-primary); background-color: var(--color-bg-primary);">
-        <div class="p-3 space-y-2">
-            <!-- Info del Usuario -->
-            <div class="flex items-center gap-3 px-3 py-2 rounded-lg" style="background-color: var(--color-bg-secondary);">
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white font-semibold text-sm">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium truncate" style="color: var(--color-text-primary);">
-                        {{ Auth::user()->name }}
-                    </p>
-                    <p class="text-xs truncate" style="color: var(--color-text-tertiary);">
-                        {{ Auth::user()->email }}
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Botones de Acción -->
-            <div class="grid grid-cols-3 gap-2">
-                <!-- Botón Tema -->
-                <button @click="darkMode = !darkMode"
-                    class="flex items-center justify-center gap-1 px-2 py-2 text-xs font-medium rounded-lg transition-colors"
-                    style="background-color: var(--color-bg-secondary); color: var(--color-text-secondary); box-shadow: var(--shadow-sm);"
-                    onmouseover="this.style.backgroundColor='var(--color-bg-hover)'; this.style.color='var(--color-blue-600)'"
-                    onmouseout="this.style.backgroundColor='var(--color-bg-secondary)'; this.style.color='var(--color-text-secondary)'">
-                    <i class="fa-solid text-sm" :class="darkMode ? 'fa-sun text-yellow-500' : 'fa-moon text-blue-600'"></i>
-                    <span x-text="darkMode ? 'Claro' : 'Oscuro'"></span>
-                </button>
-                
-                <!-- Botón Configuración -->
-                <a href="{{ route('admin.settings.profile') }}" wire:navigate
-                    class="flex items-center justify-center gap-1 px-2 py-2 text-xs font-medium rounded-lg transition-colors"
-                    style="background-color: var(--color-bg-secondary); color: var(--color-text-secondary); box-shadow: var(--shadow-sm);"
-                    onmouseover="this.style.backgroundColor='var(--color-bg-hover)'; this.style.color='var(--color-blue-600)'"
-                    onmouseout="this.style.backgroundColor='var(--color-bg-secondary)'; this.style.color='var(--color-text-secondary)'">
-                    <i class="fa-solid fa-gear text-sm"></i>
-                    <span>Config</span>
-                </a>
-                
-                <!-- Botón Salir -->
-                <button wire:click="logout"
-                    class="flex items-center justify-center gap-1 px-2 py-2 text-xs font-medium rounded-lg transition-colors"
-                    style="background-color: var(--color-bg-secondary); color: var(--color-red-600); box-shadow: var(--shadow-sm);"
-                    onmouseover="this.style.backgroundColor='var(--color-red-50)'; this.style.color='var(--color-red-700)'"
-                    onmouseout="this.style.backgroundColor='var(--color-bg-secondary)'; this.style.color='var(--color-red-600)'">
-                    <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
-                    <span>Salir</span>
-                </button>
-            </div>
-        </div>
-    </div>
-    @endif
 </aside>

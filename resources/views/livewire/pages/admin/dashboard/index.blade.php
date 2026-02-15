@@ -7,6 +7,8 @@ use App\Models\Inventory;
 use App\Models\Report;
 use App\Models\Beneficiary;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
+use Livewire\Attributes\Computed;
 
 new class extends Component {
     public $beneficiariosHoy;
@@ -24,119 +26,76 @@ new class extends Component {
     public $productosAgotadosLista;
     public $productosStockBajoLista;
     public $mostrarDesglose = false;
-    
+
     // Estadísticas de reportes
     public $totalReportes;
     public $reportesEsteMes;
     public $reportesHoy;
 
+    // Datos mensuales para gráficas
+    public $mesesBeneficiarios = [];
+    public $datosBeneficiariosMensuales = [];
+
+    public $mesesMovimientos = [];
+    public $datosEntradas = [];
+    public $datosSalidas = [];
+
     public function mount()
     {
         try {
-            // Beneficiarios del día (de la tabla beneficiaries)
             $this->beneficiariosHoy = Beneficiary::whereDate('created_at', today())->count();
-
-            // Beneficiarios del mes
             $this->beneficiariosMes = Beneficiary::whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count();
-
-            // Total beneficiarios registrados
+                ->whereYear('created_at', now()->year)->count();
             $this->totalBeneficiarios = Beneficiary::count();
-
-            // Total productos
             $this->totalProductos = Product::count();
 
-            // Desglose de productos por categoría (optimizado)
             $this->desgloseProductos = DB::table('categories')
                 ->join('products', 'categories.id', '=', 'products.category_id')
-                ->select(
-                    'categories.id as categoria_id',
-                    'categories.name as categoria',
-                    DB::raw('COUNT(products.id) as total')
-                )
+                ->select('categories.id as categoria_id', 'categories.name as categoria', DB::raw('COUNT(products.id) as total'))
                 ->groupBy('categories.id', 'categories.name')
-                ->orderBy('total', 'desc')
-                ->get();
+                ->orderBy('total', 'desc')->get();
 
-            // Productos con stock REAL (suma de entradas - salidas)
             $productosConStock = DB::table('products')
                 ->leftJoin('inventories', 'products.id', '=', 'inventories.product_id')
-                ->select(
-                    'products.id',
-                    'products.name',
-                    DB::raw('COALESCE(SUM(inventories.quantity_in), 0) - COALESCE(SUM(inventories.quantity_out), 0) as total_stock')
-                )
-                ->groupBy('products.id', 'products.name')
-                ->get();
+                ->select('products.id', 'products.name',
+                    DB::raw('COALESCE(SUM(inventories.quantity_in), 0) - COALESCE(SUM(inventories.quantity_out), 0) as total_stock'))
+                ->groupBy('products.id', 'products.name')->get();
 
-            // Productos con stock bajo (entre 1 y 9 unidades)
-            $this->productosStockBajoLista = $productosConStock->filter(function($producto) {
-                return $producto->total_stock > 0 && $producto->total_stock < 10;
-            });
+            $this->productosStockBajoLista = $productosConStock->filter(fn($p) => $p->total_stock > 0 && $p->total_stock < 10);
             $this->productosStockBajo = $this->productosStockBajoLista->count();
-
-            // Productos agotados (0 unidades o sin inventario)
-            $this->productosAgotadosLista = $productosConStock->filter(function($producto) {
-                return $producto->total_stock <= 0;
-            });
+            $this->productosAgotadosLista = $productosConStock->filter(fn($p) => $p->total_stock <= 0);
             $this->productosAgotados = $this->productosAgotadosLista->count();
 
-            // Entradas del mes (registros de inventario con quantity_in > 0)
             $this->entradasPendientes = Inventory::where('quantity_in', '>', 0)
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count();
-
-            // Salidas del mes (registros de inventario con quantity_out > 0)
+                ->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
             $this->salidasMes = Inventory::where('quantity_out', '>', 0)
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count();
-
-            // Total movimientos del año (todos los registros de inventario)
+                ->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
             $this->totalMovimientosAnio = Inventory::whereYear('created_at', now()->year)->count();
 
-            // Top 5 productos más distribuidos (optimizado)
             $this->productosTop = DB::table('inventories')
                 ->join('products', 'inventories.product_id', '=', 'products.id')
                 ->where('inventories.quantity_out', '>', 0)
-                ->select(
-                    'products.id',
-                    'products.name',
-                    DB::raw('COUNT(*) as movimientos_count'),
-                    DB::raw('SUM(inventories.quantity_out) as total_movido')
-                )
+                ->select('products.id', 'products.name', DB::raw('COUNT(*) as movimientos_count'), DB::raw('SUM(inventories.quantity_out) as total_movido'))
                 ->groupBy('products.id', 'products.name')
-                ->orderByDesc('total_movido')
-                ->limit(5)
-                ->get();
+                ->orderByDesc('total_movido')->limit(5)->get();
 
-            // Top categorías con más entregas (optimizado)
             $this->categoriasTop = DB::table('inventories')
                 ->join('products', 'inventories.product_id', '=', 'products.id')
                 ->join('categories', 'products.category_id', '=', 'categories.id')
                 ->where('inventories.quantity_out', '>', 0)
-                ->select(
-                    'categories.id',
-                    'categories.name',
-                    DB::raw('COUNT(*) as cantidad'),
-                    DB::raw('SUM(inventories.quantity_out) as total_movimientos')
-                )
+                ->select('categories.id', 'categories.name', DB::raw('COUNT(*) as cantidad'), DB::raw('SUM(inventories.quantity_out) as total_movimientos'))
                 ->groupBy('categories.id', 'categories.name')
-                ->orderByDesc('total_movimientos')
-                ->limit(5)
-                ->get();
+                ->orderByDesc('total_movimientos')->limit(5)->get();
 
-            // Estadísticas de reportes
             $this->totalReportes = Report::count();
-            $this->reportesEsteMes = Report::whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count();
+            $this->reportesEsteMes = Report::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
             $this->reportesHoy = Report::whereDate('created_at', today())->count();
 
+            // Cargar datos mensuales para gráficas
+            $this->cargarBeneficiariosMensuales();
+            $this->cargarMovimientosMensuales();
+
         } catch (\Exception $e) {
-            // Valores por defecto en caso de error
             $this->beneficiariosHoy = 0;
             $this->beneficiariosMes = 0;
             $this->totalBeneficiarios = 0;
@@ -154,9 +113,40 @@ new class extends Component {
             $this->totalReportes = 0;
             $this->reportesEsteMes = 0;
             $this->reportesHoy = 0;
-            
-            // Log del error para debugging
             \Log::error('Dashboard Error: ' . $e->getMessage());
+        }
+    }
+
+    public function cargarBeneficiariosMensuales()
+    {
+        $this->mesesBeneficiarios = [];
+        $this->datosBeneficiariosMensuales = [];
+
+        for ($i = 11; $i >= 0; $i--) {
+            $fecha = Carbon::now()->subMonths($i);
+            $this->mesesBeneficiarios[] = ucfirst($fecha->translatedFormat('M'));
+            $this->datosBeneficiariosMensuales[] = Beneficiary::whereMonth('created_at', $fecha->month)
+                ->whereYear('created_at', $fecha->year)->count();
+        }
+    }
+
+    public function cargarMovimientosMensuales()
+    {
+        $this->mesesMovimientos = [];
+        $this->datosEntradas = [];
+        $this->datosSalidas = [];
+
+        for ($i = 11; $i >= 0; $i--) {
+            $fecha = Carbon::now()->subMonths($i);
+            $this->mesesMovimientos[] = ucfirst($fecha->translatedFormat('M'));
+
+            $this->datosEntradas[] = Inventory::where('quantity_in', '>', 0)
+                ->whereMonth('created_at', $fecha->month)
+                ->whereYear('created_at', $fecha->year)->count();
+
+            $this->datosSalidas[] = Inventory::where('quantity_out', '>', 0)
+                ->whereMonth('created_at', $fecha->month)
+                ->whereYear('created_at', $fecha->year)->count();
         }
     }
 
@@ -164,45 +154,121 @@ new class extends Component {
     {
         $this->mostrarDesglose = !$this->mostrarDesglose;
     }
+
+    public function refreshData()
+    {
+        $this->mount();
+    }
 }; ?>
 
-<div class="min-h-screen bg-gray-950">
-    <x-container class="w-full px-4 py-6">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-white">Panel de Control</h1>
-            <div class="text-gray-400 text-sm">
-                <i class="fas fa-calendar-alt mr-2"></i>{{ now()->format('d/m/Y H:i') }}
+<div class="mt-6 page-enter">
+    {{-- Breadcrumbs --}}
+    <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            ['name' => 'Dashboard', 'route' => route('admin.dashboard')],
+            ['name' => 'Panel de Control'],
+        ]" />
+    </x-slot>
+
+    <x-container class="w-full px-4 sm:px-6">
+
+        {{-- Header --}}
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Panel de Control</h1>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Resumen general del sistema de gestión</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-gray-400 dark:text-gray-500 text-sm">
+                    <i class="fas fa-calendar-alt mr-1"></i>{{ now()->format('d/m/Y H:i') }}
+                </span>
+                <button wire:click="refreshData" class="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors" title="Actualizar datos">
+                    <i class="fas fa-sync-alt" wire:loading.class="animate-spin" wire:target="refreshData"></i>
+                </button>
             </div>
         </div>
 
-        <!-- Alertas -->
+        {{-- ===== TARJETAS PRINCIPALES ===== --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+
+            {{-- Beneficiarios Hoy --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6 flex items-center justify-between border-l-4 border-green-500 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                <div>
+                    <p class="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-1">Beneficiarios Hoy</p>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{{ $beneficiariosHoy }}</h3>
+                    <p class="text-green-500 text-xs mt-2 flex items-center gap-1">
+                        <i class="fas fa-user-plus"></i> Registros de hoy
+                    </p>
+                </div>
+                <div class="p-3 sm:p-4 bg-green-100 dark:bg-green-900/30 rounded-xl">
+                    <i class="fas fa-user-plus text-2xl sm:text-3xl text-green-500 dark:text-green-400"></i>
+                </div>
+            </div>
+
+            {{-- Beneficiarios del Mes --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6 flex items-center justify-between border-l-4 border-blue-500 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                <div>
+                    <p class="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-1">Beneficiarios del Mes</p>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{{ $beneficiariosMes }}</h3>
+                    <p class="text-blue-500 text-xs mt-2 flex items-center gap-1">
+                        <i class="fas fa-chart-line"></i> Este mes
+                    </p>
+                </div>
+                <div class="p-3 sm:p-4 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                    <i class="fas fa-chart-line text-2xl sm:text-3xl text-blue-500 dark:text-blue-400"></i>
+                </div>
+            </div>
+
+            {{-- Total Beneficiarios --}}
+            <a href="{{ route('admin.beneficiaries.index') }}" wire:navigate class="block">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6 flex items-center justify-between border-l-4 border-purple-500 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                    <div>
+                        <p class="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-1">Total Beneficiarios</p>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{{ $totalBeneficiarios }}</h3>
+                        <p class="text-purple-500 text-xs mt-2 flex items-center gap-1">
+                            <i class="fas fa-users"></i> Registrados
+                        </p>
+                    </div>
+                    <div class="p-3 sm:p-4 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
+                        <i class="fas fa-users text-2xl sm:text-3xl text-purple-500 dark:text-purple-400"></i>
+                    </div>
+                </div>
+            </a>
+
+            {{-- Total Productos --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6 flex items-center justify-between border-l-4 border-orange-500 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer" wire:click="toggleDesglose">
+                <div>
+                    <p class="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium mb-1">Total Productos</p>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{{ $totalProductos }}</h3>
+                    <p class="text-orange-500 text-xs mt-2 flex items-center gap-1">
+                        <i class="fas fa-chart-pie"></i> Ver desglose
+                    </p>
+                </div>
+                <div class="p-3 sm:p-4 bg-orange-100 dark:bg-orange-900/30 rounded-xl">
+                    <i class="fas fa-box text-2xl sm:text-3xl text-orange-500 dark:text-orange-400"></i>
+                </div>
+            </div>
+        </div>
+
+        {{-- ===== ALERTAS ===== --}}
         <div class="space-y-3 mb-6">
             @if($productosAgotados > 0)
-            <div class="bg-red-900/20 border border-red-500/50 rounded-lg p-4" x-data="{ open: false }">
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/50 rounded-xl p-4" x-data="{ open: false }">
                 <div class="flex items-center justify-between cursor-pointer" @click="open = !open">
                     <div class="flex items-center space-x-3">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
-                        <span class="text-red-400 font-semibold">{{ $productosAgotados }} producto(s) agotado(s)</span>
+                        <div class="p-2 bg-red-100 dark:bg-red-900/40 rounded-lg">
+                            <i class="fas fa-exclamation-triangle text-red-500 text-lg"></i>
+                        </div>
+                        <span class="text-red-700 dark:text-red-400 font-semibold">{{ $productosAgotados }} producto(s) agotado(s)</span>
                     </div>
-                    <button type="button" class="text-red-400 hover:text-red-300 transition-transform" :class="{ 'rotate-180': open }">
-                        <i class="fas fa-chevron-down text-sm"></i>
-                    </button>
+                    <i class="fas fa-chevron-down text-red-400 text-sm transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
                 </div>
-                
-                <div x-show="open" 
-                     x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0 transform -translate-y-2"
-                     x-transition:enter-end="opacity-100 transform translate-y-0"
-                     x-transition:leave="transition ease-in duration-150"
-                     x-transition:leave-start="opacity-100 transform translate-y-0"
-                     x-transition:leave-end="opacity-0 transform -translate-y-2"
-                     class="mt-4 pt-4 border-t border-red-500/30">
-                    <div class="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-red-600 scrollbar-track-gray-800">
+                <div x-show="open" x-transition class="mt-4 pt-4 border-t border-red-200 dark:border-red-500/30">
+                    <div class="space-y-2 max-h-60 overflow-y-auto">
                         @foreach($productosAgotadosLista->take(10) as $producto)
-                        <div class="flex items-center justify-between p-2 bg-red-950/30 rounded hover:bg-red-950/50 transition-colors">
-                            <span class="text-gray-300 text-sm">{{ $producto->name }}</span>
-                            <span class="text-red-400 text-xs font-semibold">Stock: {{ number_format($producto->total_stock) }}</span>
+                        <div class="flex items-center justify-between p-2 bg-red-100/50 dark:bg-red-950/30 rounded-lg">
+                            <span class="text-gray-700 dark:text-gray-300 text-sm">{{ $producto->name }}</span>
+                            <span class="text-red-600 dark:text-red-400 text-xs font-semibold">Stock: {{ number_format($producto->total_stock) }}</span>
                         </div>
                         @endforeach
                         @if($productosAgotados > 10)
@@ -214,30 +280,22 @@ new class extends Component {
             @endif
 
             @if($productosStockBajo > 0)
-            <div class="bg-yellow-900/20 border border-yellow-500/50 rounded-lg p-4" x-data="{ open: false }">
+            <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-500/50 rounded-xl p-4" x-data="{ open: false }">
                 <div class="flex items-center justify-between cursor-pointer" @click="open = !open">
                     <div class="flex items-center space-x-3">
-                        <i class="fas fa-exclamation-circle text-yellow-500 text-xl"></i>
-                        <span class="text-yellow-400 font-semibold">{{ $productosStockBajo }} producto(s) con stock bajo</span>
+                        <div class="p-2 bg-yellow-100 dark:bg-yellow-900/40 rounded-lg">
+                            <i class="fas fa-exclamation-circle text-yellow-500 text-lg"></i>
+                        </div>
+                        <span class="text-yellow-700 dark:text-yellow-400 font-semibold">{{ $productosStockBajo }} producto(s) con stock bajo</span>
                     </div>
-                    <button type="button" class="text-yellow-400 hover:text-yellow-300 transition-transform" :class="{ 'rotate-180': open }">
-                        <i class="fas fa-chevron-down text-sm"></i>
-                    </button>
+                    <i class="fas fa-chevron-down text-yellow-400 text-sm transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
                 </div>
-                
-                <div x-show="open" 
-                     x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0 transform -translate-y-2"
-                     x-transition:enter-end="opacity-100 transform translate-y-0"
-                     x-transition:leave="transition ease-in duration-150"
-                     x-transition:leave-start="opacity-100 transform translate-y-0"
-                     x-transition:leave-end="opacity-0 transform -translate-y-2"
-                     class="mt-4 pt-4 border-t border-yellow-500/30">
-                    <div class="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-yellow-600 scrollbar-track-gray-800">
+                <div x-show="open" x-transition class="mt-4 pt-4 border-t border-yellow-200 dark:border-yellow-500/30">
+                    <div class="space-y-2 max-h-60 overflow-y-auto">
                         @foreach($productosStockBajoLista->take(10) as $producto)
-                        <div class="flex items-center justify-between p-2 bg-yellow-950/30 rounded hover:bg-yellow-950/50 transition-colors">
-                            <span class="text-gray-300 text-sm">{{ $producto->name }}</span>
-                            <span class="text-yellow-400 text-xs font-semibold">Stock: {{ number_format($producto->total_stock) }} unidades</span>
+                        <div class="flex items-center justify-between p-2 bg-yellow-100/50 dark:bg-yellow-950/30 rounded-lg">
+                            <span class="text-gray-700 dark:text-gray-300 text-sm">{{ $producto->name }}</span>
+                            <span class="text-yellow-600 dark:text-yellow-400 text-xs font-semibold">Stock: {{ number_format($producto->total_stock) }} uds</span>
                         </div>
                         @endforeach
                         @if($productosStockBajo > 10)
@@ -249,526 +307,373 @@ new class extends Component {
             @endif
         </div>
 
-        <!-- Métricas Principales -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <!-- Beneficiarios Hoy -->
-            <div class="bg-gray-900 border-l-4 border-green-500 rounded-lg p-6 hover:bg-gray-850 transition-colors">
+        {{-- ===== TARJETAS SECUNDARIAS ===== --}}
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+            {{-- Agotados --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4 sm:p-5 border-l-4 border-red-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <div class="flex items-center justify-between mb-2">
-                    <h3 class="text-gray-400 text-sm font-medium">Beneficiarios Hoy</h3>
-                    <i class="fas fa-user-plus text-green-500 text-xl"></i>
+                    <i class="fas fa-exclamation-triangle text-red-500 text-lg"></i>
                 </div>
-                <div class="text-3xl font-bold text-green-400 mb-1">{{ $beneficiariosHoy }}</div>
-                <p class="text-xs text-gray-500">Registros de hoy</p>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $productosAgotados }}</div>
+                <p class="text-gray-500 dark:text-gray-400 text-xs mt-1">Agotados</p>
             </div>
 
-            <!-- Beneficiarios Mes -->
-            <div class="bg-gray-900 border-l-4 border-blue-500 rounded-lg p-6 hover:bg-gray-850 transition-colors">
+            {{-- Entradas --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4 sm:p-5 border-l-4 border-yellow-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <div class="flex items-center justify-between mb-2">
-                    <h3 class="text-gray-400 text-sm font-medium">Beneficiarios del Mes</h3>
-                    <i class="fas fa-chart-line text-blue-500 text-xl"></i>
+                    <i class="fas fa-arrow-circle-down text-yellow-500 text-lg"></i>
                 </div>
-                <div class="text-3xl font-bold text-blue-400 mb-1">{{ $beneficiariosMes }}</div>
-                <p class="text-xs text-gray-500">Registros este mes</p>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $entradasPendientes }}</div>
+                <p class="text-gray-500 dark:text-gray-400 text-xs mt-1">Entradas del Mes</p>
             </div>
 
-            <!-- Total Beneficiarios -->
-            <div class="bg-gray-900 border-l-4 border-purple-500 rounded-lg p-6 hover:bg-gray-850 transition-colors">
+            {{-- Salidas --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4 sm:p-5 border-l-4 border-emerald-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <div class="flex items-center justify-between mb-2">
-                    <h3 class="text-gray-400 text-sm font-medium">Total Beneficiarios</h3>
-                    <i class="fas fa-users text-purple-500 text-xl"></i>
+                    <i class="fas fa-arrow-circle-up text-emerald-500 text-lg"></i>
                 </div>
-                <div class="text-3xl font-bold text-purple-400 mb-1">{{ $totalBeneficiarios }}</div>
-                <p class="text-xs text-gray-500">Usuarios registrados</p>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $salidasMes }}</div>
+                <p class="text-gray-500 dark:text-gray-400 text-xs mt-1">Salidas del Mes</p>
             </div>
 
-            <!-- Total Productos -->
-            <div class="bg-gray-900 border-l-4 border-orange-500 rounded-lg p-6 hover:bg-gray-850 transition-colors cursor-pointer" wire:click="toggleDesglose">
+            {{-- Movimientos del Año --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4 sm:p-5 border-l-4 border-cyan-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <div class="flex items-center justify-between mb-2">
-                    <h3 class="text-gray-400 text-sm font-medium">Total Productos</h3>
-                    <i class="fas fa-box text-orange-500 text-xl"></i>
+                    <i class="fas fa-chart-bar text-cyan-500 text-lg"></i>
                 </div>
-                <div class="text-3xl font-bold text-orange-400 mb-1">{{ $totalProductos }}</div>
-                <div class="flex items-center justify-between">
-                    <p class="text-xs text-gray-500">{{ $productosStockBajo }} con stock bajo</p>
-                    <button class="text-xs text-orange-400 hover:text-orange-300">
-                        <i class="fas fa-chart-pie mr-1"></i>Ver desglose
-                    </button>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $totalMovimientosAnio }}</div>
+                <p class="text-gray-500 dark:text-gray-400 text-xs mt-1">Movimientos {{ now()->year }}</p>
+            </div>
+
+            {{-- Reportes --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4 sm:p-5 border-l-4 border-indigo-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-file-alt text-indigo-500 text-lg"></i>
                 </div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $reportesEsteMes }}</div>
+                <p class="text-gray-500 dark:text-gray-400 text-xs mt-1">Reportes del Mes</p>
             </div>
         </div>
 
-        <!-- Métricas Secundarias -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-            <!-- Productos Agotados -->
-            @if(Route::has('products.index'))
-            <a href="{{ route('products.index') }}" wire:navigate class="block">
-            @endif
-                <div class="bg-gray-900 border-l-4 border-red-500 rounded-lg p-6 hover:bg-gray-850 transition-colors hover:scale-105 transform duration-200">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-gray-400 text-sm font-medium">Productos Agotados</h3>
-                        <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
-                    </div>
-                    <div class="text-3xl font-bold text-red-400 mb-1">{{ $productosAgotados }}</div>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-gray-500">Requieren reabastecimiento</p>
-                        @if(Route::has('products.index'))
-                        <i class="fas fa-arrow-right text-red-400 text-xs"></i>
-                        @endif
-                    </div>
-                </div>
-            @if(Route::has('products.index'))
-            </a>
-            @endif
-
-            <!-- Entradas del Mes -->
-            @if(Route::has('inventory-entries.index'))
-            <a href="{{ route('inventory-entries.index') }}" wire:navigate class="block" title="Ver todas las entradas de inventario">
-            @endif
-                <div class="bg-gray-900 border-l-4 border-yellow-500 rounded-lg p-6 hover:bg-gray-850 transition-colors hover:scale-105 transform duration-200">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-gray-400 text-sm font-medium">Entradas del Mes</h3>
-                        <i class="fas fa-arrow-circle-down text-yellow-500 text-xl"></i>
-                    </div>
-                    <div class="text-3xl font-bold text-yellow-400 mb-1">{{ $entradasPendientes }}</div>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-gray-500">Registros de entrada al inventario</p>
-                        @if(Route::has('inventory-entries.index'))
-                        <i class="fas fa-arrow-right text-yellow-400 text-xs"></i>
-                        @endif
-                    </div>
-                </div>
-            @if(Route::has('inventory-entries.index'))
-            </a>
-            @endif
-
-            <!-- Salidas del Mes -->
-            @if(Route::has('inventory-exits.index'))
-            <a href="{{ route('inventory-exits.index') }}" wire:navigate class="block" title="Ver todas las salidas de inventario">
-            @endif
-                <div class="bg-gray-900 border-l-4 border-green-500 rounded-lg p-6 hover:bg-gray-850 transition-colors hover:scale-105 transform duration-200">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-gray-400 text-sm font-medium">Salidas del Mes</h3>
-                        <i class="fas fa-arrow-circle-up text-green-500 text-xl"></i>
-                    </div>
-                    <div class="text-3xl font-bold text-green-400 mb-1">{{ $salidasMes }}</div>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-gray-500">Distribuciones de inventario</p>
-                        @if(Route::has('inventory-exits.index'))
-                        <i class="fas fa-arrow-right text-green-400 text-xs"></i>
-                        @endif
-                    </div>
-                </div>
-            @if(Route::has('inventory-exits.index'))
-            </a>
-            @endif
-
-            <!-- Movimientos del Año -->
-            @if(Route::has('inventory-entries.index'))
-            <a href="{{ route('inventory-entries.index') }}" wire:navigate class="block" title="Ver todos los movimientos de inventario">
-            @endif
-                <div class="bg-gray-900 border-l-4 border-blue-500 rounded-lg p-6 hover:bg-gray-850 transition-colors hover:scale-105 transform duration-200">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-gray-400 text-sm font-medium">Movimientos del Año</h3>
-                        <i class="fas fa-chart-bar text-blue-500 text-xl"></i>
-                    </div>
-                    <div class="text-3xl font-bold text-blue-400 mb-1">{{ $totalMovimientosAnio }}</div>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-gray-500">Entradas + Salidas {{ now()->year }}</p>
-                        @if(Route::has('inventory-entries.index'))
-                        <i class="fas fa-arrow-right text-blue-400 text-xs"></i>
-                        @endif
-                    </div>
-                </div>
-            @if(Route::has('inventory-entries.index'))
-            </a>
-            @endif
-
-            <!-- Reportes de Entregas -->
-            @if(Route::has('admin.reports.index'))
-            <a href="{{ route('admin.reports.index') }}" wire:navigate class="block" title="Ver todos los reportes de entregas">
-            @endif
-                <div class="bg-gray-900 border-l-4 border-indigo-500 rounded-lg p-6 hover:bg-gray-850 transition-colors hover:scale-105 transform duration-200">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-gray-400 text-sm font-medium">Reportes Este Mes</h3>
-                        <i class="fas fa-file-alt text-indigo-500 text-xl"></i>
-                    </div>
-                    <div class="text-3xl font-bold text-indigo-400 mb-1">{{ $reportesEsteMes }}</div>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-gray-500">Total: {{ $totalReportes }} reportes</p>
-                        @if(Route::has('admin.reports.index'))
-                        <i class="fas fa-arrow-right text-indigo-400 text-xs"></i>
-                        @endif
-                    </div>
-                </div>
-            @if(Route::has('admin.reports.index'))
-            </a>
-            @endif
-        </div>
-
-        <!-- Desglose de Productos por Categoría -->
+        {{-- ===== DESGLOSE DE PRODUCTOS POR CATEGORÍA ===== --}}
         @if($mostrarDesglose)
-        <div class="mb-6 animate-fade-in">
-            <div class="bg-gray-900 rounded-lg p-6 border border-orange-500">
+        <div class="mb-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-orange-200 dark:border-orange-500/30">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-bold text-white flex items-center">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
                         <i class="fas fa-chart-pie text-orange-500 mr-2"></i>
-                        Desglose de Productos por Categoría
+                        Desglose por Categoría
                     </h2>
-                    <button wire:click="toggleDesglose" class="text-gray-400 hover:text-white">
+                    <button wire:click="toggleDesglose" class="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors">
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     @forelse($desgloseProductos as $desglose)
-                    <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-orange-500 transition-colors">
-                        <div class="flex items-start justify-between mb-3">
-                            <div>
-                                <h3 class="text-white font-semibold text-lg">{{ $desglose->categoria }}</h3>
-                                <p class="text-gray-400 text-xs">Categoría</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-full bg-orange-600/20 flex items-center justify-center">
+                    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600 hover:border-orange-300 dark:hover:border-orange-500/50 transition-colors">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-gray-900 dark:text-white font-semibold">{{ $desglose->categoria }}</h3>
+                            <div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
                                 <i class="fas fa-boxes text-orange-500"></i>
                             </div>
                         </div>
-                        
-                        <div class="flex items-center justify-between mb-3">
-                            <div>
-                                <p class="text-gray-400 text-xs mb-1">Total de Productos</p>
-                                <p class="text-3xl font-bold text-white">{{ $desglose->total }}</p>
-                            </div>
-                            @php
-                                $porcentaje = $totalProductos > 0 ? ($desglose->total / $totalProductos) * 100 : 0;
-                            @endphp
-                            <div class="text-right">
-                                <div class="text-2xl font-bold text-orange-400">{{ number_format($porcentaje, 1) }}%</div>
-                                <p class="text-xs text-gray-500">del total</p>
-                            </div>
+                        @php $porcentaje = $totalProductos > 0 ? ($desglose->total / $totalProductos) * 100 : 0; @endphp
+                        <div class="flex items-end justify-between mb-3">
+                            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $desglose->total }}</p>
+                            <span class="text-orange-500 font-bold">{{ number_format($porcentaje, 1) }}%</span>
                         </div>
-                        
-                        <div class="w-full bg-gray-700 rounded-full h-2 mb-3">
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                             <div class="bg-gradient-to-r from-orange-500 to-orange-400 h-2 rounded-full transition-all duration-500" style="width: {{ $porcentaje }}%"></div>
                         </div>
-                        
-                        @if(Route::has('products.index'))
-                        <a href="{{ route('products.index') }}" wire:navigate 
-                           class="block w-full bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 hover:text-orange-300 py-2 px-4 rounded-lg text-center text-sm font-medium transition-colors border border-orange-600/30 hover:border-orange-500">
-                            <i class="fas fa-eye mr-2"></i>Ver Productos de {{ $desglose->categoria }}
-                        </a>
-                        @endif
                     </div>
                     @empty
                     <div class="col-span-full text-center py-8">
-                        <i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i>
-                        <p class="text-gray-500">No hay productos registrados</p>
+                        <i class="fas fa-box-open text-gray-300 dark:text-gray-600 text-4xl mb-3"></i>
+                        <p class="text-gray-500 dark:text-gray-400">No hay productos registrados</p>
                     </div>
                     @endforelse
-                </div>
-
-                <!-- Resumen Total -->
-                <div class="mt-6 pt-4 border-t border-gray-700">
-                    <div class="grid grid-cols-3 gap-4 text-center">
-                        <div>
-                            <p class="text-gray-400 text-sm mb-1">Total Productos</p>
-                            <p class="text-2xl font-bold text-orange-400">{{ $totalProductos }}</p>
-                        </div>
-                        <div>
-                            <p class="text-gray-400 text-sm mb-1">Stock Bajo</p>
-                            <p class="text-2xl font-bold text-yellow-400">{{ $productosStockBajo }}</p>
-                        </div>
-                        <div>
-                            <p class="text-gray-400 text-sm mb-1">Agotados</p>
-                            <p class="text-2xl font-bold text-red-400">{{ $productosAgotados }}</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
         @endif
 
-        <!-- GRÁFICOS DE TORTA -->
+        {{-- ===== GRÁFICAS ===== --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <!-- Gráfico 1: Productos Más Entregados -->
-            <div class="bg-gray-900 rounded-lg p-6 border border-gray-800">
+
+            {{-- Gráfica de Línea: Beneficiarios Mensuales --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <i class="fas fa-chart-line text-blue-500"></i>
+                            Beneficiarios Mensuales
+                        </h2>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Últimos 12 meses</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ array_sum($datosBeneficiariosMensuales) }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Total período</p>
+                    </div>
+                </div>
+                <div class="flex justify-center items-center" style="height: 300px;" wire:ignore>
+                    <canvas id="lineChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            {{-- Gráfica de Barras: Movimientos de Inventario --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <i class="fas fa-chart-bar text-emerald-500"></i>
+                            Movimientos de Inventario
+                        </h2>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Entradas vs Salidas (12 meses)</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ array_sum($datosEntradas) + array_sum($datosSalidas) }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Total movimientos</p>
+                    </div>
+                </div>
+                <div class="flex justify-center items-center" style="height: 300px;" wire:ignore>
+                    <canvas id="barChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            {{-- Gráfica de Torta: Productos Más Entregados --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <div class="text-center mb-4">
-                    <h2 class="text-xl font-bold text-white flex items-center justify-center gap-2">
-                        <i class="fas fa-chart-pie text-blue-500"></i>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center justify-center gap-2">
+                        <i class="fas fa-chart-pie text-purple-500"></i>
                         Productos Más Entregados
                     </h2>
-                    <p class="text-gray-500 text-sm mt-2">Top 5 productos distribuidos</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Top 5 productos distribuidos</p>
                 </div>
-                
-                <div class="flex justify-center items-center" style="height: 400px;" wire:ignore>
-                    <canvas id="chartProductos" width="400" height="400"></canvas>
+                <div class="flex justify-center items-center" style="height: 320px;" wire:ignore>
+                    <canvas id="chartProductos" width="400" height="320"></canvas>
                 </div>
             </div>
 
-            <!-- Gráfico 2: Categorías Más Utilizadas -->
-            <div class="bg-gray-900 rounded-lg p-6 border border-gray-800">
+            {{-- Gráfica Doughnut: Categorías Más Utilizadas --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <div class="text-center mb-4">
-                    <h2 class="text-xl font-bold text-white flex items-center justify-center gap-2">
-                        <i class="fas fa-chart-pie text-purple-500"></i>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center justify-center gap-2">
+                        <i class="fas fa-chart-pie text-amber-500"></i>
                         Categorías Más Utilizadas
                     </h2>
-                    <p class="text-gray-500 text-sm mt-2">Distribución por categorías</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Distribución por categorías</p>
                 </div>
-                
-                <div class="flex justify-center items-center" style="height: 400px;" wire:ignore>
-                    <canvas id="chartCategorias" width="400" height="400"></canvas>
+                <div class="flex justify-center items-center" style="height: 320px;" wire:ignore>
+                    <canvas id="chartCategorias" width="400" height="320"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Tablas Detalladas -->
+        {{-- ===== TABLAS DETALLADAS ===== --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Tabla Productos -->
-            <div class="bg-gray-900 rounded-lg p-6 border border-gray-800">
-                <h3 class="text-lg font-bold text-white mb-4">Detalle de Productos</h3>
+            {{-- Tabla Productos --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-trophy text-blue-500"></i> Top Productos Distribuidos
+                </h3>
                 <div class="space-y-3">
                     @forelse($productosTop as $index => $producto)
-                    @if(Route::has('inventory-exits.index'))
-                    <a href="{{ route('inventory-exits.index') }}" wire:navigate class="block" title="Ver movimientos de {{ $producto->name }}">
-                    @endif
-                        <div class="p-3 bg-gray-800 rounded-lg hover:bg-gray-750 hover:border-l-4 hover:border-blue-500 transition-all cursor-pointer group">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                                        {{ $index + 1 }}
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-300 font-medium group-hover:text-white transition-colors">{{ $producto->name }}</span>
-                                        <p class="text-xs text-gray-500">{{ $producto->movimientos_count }} transacciones</p>
-                                    </div>
+                    <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                    {{ $index + 1 }}
                                 </div>
-                                <div class="flex items-center space-x-3">
-                                    <div class="text-right">
-                                        <p class="bg-blue-900/50 text-blue-400 px-3 py-1 rounded-full text-sm font-semibold group-hover:bg-blue-800 transition-colors">
-                                            {{ number_format($producto->total_movido ?? 0) }} <i class="fas fa-boxes ml-1 text-xs"></i>
-                                        </p>
-                                        <p class="text-xs text-gray-500 mt-1">unidades entregadas</p>
-                                    </div>
-                                    <i class="fas fa-chevron-right text-gray-600 group-hover:text-blue-400 text-xs"></i>
+                                <div>
+                                    <span class="text-gray-800 dark:text-gray-200 font-medium">{{ $producto->name }}</span>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $producto->movimientos_count }} transacciones</p>
                                 </div>
                             </div>
+                            <span class="bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full text-sm font-semibold">
+                                {{ number_format($producto->total_movido ?? 0) }} uds
+                            </span>
                         </div>
-                    @if(Route::has('inventory-exits.index'))
-                    </a>
-                    @endif
+                    </div>
                     @empty
                     <div class="text-center py-8">
-                        <i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i>
-                        <p class="text-gray-500">No hay datos disponibles</p>
-                        <p class="text-xs text-gray-600 mt-1">Los datos aparecerán cuando haya movimientos</p>
+                        <i class="fas fa-box-open text-gray-300 dark:text-gray-600 text-4xl mb-3"></i>
+                        <p class="text-gray-500 dark:text-gray-400">No hay datos disponibles</p>
                     </div>
                     @endforelse
                 </div>
             </div>
 
-            <!-- Tabla Categorías -->
-            <div class="bg-gray-900 rounded-lg p-6 border border-gray-800">
-                <h3 class="text-lg font-bold text-white mb-4">Detalle de Categorías</h3>
+            {{-- Tabla Categorías --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-layer-group text-purple-500"></i> Top Categorías Distribuidas
+                </h3>
                 <div class="space-y-3">
                     @forelse($categoriasTop as $index => $categoria)
-                    @if(Route::has('inventory-exits.index'))
-                    <a href="{{ route('inventory-exits.index') }}" wire:navigate class="block" title="Ver entregas de {{ $categoria->name }}">
-                    @endif
-                        <div class="p-3 bg-gray-800 rounded-lg hover:bg-gray-750 hover:border-l-4 hover:border-purple-500 transition-all cursor-pointer group">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                                        {{ $index + 1 }}
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-300 font-medium group-hover:text-white transition-colors">{{ $categoria->name }}</span>
-                                        <p class="text-xs text-gray-500">{{ $categoria->cantidad }} transacciones</p>
-                                    </div>
+                    <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                    {{ $index + 1 }}
                                 </div>
-                                <div class="flex items-center space-x-3">
-                                    <div class="text-right">
-                                        <span class="bg-purple-900/50 text-purple-400 px-3 py-1 rounded-full text-sm font-semibold group-hover:bg-purple-800 transition-colors">
-                                            {{ number_format($categoria->total_movimientos ?? 0) }} <i class="fas fa-boxes ml-1 text-xs"></i>
-                                        </span>
-                                        <p class="text-xs text-gray-500 mt-1">unidades distribuidas</p>
-                                    </div>
-                                    <i class="fas fa-chevron-right text-gray-600 group-hover:text-purple-400 text-xs"></i>
+                                <div>
+                                    <span class="text-gray-800 dark:text-gray-200 font-medium">{{ $categoria->name }}</span>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $categoria->cantidad }} transacciones</p>
                                 </div>
                             </div>
-                            <!-- Barra de progreso -->
-                            @php
-                                $maxCantidad = $categoriasTop->max('cantidad');
-                                $porcentaje = $maxCantidad > 0 ? ($categoria->cantidad / $maxCantidad) * 100 : 0;
-                            @endphp
-                            <div class="w-full bg-gray-700 rounded-full h-1.5">
-                                <div class="bg-gradient-to-r from-purple-600 to-purple-400 h-1.5 rounded-full transition-all duration-500" style="width: {{ $porcentaje }}%"></div>
-                            </div>
+                            <span class="bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400 px-3 py-1 rounded-full text-sm font-semibold">
+                                {{ number_format($categoria->total_movimientos ?? 0) }} uds
+                            </span>
                         </div>
-                    @if(Route::has('inventory-exits.index'))
-                    </a>
-                    @endif
+                        @php
+                            $maxCantidad = $categoriasTop->max('cantidad');
+                            $porcentaje = $maxCantidad > 0 ? ($categoria->cantidad / $maxCantidad) * 100 : 0;
+                        @endphp
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5">
+                            <div class="bg-gradient-to-r from-purple-500 to-purple-400 h-1.5 rounded-full transition-all duration-500" style="width: {{ $porcentaje }}%"></div>
+                        </div>
+                    </div>
                     @empty
                     <div class="text-center py-8">
-                        <i class="fas fa-layer-group text-gray-600 text-4xl mb-3"></i>
-                        <p class="text-gray-500">No hay datos disponibles</p>
-                        <p class="text-xs text-gray-600 mt-1">Las categorías aparecerán cuando haya movimientos</p>
+                        <i class="fas fa-layer-group text-gray-300 dark:text-gray-600 text-4xl mb-3"></i>
+                        <p class="text-gray-500 dark:text-gray-400">No hay datos disponibles</p>
                     </div>
                     @endforelse
                 </div>
             </div>
         </div>
+
     </x-container>
 </div>
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Variables globales para los gráficos
-let chartProductos = null;
-let chartCategorias = null;
+let chartLine = null, chartBar = null, chartProductos = null, chartCategorias = null;
 
-function initCharts() {
-    // Datos desde PHP (ya codificados correctamente)
-    const productosData = {!! json_encode([
-        'labels' => $productosTop->pluck('name')->toArray(),
-        'values' => $productosTop->pluck('total_movido')->toArray()
-    ]) !!};
-    
-    const categoriasData = {!! json_encode([
-        'labels' => $categoriasTop->pluck('name')->toArray(),
-        'values' => $categoriasTop->pluck('total_movimientos')->toArray()
-    ]) !!};
-    
-    // Destruir gráficos existentes si los hay
-    if (chartProductos) {
-        chartProductos.destroy();
+function initAllCharts() {
+    const isDark = document.documentElement.classList.contains('dark');
+    const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+    const textColor = isDark ? '#9CA3AF' : '#6B7280';
+
+    // ========== GRÁFICA DE LÍNEA ==========
+    const ctxLine = document.getElementById('lineChart');
+    if (ctxLine) {
+        if (chartLine) chartLine.destroy();
+        const mesesB = @json($mesesBeneficiarios);
+        const datosB = @json($datosBeneficiariosMensuales);
+        chartLine = new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: mesesB,
+                datasets: [{
+                    label: 'Beneficiarios',
+                    data: datosB,
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#3B82F6',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } },
+                    x: { grid: { display: false }, ticks: { color: textColor } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { backgroundColor: isDark ? '#1F2937' : '#fff', titleColor: isDark ? '#fff' : '#111', bodyColor: isDark ? '#D1D5DB' : '#374151', borderColor: isDark ? '#374151' : '#E5E7EB', borderWidth: 1, padding: 12 }
+                }
+            }
+        });
     }
-    if (chartCategorias) {
-        chartCategorias.destroy();
+
+    // ========== GRÁFICA DE BARRAS ==========
+    const ctxBar = document.getElementById('barChart');
+    if (ctxBar) {
+        if (chartBar) chartBar.destroy();
+        const mesesM = @json($mesesMovimientos);
+        const datosE = @json($datosEntradas);
+        const datosS = @json($datosSalidas);
+        chartBar = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: mesesM,
+                datasets: [
+                    { label: 'Entradas', data: datosE, backgroundColor: 'rgba(16, 185, 129, 0.8)', borderRadius: 6 },
+                    { label: 'Salidas', data: datosS, backgroundColor: 'rgba(239, 68, 68, 0.8)', borderRadius: 6 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } },
+                    x: { grid: { display: false }, ticks: { color: textColor } }
+                },
+                plugins: {
+                    legend: { position: 'top', labels: { color: textColor, usePointStyle: true, pointStyle: 'circle', padding: 15 } },
+                    tooltip: { backgroundColor: isDark ? '#1F2937' : '#fff', titleColor: isDark ? '#fff' : '#111', bodyColor: isDark ? '#D1D5DB' : '#374151', borderColor: isDark ? '#374151' : '#E5E7EB', borderWidth: 1, padding: 12 }
+                }
+            }
+        });
     }
-    
-    // GRÁFICO 1: PRODUCTOS - Colores MUY DIFERENCIADOS
+
+    // ========== GRÁFICA PIE: PRODUCTOS ==========
     const ctx1 = document.getElementById('chartProductos');
+    const productosData = {!! json_encode(['labels' => $productosTop->pluck('name')->toArray(), 'values' => $productosTop->pluck('total_movido')->toArray()]) !!};
     if (ctx1 && productosData.labels.length > 0) {
+        if (chartProductos) chartProductos.destroy();
         chartProductos = new Chart(ctx1, {
             type: 'pie',
             data: {
                 labels: productosData.labels,
-                datasets: [{
-                    data: productosData.values,
-                    backgroundColor: [
-                        '#3B82F6',  // Azul brillante
-                        '#10B981',  // Verde esmeralda
-                        '#F59E0B',  // Naranja ámbar
-                        '#EF4444',  // Rojo coral
-                        '#8B5CF6'   // Morado violeta
-                    ],
-                    borderWidth: 3,
-                    borderColor: '#1F2937',
-                    hoverBorderWidth: 4,
-                    hoverBorderColor: '#FFFFFF'
-                }]
+                datasets: [{ data: productosData.values, backgroundColor: ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6'], borderWidth: 3, borderColor: isDark ? '#1F2937' : '#FFFFFF', hoverBorderWidth: 4, hoverBorderColor: '#FFFFFF' }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { 
-                            color: '#9CA3AF', 
-                            padding: 15, 
-                            font: { size: 12, weight: '500' },
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: '#1F2937',
-                        titleColor: '#FFFFFF',
-                        bodyColor: '#D1D5DB',
-                        borderColor: '#374151',
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: true,
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.parsed || 0;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return ` ${label}: ${value} (${percentage}%)`;
-                            }
-                        }
+                    legend: { position: 'bottom', labels: { color: textColor, padding: 15, font: { size: 12 }, usePointStyle: true, pointStyle: 'circle' } },
+                    tooltip: { backgroundColor: isDark ? '#1F2937' : '#fff', titleColor: isDark ? '#fff' : '#111', bodyColor: isDark ? '#D1D5DB' : '#374151', borderColor: isDark ? '#374151' : '#E5E7EB', borderWidth: 1, padding: 12,
+                        callbacks: { label: function(ctx) { const v = ctx.parsed || 0; const t = ctx.dataset.data.reduce((a,b)=>a+b,0); return ` ${ctx.label}: ${v} (${((v/t)*100).toFixed(1)}%)`; } }
                     }
                 }
             }
         });
-        console.log('✅ Gráfico productos creado');
     }
-    
-    // GRÁFICO 2: CATEGORÍAS - Colores MUY DIFERENCIADOS
+
+    // ========== GRÁFICA DOUGHNUT: CATEGORÍAS ==========
     const ctx2 = document.getElementById('chartCategorias');
+    const categoriasData = {!! json_encode(['labels' => $categoriasTop->pluck('name')->toArray(), 'values' => $categoriasTop->pluck('total_movimientos')->toArray()]) !!};
     if (ctx2 && categoriasData.labels.length > 0) {
+        if (chartCategorias) chartCategorias.destroy();
         chartCategorias = new Chart(ctx2, {
-            type: 'pie',
+            type: 'doughnut',
             data: {
                 labels: categoriasData.labels,
-                datasets: [{
-                    data: categoriasData.values,
-                    backgroundColor: [
-                        '#A855F7',  // Morado fucsia
-                        '#14B8A6',  // Cyan turquesa
-                        '#F97316',  // Naranja fuerte
-                        '#EC4899',  // Rosa pink
-                        '#84CC16'   // Lima verde
-                    ],
-                    borderWidth: 3,
-                    borderColor: '#1F2937',
-                    hoverBorderWidth: 4,
-                    hoverBorderColor: '#FFFFFF'
-                }]
+                datasets: [{ data: categoriasData.values, backgroundColor: ['#A855F7','#14B8A6','#F97316','#EC4899','#84CC16'], borderWidth: 3, borderColor: isDark ? '#1F2937' : '#FFFFFF', hoverBorderWidth: 4, hoverBorderColor: '#FFFFFF' }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false,
+                cutout: '55%',
                 plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { 
-                            color: '#9CA3AF', 
-                            padding: 15, 
-                            font: { size: 12, weight: '500' },
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: '#1F2937',
-                        titleColor: '#FFFFFF',
-                        bodyColor: '#D1D5DB',
-                        borderColor: '#374151',
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: true,
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.parsed || 0;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return ` ${label}: ${value} (${percentage}%)`;
-                            }
-                        }
+                    legend: { position: 'bottom', labels: { color: textColor, padding: 15, font: { size: 12 }, usePointStyle: true, pointStyle: 'circle' } },
+                    tooltip: { backgroundColor: isDark ? '#1F2937' : '#fff', titleColor: isDark ? '#fff' : '#111', bodyColor: isDark ? '#D1D5DB' : '#374151', borderColor: isDark ? '#374151' : '#E5E7EB', borderWidth: 1, padding: 12,
+                        callbacks: { label: function(ctx) { const v = ctx.parsed || 0; const t = ctx.dataset.data.reduce((a,b)=>a+b,0); return ` ${ctx.label}: ${v} (${((v/t)*100).toFixed(1)}%)`; } }
                     }
                 }
             }
         });
-        console.log('✅ Gráfico categorías creado');
     }
 }
 
-// Inicializar gráficos en diferentes eventos para asegurar que siempre se muestren
-document.addEventListener('DOMContentLoaded', initCharts);
-document.addEventListener('livewire:navigated', initCharts);
-window.addEventListener('load', initCharts);
+document.addEventListener('DOMContentLoaded', initAllCharts);
+document.addEventListener('livewire:navigated', initAllCharts);
 </script>
 @endpush

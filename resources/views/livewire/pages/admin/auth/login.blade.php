@@ -37,11 +37,37 @@ new class extends Component {
             ]);
         }
 
+        $user = Auth::user();
+
+        // Sesión única para Alcalde, Analista, Operador (no Super Admin)
+        if ($user->requiereSesionUnica()) {
+            $lifetime = (int) config('session.lifetime', 120);
+            $sessionActivaReciente = $user->session_last_activity
+                ? $user->session_last_activity->gt(now()->subMinutes($lifetime))
+                : false;
+            $otraSesionActiva = $user->active_session_id
+                && $sessionActivaReciente
+                && $user->active_session_id !== Session::getId();
+
+            if ($otraSesionActiva) {
+                Auth::logout();
+                throw ValidationException::withMessages([
+                    'email' => 'Ya existe una sesión activa con este usuario. Solo se permite una sesión a la vez. Cierre sesión en el otro dispositivo o espere a que expire.',
+                ]);
+            }
+        }
+
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        if (!Auth::user()->hasRole(['Beneficiario'])) {
-            $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: false);
+        $user->update([
+            'active_session_id' => Session::getId(),
+            'session_last_activity' => now(),
+        ]);
+
+        if (!$user->hasRole(['Beneficiario'])) {
+            $default = $user->hasRole('Analista') ? route('admin.departamentos.index', absolute: false) : route('admin.dashboard', absolute: false);
+            $this->redirectIntended(default: $default, navigate: false);
         } else {
             $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
         }
@@ -168,6 +194,12 @@ new class extends Component {
                         <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Bienvenido</h2>
                         <p class="text-gray-600 dark:text-gray-400">Ingresa tus credenciales para continuar</p>
                     </div>
+
+                    @if (session('error'))
+                        <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+                            <i class="fa-solid fa-triangle-exclamation mr-2"></i>{{ session('error') }}
+                        </div>
+                    @endif
 
                     <form wire:submit="login" class="space-y-6">
                         <div>

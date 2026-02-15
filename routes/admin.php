@@ -6,17 +6,27 @@ use App\Http\Controllers\PaymentReceiptController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MapController;
+use App\Http\Controllers\SolicitudPdfController;
 
+// /admin -> redirige según rol (Director a solicitudes, Analista a Departamentos)
 Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+    if (auth()->user()->hasRole('Director')) {
+        return redirect()->route('admin.solicitudes.index');
+    }
+    if (auth()->user()->hasRole('Analista')) {
+        return redirect()->route('admin.departamentos.index');
+    }
+    return redirect()->route('admin.dashboard');
+});
 
 
 
 Route::middleware(['auth'])->group(function () {
 
-    //Ruta de Dashboard
-    Volt::route('/dashboard', 'pages.admin.dashboard.index')->name('dashboard');
+    //Ruta de Dashboard (Analista no tiene acceso - sin estadísticas)
+    Volt::route('/dashboard', 'pages.admin.dashboard.index')
+        ->middleware('permission:view-dashboard')
+        ->name('dashboard');
 
     // Rutas para la gestión de usuarios
     Volt::route('/users', 'pages.admin.users.index')
@@ -39,46 +49,46 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:delete-user')
         ->name('users.destroy');
 
-    // Rutas para la gestión de roles
+    // Rutas para la gestión de roles (Config General - solo Super Admin)
     Volt::route('/roles', 'pages.admin.roles.index')
-        ->middleware('permission:view-role')
+        ->middleware('permission:view-super-admin-config')
         ->name('roles.index');
 
     Volt::route('/roles/create', 'pages.admin.roles.create')
-        ->middleware('permission:create-role')
+        ->middleware('permission:view-super-admin-config')
         ->name('roles.create');
 
     Volt::route('/roles/{role}/edit', 'pages.admin.roles.edit')
-        ->middleware('permission:edit-role')
+        ->middleware('permission:view-super-admin-config')
         ->name('roles.edit');
 
     Volt::route('/roles/{role}/show', 'pages.admin.roles.show')
-        ->middleware('permission:view-role')
+        ->middleware('permission:view-super-admin-config')
         ->name('roles.show');
 
     Volt::route('/roles/{role}', 'pages.admin.roles.destroy')
-        ->middleware('permission:delete-role')
+        ->middleware('permission:view-super-admin-config')
         ->name('roles.destroy');
 
-    // Rutas para la gestión de permisos
+    // Rutas para la gestión de permisos (Config General - solo Super Admin)
     Volt::route('/permissions', 'pages.admin.permissions.index')
-        ->middleware('permission:view-permission')
+        ->middleware('permission:view-super-admin-config')
         ->name('permissions.index');
 
     Volt::route('/permissions/create', 'pages.admin.permissions.create')
-        ->middleware('permission:create-permission')
+        ->middleware('permission:view-super-admin-config')
         ->name('permissions.create');
 
     Volt::route('/permissions/{permission}/edit', 'pages.admin.permissions.edit')
-        ->middleware('permission:edit-permission')
+        ->middleware('permission:view-super-admin-config')
         ->name('permissions.edit');
 
     Volt::route('/permissions/{permission}/show', 'pages.admin.permissions.show')
-        ->middleware('permission:view-permission')
+        ->middleware('permission:view-super-admin-config')
         ->name('permissions.show');
 
     Volt::route('/permissions/{permission}', 'pages.admin.permissions.destroy')
-        ->middleware('permission:delete-permission')
+        ->middleware('permission:view-super-admin-config')
         ->name('permissions.destroy');
 
     // Rutas para la gestión de estados
@@ -149,63 +159,67 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:view-parroquia')
         ->name('circuitos-comunales.index');
 
-    // Rutas para la gestión de tipos de pago
+    // Rutas para la gestión de tipos de pago (Config General - solo Super Admin)
     Volt::route('/payment-types', 'pages.admin.payment-types.index')
-        ->middleware('permission:view-payment-type')
+        ->middleware('permission:view-super-admin-config')
         ->name('payment-types.index');
 
     Volt::route('/payment-types/create', 'pages.admin.payment-types.create')
-        ->middleware('permission:create-payment-type')
+        ->middleware('permission:view-super-admin-config')
         ->name('payment-types.create');
 
     Volt::route('/payment-types/{paymentType}/edit', 'pages.admin.payment-types.edit')
-        ->middleware('permission:edit-payment-type')
+        ->middleware('permission:view-super-admin-config')
         ->name('payment-types.edit');
 
     Volt::route('/payment-types/{paymentType}/show', 'pages.admin.payment-types.show')
-        ->middleware('permission:view-payment-type')
+        ->middleware('permission:view-super-admin-config')
         ->name('payment-types.show');
 
     Volt::route('/payment-types/{paymentType}', 'pages.admin.payment-types.destroy')
-        ->middleware('permission:delete-payment-type')
+        ->middleware('permission:view-super-admin-config')
         ->name('payment-types.destroy');
 
-    // Rutas para la gestión de orígenes de pago
+    // Rutas para la gestión de orígenes de pago (Config General - solo Super Admin)
     Volt::route('/payment-origins', 'pages.admin.payment-origins.index')
-        ->middleware('permission:view-payment-origin')
+        ->middleware('permission:view-super-admin-config')
         ->name('payment-origins.index');
 
     Volt::route('/payment-origins/create', 'pages.admin.payment-origins.create')
-        ->middleware('permission:create-payment-origin')
+        ->middleware('permission:view-super-admin-config')
         ->name('payment-origins.create');
 
     Volt::route('/payment-origins/{paymentOrigin}/edit', 'pages.admin.payment-origins.edit')
-        ->middleware('permission:edit-payment-origin')
+        ->middleware('permission:view-super-admin-config')
         ->name('payment-origins.edit');
 
     Volt::route('/payment-origins/{paymentOrigin}/show', 'pages.admin.payment-origins.show')
-        ->middleware('permission:view-payment-origin')
+        ->middleware('permission:view-super-admin-config')
         ->name('payment-origins.show');
 
     Volt::route('/payment-origins/{paymentOrigin}', 'pages.admin.payment-origins.destroy')
-        ->middleware('permission:delete-payment-origin')
+        ->middleware('permission:view-super-admin-config')
         ->name('payment-origins.destroy');
 
     // Rutas para la gestión de configuración
     Volt::route('/settings', 'pages.admin.settings.index')
-        ->middleware('permission:view-setting')
+        ->middleware('permission:view-super-admin-config')
         ->name('settings.index');
 
     Route::get('/payments/{payment}/receipt/{type}', [PaymentReceiptController::class, 'download'])
         ->name('payments.receipt.download');
 
     Volt::route('/settings/general', 'pages.admin.settings.general')
-        ->middleware('permission:view-setting')
+        ->middleware('permission:view-super-admin-config')
         ->name('settings.general');
 
     Volt::route('/settings/logo', 'pages.admin.settings.logo')
-        ->middleware('permission:view-setting')
+        ->middleware('permission:view-super-admin-config')
         ->name('settings.logo');
+
+    Volt::route('/settings/colors', 'pages.admin.settings.colors')
+        ->middleware('permission:view-super-admin-config')
+        ->name('settings.colors');
 
     Volt::route('/settings/profile', 'pages.admin.profile.index')
         ->middleware('permission:profile-setting')
@@ -246,34 +260,77 @@ Route::middleware(['auth'])->group(function () {
 
     // Rutas para Beneficiarios
     Route::get('/beneficiaries', \App\Livewire\Pages\Admin\Beneficiaries\Index::class)
+        ->middleware('permission:view-beneficiary')
         ->name('beneficiaries.index');
     
     Route::get('/beneficiaries/create', \App\Livewire\Pages\Admin\Beneficiaries\Create::class)
+        ->middleware('permission:create-beneficiary')
         ->name('beneficiaries.create');
     
     Route::get('/beneficiaries/{id}/edit', \App\Livewire\Pages\Admin\Beneficiaries\Edit::class)
+        ->middleware('permission:edit-beneficiary')
         ->name('beneficiaries.edit');
 
     // Rutas para Reportes de Entregas
     Volt::route('/reports', 'pages.admin.reports.index')
+        ->middleware('permission:view-report')
         ->name('reports.index');
 
     Volt::route('/reports/create', 'pages.admin.reports.create')
+        ->middleware('permission:view-report')
         ->name('reports.create');
 
     Volt::route('/reports/{id}', 'pages.admin.reports.show')
+        ->middleware('permission:view-report')
         ->name('reports.show');
 
     Volt::route('/reports/{id}/edit', 'pages.admin.reports.edit')
+        ->middleware('permission:view-report')
         ->name('reports.edit');
 
     // Rutas para el Mapa de Geolocalización
     Volt::route('/map', 'pages.admin.map.index')
+        ->middleware('permission:view-map')
         ->name('map.index');
 
     // Rutas para el Registro de Actividades
     Volt::route('/activity-logs', 'pages.admin.activity-logs.index')
+        ->middleware('permission:view-activitylog')
         ->name('activity-logs.index');
+
+    // Departamentos y Directores
+    Volt::route('/departamentos', 'pages.admin.departamentos.index')
+        ->middleware('permission:view-departamento')
+        ->name('departamentos.index');
+
+    Volt::route('/departamentos/create', 'pages.admin.departamentos.create')
+        ->middleware('permission:create-departamento')
+        ->name('departamentos.create');
+
+    Volt::route('/departamentos/{departamento}/edit', 'pages.admin.departamentos.edit')
+        ->middleware('permission:edit-departamento')
+        ->name('departamentos.edit');
+
+    Volt::route('/directores/create', 'pages.admin.directores.create')
+        ->middleware('permission:create-director')
+        ->name('directores.create');
+
+    Volt::route('/directores/{director}/edit', 'pages.admin.directores.edit')
+        ->middleware('permission:edit-director')
+        ->name('directores.edit');
+
+    Volt::route('/directores', 'pages.admin.directores.index')
+        ->middleware('permission:view-director')
+        ->name('directores.index');
+
+    // Solicitudes ciudadanas (formulario público)
+    Volt::route('/solicitudes', 'pages.admin.solicitudes.index')
+        ->middleware('permission:view-solicitud')
+        ->name('solicitudes.index');
+
+    Route::get('/solicitudes/{solicitud}/pdf', [SolicitudPdfController::class, 'download'])
+        ->middleware('permission:view-solicitud')
+        ->name('solicitudes.pdf');
 
 });
 

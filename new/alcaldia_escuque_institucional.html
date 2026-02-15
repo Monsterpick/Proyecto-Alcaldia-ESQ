@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+        content="Alcaldía Bolivariana del Municipio Escuque - Sistema integral de gestión y atención ciudadana. Gobierno municipal comprometido con el desarrollo de nuestra comunidad.">
+    <title>Alcaldía Bolivariana del Municipio Escuque - Trujillo, Venezuela</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Figtree', 'sans-serif'],
+                    },
+                    colors: {
+                        'escuque-red': '#b91c1c',
+                        'escuque-gold': '#d97706',
+                        'venezuela': {
+                            'yellow': '#FFCC00',
+                            'blue': '#00247D',
+                            'red': '#CF142B'
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s ease-out',
+                        'fade-in-down': 'fadeInDown 0.6s ease-out',
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-in-right': 'slideInRight 0.6s ease-out',
+                        'slide-in-left': 'slideInLeft 0.6s ease-out',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        fadeInDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideInRight: {
+                            '0%': { opacity: '0', transform: 'translateX(50px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' }
+                        },
+                        slideInLeft: {
+                            '0%': { opacity: '0', transform: 'translateX(-50px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-white font-sans antialiased">
+    
+    <!-- Top Bar - Venezuela Colors -->
+    <div class="w-full h-2 bg-gradient-to-r from-venezuela-yellow via-venezuela-blue to-venezuela-red"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-2 bg-white shadow-xl border-b-4 border-escuque-red">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-24">
+                
+                <!-- Logo -->
+                <div class="flex items-center gap-4">
+                    <img src="/mnt/user-data/uploads/images.jpg" alt="Alcaldía de Escuque" class="h-20 w-auto object-contain">
+                    <div class="hidden lg:block">
+                        <h1 class="text-escuque-red font-extrabold text-xl leading-tight">
+                            ALCALDÍA BOLIVARIANA
+                        </h1>
+                        <p class="text-gray-700 font-bold text-lg">Municipio Escuque</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden lg:flex items-center gap-2">
+                    <a href="#inicio" 
+                       class="nav-link px-5 py-2.5 rounded-lg font-semibold text-gray-700 hover:text-white hover:bg-escuque-red transition-all duration-300">
+                        <i class="fa-solid fa-home mr-2"></i>Inicio
+                    </a>
+                    <a href="#servicios" 
+                       class="nav-link px-5 py-2.5 rounded-lg font-semibold text-gray-700 hover:text-white hover:bg-escuque-red transition-all duration-300">
+                        <i class="fa-solid fa-briefcase mr-2"></i>Servicios
+                    </a>
+                    <a href="#formulario" 
+                       class="nav-link px-5 py-2.5 rounded-lg font-semibold text-gray-700 hover:text-white hover:bg-escuque-red transition-all duration-300">
+                        <i class="fa-solid fa-file-lines mr-2"></i>Solicitud
+                    </a>
+                    <a href="#contacto" 
+                       class="nav-link px-5 py-2.5 rounded-lg font-semibold text-gray-700 hover:text-white hover:bg-escuque-red transition-all duration-300">
+                        <i class="fa-solid fa-envelope mr-2"></i>Contacto
+                    </a>
+                </div>
+
+                <!-- Right Side Button -->
+                <div class="flex items-center gap-3">
+                    <a href="#"
+                       class="hidden sm:flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-white bg-escuque-red hover:bg-red-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span>Ingresar</span>
+                    </a>
+
+                    <!-- Mobile menu button -->
+                    <button type="button"
+                            class="mobile-menu-button lg:hidden inline-flex items-center justify-center p-3 rounded-lg text-gray-700 hover:text-white hover:bg-escuque-red transition-all duration-300">
+                        <span class="sr-only">Abrir menú</span>
+                        <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div class="mobile-menu hidden lg:hidden border-t-2 border-gray-200 bg-white">
+            <div class="px-4 pt-4 pb-6 space-y-2">
+                <a href="#inicio" 
+                   class="nav-link-mobile block px-4 py-3 rounded-lg font-semibold text-gray-700 hover:text-white hover:bg-escuque-red transition-all duration-300">
+                    <i class="fa-solid fa-home mr-3"></i>Inicio
+                </a>
+                <a href="#servicios" 
+                   class="nav-link-mobile block px-4 py-3 rounded-lg font-semibold text-gray-700 hover:text-white hover:bg-escuque-red transition-all duration-300">
+                    <i class="fa-solid fa-briefcase mr-3"></i>Servicios
+                </a>
+                <a href="#formulario" 
+                   class="nav-link-mobile block px-4 py-3 rounded-lg font-semibold text-gray-700 hover:text-white hover:bg-escuque-red transition-all duration-300">
+                    <i class="fa-solid fa-file-lines mr-3"></i>Solicitud
+                </a>
+                <a href="#contacto" 
+                   class="nav-link-mobile block px-4 py-3 rounded-lg font-semibold text-gray-700 hover:text-white hover:bg-escuque-red transition-all duration-300">
+                    <i class="fa-solid fa-envelope mr-3"></i>Contacto
+                </a>
+                
+                <div class="pt-2 border-t-2 border-gray-200">
+                    <a href="#"
+                       class="block px-4 py-3 rounded-lg font-bold text-white bg-escuque-red hover:bg-red-800 transition-all duration-300 text-center">
+                        <i class="fa-solid fa-right-to-bracket mr-2"></i>Ingresar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Building Image -->
+    <section id="inicio" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-28">
+        <!-- Background Image with Overlay -->
+        <div class="absolute inset-0">
+            <img src="/mnt/user-data/uploads/putr-escuque-casas01.webp" 
+                 alt="Alcaldía de Escuque" 
+                 class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40"></div>
+        </div>
+
+        <!-- Content -->
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="animate-fade-in-down">
+                <!-- Logo Large -->
+                <div class="mb-8 flex justify-center">
+                    <img src="/mnt/user-data/uploads/images.jpg" alt="Escudo Alcaldía" class="h-32 sm:h-40 md:h-48 w-auto drop-shadow-2xl">
+                </div>
+
+                <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight text-white drop-shadow-2xl">
+                    Alcaldía Bolivariana del Municipio
+                    <span class="block text-escuque-gold mt-2">ESCUQUE</span>
+                </h1>
+                <p class="text-xl sm:text-2xl md:text-3xl text-white mb-8 max-w-4xl mx-auto font-semibold drop-shadow-lg">
+                    Gobierno comprometido con el desarrollo y bienestar de nuestra comunidad
+                </p>
+                <p class="text-base sm:text-lg text-gray-200 mb-12 max-w-2xl mx-auto drop-shadow-md">
+                    Trabajando juntos por un Escuque próspero y digno para todos
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="#formulario" 
+                       class="group relative inline-flex items-center gap-3 px-8 py-4 bg-escuque-red hover:bg-red-800 text-white rounded-lg font-bold text-lg shadow-2xl transition-all duration-300 hover:scale-105">
+                        <span>Solicitar Servicio</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform duration-300"></i>
+                    </a>
+                    <a href="#servicios" 
+                       class="inline-flex items-center gap-3 px-8 py-4 bg-white/90 hover:bg-white text-escuque-red rounded-lg font-bold text-lg border-2 border-white shadow-xl transition-all duration-300 hover:scale-105">
+                        <span>Nuestros Servicios</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto animate-fade-in-up">
+                <div class="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-2xl hover:shadow-escuque-red/20 transition-all duration-300 hover:scale-105">
+                    <div class="text-4xl font-bold text-escuque-red mb-2">
+                        15,000+
+                    </div>
+                    <div class="text-gray-700 font-semibold">Ciudadanos Atendidos</div>
+                </div>
+                <div class="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-2xl hover:shadow-escuque-gold/20 transition-all duration-300 hover:scale-105">
+                    <div class="text-4xl font-bold text-escuque-gold mb-2">
+                        50+
+                    </div>
+                    <div class="text-gray-700 font-semibold">Años de Servicio</div>
+                </div>
+                <div class="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-2xl hover:shadow-green-600/20 transition-all duration-300 hover:scale-105">
+                    <div class="text-4xl font-bold text-green-600 mb-2">
+                        100%
+                    </div>
+                    <div class="text-gray-700 font-semibold">Compromiso Social</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <a href="#servicios" class="block text-white hover:text-escuque-gold transition-colors drop-shadow-lg">
+                <i class="fa-solid fa-chevron-down text-3xl"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="animate-fade-in-left">
+                    <div class="bg-white rounded-2xl p-8 shadow-xl border-t-4 border-escuque-red">
+                        <h2 class="text-4xl font-extrabold text-gray-800 mb-6">
+                            <span class="text-escuque-red">Nuestra</span> Misión
+                        </h2>
+                        <p class="text-gray-700 text-lg leading-relaxed mb-6">
+                            Servir a la comunidad del Municipio Escuque con eficiencia, transparencia y responsabilidad, 
+                            promoviendo el desarrollo integral de nuestro territorio y mejorando la calidad de vida de todos 
+                            los ciudadanos.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 bg-escuque-red rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-check text-white"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Transparencia</h4>
+                                    <p class="text-gray-600">Gestión pública abierta y responsable</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 bg-escuque-gold rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-check text-white"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Inclusión</h4>
+                                    <p class="text-gray-600">Atención equitativa para todos</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-check text-white"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Desarrollo</h4>
+                                    <p class="text-gray-600">Progreso sostenible de la comunidad</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="animate-fade-in-right">
+                    <div class="bg-white rounded-2xl p-8 shadow-xl border-t-4 border-escuque-gold">
+                        <h2 class="text-4xl font-extrabold text-gray-800 mb-6">
+                            <span class="text-escuque-gold">Nuestra</span> Visión
+                        </h2>
+                        <p class="text-gray-700 text-lg leading-relaxed mb-6">
+                            Ser reconocidos como un municipio modelo en gestión pública, desarrollo sustentable y 
+                            participación ciudadana, donde cada habitante tenga acceso a servicios de calidad y 
+                            oportunidades para prosperar.
+                        </p>
+                        <div class="bg-gradient-to-r from-escuque-red to-escuque-gold text-white rounded-xl p-6">
+                            <h4 class="font-bold text-xl mb-3">Valores Institucionales</h4>
+                            <ul class="space-y-2">
+                                <li class="flex items-center gap-2">
+                                    <i class="fa-solid fa-star text-yellow-300"></i>
+                                    <span>Honestidad</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i class="fa-solid fa-star text-yellow-300"></i>
+                                    <span>Compromiso Social</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i class="fa-solid fa-star text-yellow-300"></i>
+                                    <span>Eficiencia</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i class="fa-solid fa-star text-yellow-300"></i>
+                                    <span>Respeto</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="servicios" class="relative py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Section Header -->
+            <div class="text-center mb-16 animate-fade-in-down">
+                <h2 class="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 text-gray-800">
+                    <span class="text-escuque-red">Servicios</span> Municipales
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Programas y servicios diseñados para atender las necesidades de nuestra comunidad
+                </p>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Service Card 1 -->
+                <div class="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-escuque-red shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-gradient-to-br from-escuque-red to-red-800 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                        <i class="fa-solid fa-hand-holding-heart text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4 group-hover:text-escuque-red transition-colors duration-300">
+                        Ayudas Sociales
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        Programas de asistencia directa para familias en situación de vulnerabilidad
+                    </p>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Apoyo económico mensual</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Asistencia alimentaria</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Medicamentos esenciales</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Service Card 2 -->
+                <div class="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-600 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                        <i class="fa-solid fa-graduation-cap text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4 group-hover:text-blue-600 transition-colors duration-300">
+                        Educación
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        Becas y programas de apoyo educativo para estudiantes de todos los niveles
+                    </p>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Becas estudiantiles</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Útiles escolares</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Capacitación técnica</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Service Card 3 -->
+                <div class="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-green-600 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-600 to-green-800 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                        <i class="fa-solid fa-heartbeat text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4 group-hover:text-green-600 transition-colors duration-300">
+                        Salud
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        Acceso a servicios médicos y programas de prevención de salud
+                    </p>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Consultas médicas gratuitas</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Jornadas de vacunación</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Medicamentos subsidiados</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Service Card 4 -->
+                <div class="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-escuque-gold shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-gradient-to-br from-escuque-gold to-amber-700 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                        <i class="fa-solid fa-briefcase text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4 group-hover:text-escuque-gold transition-colors duration-300">
+                        Empleo
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        Programas de capacitación laboral y bolsa de trabajo municipal
+                    </p>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Bolsa de trabajo</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Cursos de formación</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Asesoría empresarial</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Service Card 5 -->
+                <div class="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-orange-600 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-gradient-to-br from-orange-600 to-orange-800 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                        <i class="fa-solid fa-home text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4 group-hover:text-orange-600 transition-colors duration-300">
+                        Vivienda
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        Apoyo para mejoras habitacionales y programas de vivienda social
+                    </p>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Reparación de viviendas</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Materiales de construcción</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Asesoría técnica</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Service Card 6 -->
+                <div class="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-purple-600 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-800 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                        <i class="fa-solid fa-microphone text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4 group-hover:text-purple-600 transition-colors duration-300">
+                        Participación Ciudadana
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        Espacios para que tu voz sea escuchada en las decisiones municipales
+                    </p>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Derecho de palabra</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Consultas ciudadanas</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-green-600 mt-1 flex-shrink-0"></i>
+                            <span>Mesas de trabajo</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Form Section -->
+    <section id="formulario" class="relative py-24 bg-gradient-to-br from-gray-50 to-gray-100">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Section Header -->
+            <div class="text-center mb-16 animate-fade-in-down">
+                <h2 class="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6">
+                    <span class="text-escuque-red">Solicita</span> <span class="text-gray-800">un Servicio</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Completa el formulario y un funcionario se pondrá en contacto contigo
+                </p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="bg-white rounded-2xl p-8 md:p-12 border-t-4 border-escuque-red shadow-2xl animate-fade-in-up">
+                
+                <form class="space-y-8">
+                    <!-- Datos Personales -->
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                            <div class="w-10 h-10 bg-escuque-red rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-user text-white"></i>
+                            </div>
+                            <span>Datos Personales</span>
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">
+                                    Cédula <span class="text-escuque-red">*</span>
+                                </label>
+                                <div class="flex">
+                                    <span class="inline-flex items-center px-4 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg text-gray-700 font-semibold">
+                                        V-
+                                    </span>
+                                    <input type="text" 
+                                           placeholder="12345678" 
+                                           maxlength="8"
+                                           class="flex-1 px-4 py-3 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-escuque-red focus:border-transparent transition-all duration-300"
+                                           required>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">
+                                    Email <span class="text-escuque-red">*</span>
+                                </label>
+                                <input type="email" 
+                                       placeholder="tucorreo@ejemplo.com"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-escuque-red focus:border-transparent transition-all duration-300"
+                                       required>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">
+                                    Nombre <span class="text-escuque-red">*</span>
+                                </label>
+                                <input type="text" 
+                                       placeholder="Tu nombre"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-escuque-red focus:border-transparent transition-all duration-300"
+                                       required>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">
+                                    Apellido <span class="text-escuque-red">*</span>
+                                </label>
+                                <input type="text" 
+                                       placeholder="Tu apellido"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-escuque-red focus:border-transparent transition-all duration-300"
+                                       required>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">
+                                    Teléfono Móvil <span class="text-escuque-red">*</span>
+                                </label>
+                                <input type="tel" 
+                                       placeholder="04121234567"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-escuque-red focus:border-transparent transition-all duration-300"
+                                       required>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">
+                                    WhatsApp <span class="text-escuque-red">*</span>
+                                </label>
+                                <input type="tel" 
+                                       placeholder="04121234567"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-escuque-red focus:border-transparent transition-all duration-300"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tipo de Solicitud -->
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                            <div class="w-10 h-10 bg-escuque-gold rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-clipboard-list text-white"></i>
+                            </div>
+                            <span>Solicitud</span>
+                        </h3>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">
+                                Tipo de Servicio <span class="text-escuque-red">*</span>
+                            </label>
+                            <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-escuque-red focus:border-transparent transition-all duration-300" required>
+                                <option value="">Seleccione un servicio</option>
+                                <option value="1">Ayuda Social</option>
+                                <option value="2">Beca Educativa</option>
+                                <option value="3">Asistencia Médica</option>
+                                <option value="4">Apoyo al Empleo</option>
+                                <option value="5">Mejora de Vivienda</option>
+                                <option value="6">Participación Ciudadana</option>
+                            </select>
+                        </div>
+
+                        <div class="mt-6">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">
+                                Descripción de tu solicitud <span class="text-escuque-red">*</span>
+                            </label>
+                            <textarea rows="5"
+                                      placeholder="Describe tu solicitud con el mayor detalle posible..."
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-escuque-red focus:border-transparent transition-all duration-300 resize-none"
+                                      required></textarea>
+                            <p class="text-sm text-gray-500 mt-2">
+                                Mínimo 10 caracteres, máximo 2000
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Términos y Condiciones -->
+                    <div>
+                        <label class="flex items-start cursor-pointer group">
+                            <input type="checkbox" 
+                                   class="mt-1 w-5 h-5 text-escuque-red border-gray-300 rounded focus:ring-escuque-red focus:ring-2"
+                                   required>
+                            <span class="ml-3 text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
+                                Acepto los <a href="#" class="text-escuque-red hover:text-red-800 font-bold">términos y condiciones</a> y autorizo el tratamiento de mis datos personales conforme a la <a href="#" class="text-escuque-red hover:text-red-800 font-bold">política de privacidad</a>.
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center pt-4">
+                        <button type="submit" 
+                                class="inline-flex items-center gap-3 px-12 py-4 bg-escuque-red hover:bg-red-800 text-white rounded-lg font-bold text-lg shadow-xl transition-all duration-300 hover:scale-105">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>Enviar Solicitud</span>
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contacto" class="relative py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Section Header -->
+            <div class="text-center mb-16 animate-fade-in-down">
+                <h2 class="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6">
+                    <span class="text-escuque-red">Contáctanos</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Estamos aquí para servirte. Visítanos o comunícate con nosotros
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 items-start">
+                
+                <!-- Contact Info -->
+                <div class="space-y-8">
+                    
+                    <!-- Contact Card 1 -->
+                    <div class="group bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-escuque-red shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 bg-escuque-red rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <i class="fa-solid fa-map-marker-alt text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Dirección</h3>
+                                <p class="text-gray-600 leading-relaxed">
+                                    Alcaldía del Municipio Escuque<br>
+                                    Estado Trujillo, Venezuela
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Card 2 -->
+                    <div class="group bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-green-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <i class="fa-solid fa-phone text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Teléfono</h3>
+                                <p class="text-gray-600 leading-relaxed">
+                                    (0272) 123-4567<br>
+                                    (0414) 765-4321
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Card 3 -->
+                    <div class="group bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-escuque-gold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 bg-escuque-gold rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <i class="fa-solid fa-envelope text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Email</h3>
+                                <p class="text-gray-600 leading-relaxed">
+                                    contacto@alcaldiaescuque.gob.ve<br>
+                                    info@alcaldiaescuque.gob.ve
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Card 4 -->
+                    <div class="group bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <i class="fa-solid fa-clock text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Horario de Atención</h3>
+                                <p class="text-gray-600 leading-relaxed">
+                                    Lunes a Viernes: 8:00 AM - 4:00 PM<br>
+                                    Sábados y Domingos: Cerrado
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Map -->
+                <div class="bg-white rounded-xl p-4 border-2 border-gray-200 shadow-xl">
+                    <iframe class="w-full h-[500px] rounded-lg shadow-lg"
+                        src="https://www.openstreetmap.org/export/embed.html?bbox=-70.68296915830971%2C9.290866608435222%2C-70.66296915830971%2C9.300866608435222&amp;layer=mapnik&amp;marker=9.295866608435222%2C-70.67296915830971"
+                        style="border: none">
+                    </iframe>
+                    <div class="mt-4 text-center">
+                        <a href="https://www.google.com/maps/search/?api=1&amp;query=9.295866608435222,-70.67296915830971"
+                            target="_blank"
+                            class="inline-flex items-center gap-3 px-8 py-4 bg-escuque-red hover:bg-red-800 text-white rounded-lg font-bold shadow-xl transition-all duration-300 hover:scale-105">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                            <span>Ver en Google Maps</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative bg-gradient-to-r from-gray-900 to-gray-800 text-white py-16 border-t-4 border-escuque-red">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-12 mb-12">
+                
+                <!-- Logo y descripción -->
+                <div>
+                    <img src="/mnt/user-data/uploads/images.jpg" alt="Alcaldía de Escuque" class="h-24 w-auto mb-4">
+                    <p class="text-gray-300 leading-relaxed">
+                        Gobierno comprometido con el desarrollo y bienestar de nuestra comunidad. Trabajando juntos por un Escuque próspero.
+                    </p>
+                </div>
+
+                <!-- Enlaces rápidos -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-escuque-gold">Enlaces Rápidos</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#inicio" class="text-gray-300 hover:text-white transition-colors">Inicio</a></li>
+                        <li><a href="#servicios" class="text-gray-300 hover:text-white transition-colors">Servicios</a></li>
+                        <li><a href="#formulario" class="text-gray-300 hover:text-white transition-colors">Solicitudes</a></li>
+                        <li><a href="#contacto" class="text-gray-300 hover:text-white transition-colors">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <!-- Redes sociales -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-escuque-gold">Síguenos</h3>
+                    <div class="flex gap-4 mb-6">
+                        <a href="#" class="w-12 h-12 bg-gray-700 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110">
+                            <i class="fab fa-facebook-f text-lg"></i>
+                        </a>
+                        <a href="#" class="w-12 h-12 bg-gray-700 hover:bg-blue-400 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110">
+                            <i class="fab fa-twitter text-lg"></i>
+                        </a>
+                        <a href="#" class="w-12 h-12 bg-gray-700 hover:bg-pink-600 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110">
+                            <i class="fab fa-instagram text-lg"></i>
+                        </a>
+                        <a href="#" class="w-12 h-12 bg-gray-700 hover:bg-red-600 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110">
+                            <i class="fab fa-youtube text-lg"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-300 text-sm">
+                        Mantente informado sobre nuestros programas y actividades
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-gray-700 pt-8 text-center">
+                <p class="text-gray-400 mb-4">
+                    &copy; 2025 Alcaldía Bolivariana del Municipio Escuque. Todos los derechos reservados.
+                </p>
+                <p class="text-gray-500 text-sm">
+                    Desarrollado por <span class="text-escuque-gold font-semibold">AG 1.0</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Mobile Menu Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const button = document.querySelector('.mobile-menu-button');
+            const menu = document.querySelector('.mobile-menu');
+            const menuIcons = button?.querySelectorAll('svg');
+
+            if (button && menu && menuIcons?.length) {
+                button.addEventListener('click', () => {
+                    menu.classList.toggle('hidden');
+                    menuIcons.forEach(icon => icon.classList.toggle('hidden'));
+                });
+
+                menu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        menu.classList.add('hidden');
+                        menuIcons[0]?.classList.remove('hidden');
+                        menuIcons[1]?.classList.add('hidden');
+                    });
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!button.contains(e.target) && !menu.contains(e.target)) {
+                        menu.classList.add('hidden');
+                        menuIcons[0]?.classList.remove('hidden');
+                        menuIcons[1]?.classList.add('hidden');
+                    }
+                });
+            }
+        });
+
+        // Smooth scroll y navegación activa
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    updateActiveLinks(this.getAttribute('href'));
+                }
+            });
+        });
+
+        function updateActiveLinks(href) {
+            document.querySelectorAll('.nav-link, .nav-link-mobile').forEach(link => {
+                link.classList.remove('bg-escuque-red', 'text-white');
+            });
+            document.querySelectorAll(`a[href="${href}"]`).forEach(link => {
+                if (link.classList.contains('nav-link') || link.classList.contains('nav-link-mobile')) {
+                    link.classList.add('bg-escuque-red', 'text-white');
+                }
+            });
+        }
+
+        // Intersection Observer para secciones
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+                    const id = entry.target.getAttribute('id');
+                    if (id) updateActiveLinks('#' + id);
+                }
+            });
+        }, { threshold: [0.5] });
+
+        document.querySelectorAll('section[id]').forEach(section => observer.observe(section));
+        
+        // Marcar inicio como activo
+        updateActiveLinks('#inicio');
+    </script>
+</body>
+
+</html>

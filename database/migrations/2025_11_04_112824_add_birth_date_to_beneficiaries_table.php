@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasColumn('beneficiaries', 'birth_date')) {
+            return; // La columna ya existe, no hacer nada
+        }
+
         Schema::table('beneficiaries', function (Blueprint $table) {
-            // Agregar fecha de nacimiento después de cedula
-            // Nullable inicialmente para permitir registros existentes
             $table->date('birth_date')->nullable()->after('cedula');
         });
     }

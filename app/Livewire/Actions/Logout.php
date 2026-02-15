@@ -12,6 +12,11 @@ class Logout
      */
     public function __invoke()
     {
+        $user = Auth::user();
+        if ($user) {
+            $user->update(['active_session_id' => null, 'session_last_activity' => null]);
+        }
+
         Auth::guard('web')->logout();
 
         Session::invalidate();

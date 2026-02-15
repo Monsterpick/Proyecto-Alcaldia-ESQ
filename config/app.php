@@ -123,4 +123,22 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Evolution API (WhatsApp)
+    |--------------------------------------------------------------------------
+    */
+
+    'evolution_api_url' => env('EVOLUTION_API_URL'),
+    'evolution_api_key' => env('EVOLUTION_API_KEY'),
+    'evolution_instance_name' => env('EVOLUTION_INSTANCE_NAME', 'Sistema_1x10_1'),
+    // Si tu host (ej. nevora) exige "Authorization: Bearer API_KEY", pon EVOLUTION_AUTH_BEARER=true en .env
+    'evolution_auth_bearer' => env('EVOLUTION_AUTH_BEARER', false),
+
+    /*
+    | Número de WhatsApp donde recibir notificaciones de nuevas solicitudes (tu número).
+    | Formato: 584241234567 (código país + número sin 0 inicial).
+    */
+    'whatsapp_notify_number' => env('WHATSAPP_NOTIFY_NUMBER'),
+
 ];

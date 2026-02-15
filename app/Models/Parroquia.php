@@ -22,4 +22,10 @@ class Parroquia extends Model
     }
 
     protected $fillable = ['municipio_id', 'parroquia'];
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => \Illuminate\Support\Facades\Cache::forget('welcome_form_data'));
+        static::deleted(fn () => \Illuminate\Support\Facades\Cache::forget('welcome_form_data'));
+    }
 }

@@ -13,13 +13,17 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::create(['name' => 'Super Admin']);
-        $admin = Role::create(['name' => 'admin']);
-        $user = Role::create(['name' => 'user']);
-        $beneficiario = Role::create(['name' => 'Beneficiario']);
-        $coordinador = Role::create(['name' => 'Coordinador']);
-        $operador = Role::create(['name' => 'Operador']);
-        $administrador = Role::create(['name' => 'Administrador']);
+        $guard = 'web';
+        Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => $guard]);
+        $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => $guard]);
+        $user = Role::firstOrCreate(['name' => 'user', 'guard_name' => $guard]);
+        Role::firstOrCreate(['name' => 'Beneficiario', 'guard_name' => $guard]);
+        Role::firstOrCreate(['name' => 'Coordinador', 'guard_name' => $guard]);
+        Role::firstOrCreate(['name' => 'Operador', 'guard_name' => $guard]);
+        Role::firstOrCreate(['name' => 'Administrador', 'guard_name' => $guard]);
+        Role::firstOrCreate(['name' => 'Alcalde', 'guard_name' => $guard]);
+        Role::firstOrCreate(['name' => 'Analista', 'guard_name' => $guard]);
+        Role::firstOrCreate(['name' => 'Director', 'guard_name' => $guard]);
 
         $admin->givePermissionTo([
             'create-user',
@@ -94,6 +98,14 @@ class RoleSeeder extends Seeder
             'create-project-proposed',
             'edit-project-proposed',
             'delete-project-proposed',
+            'view-director',
+            'create-director',
+            'edit-director',
+            'delete-director',
+            'view-departamento',
+            'create-departamento',
+            'edit-departamento',
+            'delete-departamento',
         ]);
 
         $user->givePermissionTo([

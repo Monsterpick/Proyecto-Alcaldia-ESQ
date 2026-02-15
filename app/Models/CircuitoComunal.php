@@ -41,4 +41,10 @@ class CircuitoComunal extends Model
     {
         return $query->where('parroquia_id', $parroquiaId);
     }
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => \Illuminate\Support\Facades\Cache::forget('welcome_form_data'));
+        static::deleted(fn () => \Illuminate\Support\Facades\Cache::forget('welcome_form_data'));
+    }
 }

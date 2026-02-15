@@ -215,11 +215,38 @@ class PermissionSeeder extends Seeder
             'create-project-proposed',
             'edit-project-proposed',
             'delete-project-proposed',
+
+            // Directores y Departamentos
+            'view-director',
+            'create-director',
+            'edit-director',
+            'delete-director',
+            'view-departamento',
+            'create-departamento',
+            'edit-departamento',
+            'delete-departamento',
+
+            // Solicitudes Alcaldía Digital
+            'view-solicitud',
+            'delete-solicitud',
+
+            // Config exclusiva Super Admin (Datos empresa, Moneda, Logos, Colores, Roles, Permisos, etc.)
+            'view-super-admin-config',
+
+            // Beneficiarios
+            'view-beneficiary',
+            'create-beneficiary',
+            'edit-beneficiary',
+            'delete-beneficiary',
+
+            // Reportes y Mapa
+            'view-report',
+            'view-map',
         ];
 
         // Looping and Inserting Array's Permissions into Permission Table
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
     }
 }

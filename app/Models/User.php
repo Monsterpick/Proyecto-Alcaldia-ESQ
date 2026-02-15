@@ -46,6 +46,9 @@ class User extends Authenticatable
         'email',
         'telegram_chat_id',
         'password',
+        'active_session_id',
+        'session_last_activity',
+        'password_changed_at',
     ];
 
     /**
@@ -67,8 +70,21 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'session_last_activity' => 'datetime',
+            'password_changed_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /** Roles con sesión única (solo 1 dispositivo a la vez). Super Admin está exento. */
+    public static function rolesConSesionUnica(): array
+    {
+        return ['Alcalde', 'Analista', 'Operador', 'Director'];
+    }
+
+    public function requiereSesionUnica(): bool
+    {
+        return $this->hasAnyRole(self::rolesConSesionUnica());
     }
 
     /**
@@ -97,5 +113,13 @@ class User extends Authenticatable
     public function doctor()
     {
         return $this->hasOne(Doctor::class);
+    }
+
+    /**
+     * Get the director associated with the user (para rol Director).
+     */
+    public function director()
+    {
+        return $this->hasOne(Director::class);
     }
 }

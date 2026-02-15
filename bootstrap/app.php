@@ -14,40 +14,33 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         /* Routes for admin prefix */
         then: function() {
-            // Admin authentication routes (guest access)
+            // /admin/login redirige al login único en /login
             Route::middleware('web')
                 ->prefix('admin')
                 ->name('admin.')
                 ->group(function() {
-                    Route::middleware('guest')->group(function () {
-                        \Livewire\Volt\Volt::route('/login', 'pages.admin.auth.login')
-                            ->name('login');
-                        
-                        /* \Livewire\Volt\Volt::route('/register', 'pages.admin.auth.register')
-                            ->name('register');
-                        
-                        \Livewire\Volt\Volt::route('/forgot-password', 'pages.admin.auth.forgot-password')
-                            ->name('password.request');
-                        
-                        \Livewire\Volt\Volt::route('/reset-password/{token}', 'pages.admin.auth.reset-password')
-                            ->name('password.reset'); */
-                    });
+                    Route::redirect('/login', '/login', 301)->name('login');
                 });
             
-            // Protected admin routes
-            Route::middleware('web', 'auth', 'verified', 'role:admin|Super Admin|Doctor|Recepcionista|Administrador')
+            // Protected admin routes (prevent.concurrent = sesión única para Alcalde, Analista, Operador)
+            Route::middleware('web', 'auth', 'verified', 'prevent.concurrent', 'role:admin|Super Admin|Alcalde|Analista|Operador|Director|Doctor|Recepcionista|Administrador')
                 ->prefix('admin')
                 ->name('admin.')
                 ->group(base_path('routes/admin.php'));
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Inertia middleware para compartir datos con React
+        $middleware->web(append: [
+            \App\Http\Middleware\HandleInertiaRequests::class,
+        ]);
 
         /* Use the following middleware to check for roles and permissions in routes files */
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'prevent.concurrent' => \App\Http\Middleware\PreventConcurrentSessions::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

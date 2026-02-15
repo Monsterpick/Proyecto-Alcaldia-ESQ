@@ -31,7 +31,7 @@
     darkMode: $persist(localStorage.getItem('darkMode') === 'true' ||
         (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)),
     sidebarOpen: false
-}" x-init="$watch('darkMode', value => document.documentElement.classList.toggle('dark', value))" class="min-h-screen dark:bg-gray-900 bg-white"
+}" x-init="document.documentElement.classList.toggle('dark', darkMode); $watch('darkMode', value => { document.documentElement.classList.toggle('dark', value); localStorage.setItem('darkMode', value); })" class="min-h-screen dark:bg-gray-900 bg-white"
     :class="{ 'dark': darkMode }" x-cloak>
 
     @if (Auth::check())

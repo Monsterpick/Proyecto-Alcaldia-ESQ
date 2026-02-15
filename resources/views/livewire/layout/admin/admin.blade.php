@@ -1,5 +1,35 @@
 @props(['title' => config('app.name', 'Laravel')])
 
+@php
+    // Cargar datos institucionales desde Settings (con cache para performance)
+    $appColors = cache()->remember('app_colors', 60, function () {
+        return [
+            'primary' => \App\Models\Setting::get('color_primary', '#5C0A1E'),
+            'secondary' => \App\Models\Setting::get('color_secondary', '#7A1232'),
+            'buttons' => \App\Models\Setting::get('color_buttons', '#5C0A1E'),
+        ];
+    });
+
+    $appBranding = cache()->remember('app_branding', 60, function () {
+        return [
+            'name' => \App\Models\Setting::get('name', 'Sistema Web de Gestión'),
+            'description' => \App\Models\Setting::get('description', 'Sistema de gestión'),
+        ];
+    });
+
+    // Función para oscurecer un color hex
+    $darken = function($hex, $percent) {
+        $hex = ltrim($hex, '#');
+        $r = max(0, hexdec(substr($hex, 0, 2)) - (255 * $percent / 100));
+        $g = max(0, hexdec(substr($hex, 2, 2)) - (255 * $percent / 100));
+        $b = max(0, hexdec(substr($hex, 4, 2)) - (255 * $percent / 100));
+        return sprintf('#%02x%02x%02x', $r, $g, $b);
+    };
+
+    $primaryDark = $darken($appColors['primary'], 15);
+    $primaryDarker = $darken($appColors['primary'], 25);
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -9,7 +39,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
 
-    <title>{{ $title }} | {{ config('app.name') }}</title>
+    <title>{{ $title }} | {{ $appBranding['name'] }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -192,16 +222,99 @@
             scrollbar-color: var(--color-border-secondary) transparent;
         }
         
-        /* Transiciones suaves */
-        * {
-            transition: background-color 0.15s ease, 
-                        border-color 0.15s ease, 
+        /* Transiciones suaves — solo en elementos interactivos, no en * */
+        button, a, input, select, textarea,
+        .transition-colors {
+            transition: background-color 0.15s ease,
+                        border-color 0.15s ease,
                         color 0.15s ease,
                         box-shadow 0.15s ease;
         }
-        
-        button, a, input, select, textarea {
-            transition: all 0.2s ease;
+
+        /* ===== SIDEBAR - Color Institucional Dinámico ===== */
+        #logo-sidebar {
+            background: linear-gradient(180deg, {{ $primaryDark }} 0%, {{ $primaryDarker }} 100%) !important;
+            border-right: 1px solid rgba(255,255,255,0.08) !important;
+            --color-bg-primary: {{ $primaryDark }};
+            --color-bg-secondary: rgba(255,255,255,0.08);
+            --color-bg-tertiary: rgba(255,255,255,0.12);
+            --color-bg-hover: rgba(255,255,255,0.1);
+            --color-bg-active: rgba(255,255,255,0.15);
+            --color-text-primary: #ffffff;
+            --color-text-secondary: rgba(255,255,255,0.85);
+            --color-text-tertiary: rgba(255,255,255,0.6);
+            --color-text-muted: rgba(255,255,255,0.4);
+            --color-border-primary: rgba(255,255,255,0.1);
+            --color-border-secondary: rgba(255,255,255,0.15);
+            --color-blue-50: rgba(255,255,255,0.12);
+            --color-blue-600: #ffffff;
+            --color-red-50: rgba(255,150,150,0.15);
+            --color-red-600: #fca5a5;
+            --color-red-700: #f87171;
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.3);
+        }
+
+        #logo-sidebar .text-gray-400,
+        #logo-sidebar .dark\:text-gray-500 {
+            color: rgba(255,255,255,0.45) !important;
+        }
+
+        #logo-sidebar .bg-blue-600 {
+            background-color: rgba(255,255,255,0.2) !important;
+        }
+
+        /* Sidebar en modo oscuro - se integra con el tema oscuro global */
+        .dark #logo-sidebar {
+            background: linear-gradient(180deg, #0f172a 0%, #0b1120 100%) !important;
+            border-right-color: #1e293b !important;
+            --color-bg-primary: #0f172a;
+            --color-bg-secondary: #1e293b;
+            --color-bg-tertiary: #334155;
+            --color-bg-hover: #1e293b;
+            --color-bg-active: #1e3a8a;
+            --color-text-primary: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+            --color-text-tertiary: #94a3b8;
+            --color-text-muted: #64748b;
+            --color-border-primary: #334155;
+            --color-border-secondary: #475569;
+            --color-blue-50: #1e3a8a;
+            --color-blue-600: #3b82f6;
+            --color-red-50: #7f1d1d;
+            --color-red-600: #f87171;
+            --color-red-700: #ef4444;
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.6);
+        }
+
+        .dark #logo-sidebar .text-gray-400,
+        .dark #logo-sidebar .dark\:text-gray-500 {
+            color: #64748b !important;
+        }
+
+        .dark #logo-sidebar .bg-blue-600 {
+            background-color: #1e40af !important;
+        }
+
+        /* Scrollbar del sidebar con tema vino (modo claro) */
+        #logo-sidebar .scrollbar-thin::-webkit-scrollbar-thumb {
+            background-color: rgba(255,255,255,0.15);
+        }
+        #logo-sidebar .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255,255,255,0.25);
+        }
+        #logo-sidebar .scrollbar-thin {
+            scrollbar-color: rgba(255,255,255,0.15) transparent;
+        }
+
+        /* Scrollbar del sidebar en modo oscuro */
+        .dark #logo-sidebar .scrollbar-thin::-webkit-scrollbar-thumb {
+            background-color: #334155;
+        }
+        .dark #logo-sidebar .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background-color: #475569;
+        }
+        .dark #logo-sidebar .scrollbar-thin {
+            scrollbar-color: #334155 transparent;
         }
     </style>
     @stack('styles')
@@ -211,34 +324,28 @@
     darkMode: $persist(localStorage.getItem('darkMode') === 'true' ||
         (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)),
     sidebarOpen: false
-}" x-init="$watch('darkMode', value => document.documentElement.classList.toggle('dark', value))" 
+}" x-init="document.documentElement.classList.toggle('dark', darkMode); $watch('darkMode', value => { document.documentElement.classList.toggle('dark', value); localStorage.setItem('darkMode', value); })" 
     class="min-h-screen antialiased"
     style="background-color: var(--color-bg-app); color: var(--color-text-primary);"
     :class="{ 'dark': darkMode }" x-cloak>
 
     @if (Auth::check())
         <!-- Overlay para móviles -->
-        <div class="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 sm:hidden" x-show="sidebarOpen"
+        <div class="fixed inset-0 bg-gray-900/50 z-30 sm:hidden" x-show="sidebarOpen"
             x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-300"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="sidebarOpen = false">
         </div>
-        
-        <!-- Botón flotante para abrir sidebar en móviles -->
-        <button @click="sidebarOpen = true" 
-            class="fixed top-4 left-4 z-30 sm:hidden bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg shadow-lg transition-colors"
-            x-show="!sidebarOpen">
-            <i class="fa-solid fa-bars text-xl"></i>
-        </button>
     @endif
 
     @if (Auth::check())
+        <livewire:layout.admin.includes.navigation />
         <livewire:layout.admin.includes.sidebar />
     @endif
 
     <!-- Main Content -->
     @if (Auth::check())
-        <div class="sm:ml-64 min-h-screen" style="background-color: var(--color-bg-app);">
+        <div class="sm:ml-64 min-h-screen pt-[3.5rem] sm:pt-[3.75rem]" style="background-color: var(--color-bg-app);">
             <div style="color: var(--color-text-primary);">
                 <div class="flex justify-between items-center px-4 pt-6">
 
@@ -280,6 +387,24 @@
             Swal.fire({!! json_encode(session('swal')) !!});
         </script>
     @endif
+    @if (session('show_password_change_alert') && Auth::check() && Auth::user()->hasRole('Director'))
+        <script type="module">
+            Swal.fire({
+                icon: 'info',
+                title: 'Cambio de contraseña recomendado',
+                html: 'Por seguridad, te recomendamos cambiar tu contraseña en tu primer acceso. Puedes hacerlo desde tu <strong>Perfil</strong>.',
+                confirmButtonText: 'Ir a mi perfil',
+                confirmButtonColor: '#2563eb',
+                showCancelButton: true,
+                cancelButtonText: 'Más tarde',
+                cancelButtonColor: '#6b7280'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '{{ route("admin.settings.profile") }}';
+                }
+            });
+        </script>
+    @endif
 
     <script>
         document.addEventListener('livewire:navigated', () => {
@@ -288,6 +413,85 @@
 
         Livewire.on('swal', data => {
             Swal.fire(data[0]);
+        });
+
+        // ===== Aplicar colores institucionales en tiempo real =====
+        Livewire.on('colors-updated', (data) => {
+            const colors = data[0];
+            const primary = colors.primary;
+            const secondary = colors.secondary;
+
+            // Función JS para oscurecer un color hex
+            function darkenHex(hex, percent) {
+                hex = hex.replace('#', '');
+                let r = Math.max(0, parseInt(hex.substring(0, 2), 16) - Math.round(255 * percent / 100));
+                let g = Math.max(0, parseInt(hex.substring(2, 4), 16) - Math.round(255 * percent / 100));
+                let b = Math.max(0, parseInt(hex.substring(4, 6), 16) - Math.round(255 * percent / 100));
+                return '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('');
+            }
+
+            const primaryDark = darkenHex(primary, 15);
+            const primaryDarker = darkenHex(primary, 25);
+            const isDark = document.documentElement.classList.contains('dark');
+
+            // 1. Actualizar la Navbar
+            const navbar = document.querySelector('nav.fixed.top-0');
+            if (navbar) {
+                if (!isDark) {
+                    navbar.style.background = `linear-gradient(to right, ${primary}, ${secondary}, ${primary})`;
+                }
+                // Guardar los colores en data-attributes para el toggle de dark mode
+                navbar.dataset.colorPrimary = primary;
+                navbar.dataset.colorSecondary = secondary;
+            }
+
+            // 2. Actualizar el Sidebar (solo en modo claro)
+            const sidebar = document.getElementById('logo-sidebar');
+            if (sidebar && !isDark) {
+                sidebar.style.background = `linear-gradient(180deg, ${primaryDark} 0%, ${primaryDarker} 100%)`;
+                sidebar.style.setProperty('--color-bg-primary', primaryDark);
+            }
+
+            // 3. Actualizar la hoja de estilos dinámica
+            let styleEl = document.getElementById('dynamic-institutional-colors');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'dynamic-institutional-colors';
+                document.head.appendChild(styleEl);
+            }
+            styleEl.textContent = `
+                #logo-sidebar {
+                    background: linear-gradient(180deg, ${primaryDark} 0%, ${primaryDarker} 100%) !important;
+                    --color-bg-primary: ${primaryDark};
+                }
+                .dark #logo-sidebar {
+                    background: linear-gradient(180deg, #0f172a 0%, #0b1120 100%) !important;
+                    --color-bg-primary: #0f172a;
+                }
+            `;
+        });
+
+        // ===== Aplicar branding (nombre/logo) en tiempo real =====
+        Livewire.on('branding-updated', (data) => {
+            const branding = data[0];
+
+            // 1. Actualizar el nombre en la navbar
+            const navTitle = document.querySelector('nav.fixed.top-0 .logo-text');
+            if (navTitle && branding.name) {
+                navTitle.textContent = branding.name;
+            }
+
+            // 2. Actualizar el logo en la navbar
+            const navLogo = document.querySelector('nav.fixed.top-0 .logo-img');
+            if (navLogo && branding.logo) {
+                navLogo.src = branding.logo;
+            }
+
+            // 3. Actualizar el título de la página
+            if (branding.name) {
+                const titleParts = document.title.split(' | ');
+                document.title = titleParts[0] + ' | ' + branding.name;
+            }
         });
 
         document.addEventListener('livewire:initialized', () => {

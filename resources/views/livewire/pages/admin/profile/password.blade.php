@@ -1,10 +1,8 @@
 <?php
 
+use App\Services\DirectorCredentialsService;
 use Livewire\Volt\Component;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
@@ -27,10 +25,21 @@ new class extends Component {
 
             throw $e;
         }
-        
-        Auth::user()->update([
-            'password' => Hash::make($validated['password']),
+
+        $user = Auth::user();
+        $user->update([
+            'password' => $validated['password'],
+            'password_changed_at' => now(),
         ]);
+
+        if ($user->hasRole('Director') && $user->director) {
+            app(DirectorCredentialsService::class)->enviarCredencialesWhatsApp(
+                $user->director,
+                $user->email,
+                $validated['password'],
+                true
+            );
+        }
 
         $this->reset('current_password', 'password', 'password_confirmation');
 
@@ -39,7 +48,6 @@ new class extends Component {
             'icon' => 'success',
             'text' => 'La contraseña se ha actualizado correctamente',
         ]);
-        
     }
 }; ?>
 

@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasColumn('reports', 'pdf_path')) {
+            return;
+        }
+
         Schema::table('reports', function (Blueprint $table) {
             $table->string('pdf_path')->nullable()->after('status');
         });

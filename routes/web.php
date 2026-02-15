@@ -2,10 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+use App\Http\Controllers\WelcomeController;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+// Página pública principal con Inertia + React
+Route::get('/', [WelcomeController::class, 'index'])->name('home');
+
+// Formulario Alcaldía Digital (React) - rate limit: 5 solicitudes/min por IP
+Route::post('/solicitud', [WelcomeController::class, 'storeSolicitud'])
+    ->middleware('throttle:5,1')
+    ->name('solicitud.store');
 
 Route::middleware(['auth'])->group(function () {
 

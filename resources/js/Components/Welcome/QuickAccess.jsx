@@ -1,4 +1,3 @@
-import { Link } from '@inertiajs/react';
 import { useTheme } from '@/Components/Theme/ThemeProvider';
 import Icon from '@/Components/Icons/Icon';
 import SectionReveal from '@/Components/UI/SectionReveal';
@@ -41,14 +40,14 @@ export default function QuickAccess({ settings }) {
                         <p className="text-gray-600 text-sm sm:text-base mb-4">
                             Control de beneficios, estadísticas y reportes del Municipio Escuque en tiempo real.
                         </p>
-                        <Link
+                        <a
                             href="/login"
                             className="inline-flex items-center gap-2 font-semibold hover:underline transition-colors"
                             style={{ color: theme.colors.primary }}
                         >
                             Acceder al sistema
                             <Icon name="arrow-right" className="w-4 h-4" />
-                        </Link>
+                        </a>
                     </div>
 
                     {/* Servicios Municipales */}

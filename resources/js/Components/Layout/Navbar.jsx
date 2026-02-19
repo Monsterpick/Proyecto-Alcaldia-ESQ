@@ -274,12 +274,13 @@ export default function Navbar({ settings }) {
                         ) : (
                             <a 
                                 href="/login" 
-                                className="block px-4 py-3 rounded-lg font-bold text-white text-center transition-smooth"
+                                className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] rounded-lg font-bold text-white text-center transition-smooth"
                                 style={{ backgroundColor: theme.colors.primary }}
                                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#991b1b'; }}
                                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = theme.colors.primary; }}
+                                onClick={() => setMobileMenuOpen(false)}
                             >
-                                <Icon name="logout" className="w-5 h-5 inline mr-2" />
+                                <Icon name="logout" className="w-5 h-5" />
                                 Ingresar
                             </a>
                         )}

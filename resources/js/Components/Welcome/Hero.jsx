@@ -1,4 +1,3 @@
-import { Link } from '@inertiajs/react';
 import { useTheme } from '@/Components/Theme/ThemeProvider';
 import Icon from '@/Components/Icons/Icon';
 import useInViewAnimation from '@/hooks/useInViewAnimation';
@@ -95,7 +94,7 @@ export default function Hero({ settings }) {
 
                 {/* Botones */}
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
-                    <Link
+                    <a
                         href="/login"
                         className="inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 text-white rounded-lg font-bold text-base sm:text-lg shadow-2xl transition-smooth hover:scale-105 w-full sm:w-auto"
                         style={{ backgroundColor: theme.colors.primary }}
@@ -104,7 +103,7 @@ export default function Hero({ settings }) {
                     >
                         <Icon name="logout" className="w-5 h-5" />
                         <span>Acceder al Sistema</span>
-                    </Link>
+                    </a>
                     <a 
                         href="#formulario" 
                         onClick={handleNavClick}

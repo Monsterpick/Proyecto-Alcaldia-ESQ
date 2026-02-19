@@ -105,8 +105,8 @@ return new class extends Migration
             });
         }
 
-        // USERS - Optimizar autenticación
-        if (Schema::hasTable('users')) {
+        // USERS - Optimizar autenticación (solo si existe la columna telegram_chat_id)
+        if (Schema::hasTable('users') && Schema::hasColumn('users', 'telegram_chat_id')) {
             Schema::table('users', function (Blueprint $table) use ($indexExists) {
                 if (!$indexExists('users', 'idx_users_telegram_chat_id')) {
                     $table->index('telegram_chat_id', 'idx_users_telegram_chat_id');
@@ -180,7 +180,7 @@ return new class extends Migration
             });
         }
 
-        if (Schema::hasTable('users')) {
+        if (Schema::hasTable('users') && Schema::hasColumn('users', 'telegram_chat_id')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->dropIndex('idx_users_telegram_chat_id');
             });

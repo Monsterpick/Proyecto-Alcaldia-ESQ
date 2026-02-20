@@ -24,6 +24,12 @@ class TelegramBotController extends Controller
     public function webhook()
     {
         try {
+            // Log para verificar que las peticiones llegan a ESTE servidor (útil tras cambio de servidor)
+            logger()->info('Telegram webhook: petición recibida en este servidor', [
+                'app_url' => config('app.url'),
+                'timestamp' => now()->toIso8601String(),
+            ]);
+
             $update = Telegram::getWebhookUpdate();
             
             // Obtener información del usuario de Telegram
@@ -613,6 +619,16 @@ class TelegramBotController extends Controller
     public function getMe()
     {
         $result = $this->telegramService->getBotInfo();
+        return response()->json($result);
+    }
+
+    /**
+     * Obtener información del webhook actual (URL a la que Telegram envía las actualizaciones)
+     * Útil para verificar si el webhook apunta a este servidor o al anterior.
+     */
+    public function getWebhookInfo()
+    {
+        $result = $this->telegramService->getWebhookInfo();
         return response()->json($result);
     }
 

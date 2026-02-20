@@ -226,6 +226,7 @@ Route::prefix('telegram')->group(function () {
     Route::post('/set-webhook', [App\Http\Controllers\TelegramBotController::class, 'setWebhook']);
     Route::post('/remove-webhook', [App\Http\Controllers\TelegramBotController::class, 'removeWebhook']);
     Route::get('/me', [App\Http\Controllers\TelegramBotController::class, 'getMe']);
+    Route::get('/webhook-info', [App\Http\Controllers\TelegramBotController::class, 'getWebhookInfo']);
     Route::post('/test', [App\Http\Controllers\TelegramBotController::class, 'sendTestMessage']);
 });
 

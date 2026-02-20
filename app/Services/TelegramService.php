@@ -193,4 +193,26 @@ class TelegramService
             ];
         }
     }
+
+    /**
+     * Obtener información actual del webhook (URL a la que Telegram envía las actualizaciones)
+     */
+    public function getWebhookInfo(): array
+    {
+        try {
+            $info = Telegram::getWebhookInfo();
+            $data = is_array($info) ? $info : $info->toArray();
+            return [
+                'success' => true,
+                'data' => $data,
+                'current_url' => $data['url'] ?? null,
+                'pending_update_count' => $data['pending_update_count'] ?? 0,
+            ];
+        } catch (TelegramSDKException $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
 }
